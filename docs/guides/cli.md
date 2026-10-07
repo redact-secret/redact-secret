@@ -89,6 +89,17 @@ redact-secret --pii pii --print-pii-activation
 # credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v2
 ```
 
+`--print-artifact-manifest` prints this binary's `artifact-manifest/v1` document
+(build identity, the built-in detectors in canonical order with the finding types
+each can emit, the PII runtime, capabilities, defaults, bounds and a digest) as
+one line of JSON and exits without reading input. It accepts no other argument.
+Each detector's `types` list is its declared types, not a closed vocabulary: a
+ruleset and the PII adapter emit others.
+
+```bash
+redact-secret --print-artifact-manifest
+```
+
 With no paths, the CLI reads standard input. With paths, check mode reads each
 file; redaction accepts exactly one. It does not recursively walk directories
 or modify files in place. Use different input and output paths: shell redirection

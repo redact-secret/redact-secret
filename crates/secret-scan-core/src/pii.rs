@@ -154,6 +154,24 @@ impl PiiSelection {
         self.selectors.is_empty()
     }
 
+    /// The `off` selection as a constant, for a `const` constructor.
+    pub(crate) const fn empty() -> Self {
+        Self {
+            selectors: Vec::new(),
+            families: Vec::new(),
+        }
+    }
+
+    /// The canonical selectors, sorted; empty when off.
+    pub(crate) fn selectors(&self) -> &[String] {
+        &self.selectors
+    }
+
+    /// The families the selectors close over, sorted; empty when off.
+    pub(crate) fn families(&self) -> &[String] {
+        &self.families
+    }
+
     /// Canonical activation identity for `profile`.
     #[must_use]
     pub fn activation_identity(&self, profile: crate::Profile) -> String {
@@ -208,6 +226,13 @@ fn valid_slug(value: &str) -> bool {
 fn selector_to_family(selector: &str) -> Option<String> {
     let rest = selector.strip_prefix("pii:family:")?;
     Some(format!("pii:{rest}"))
+}
+
+/// The canonical ids of the PII families a PII-enabled artifact can activate,
+/// sorted. Pure data: reading it builds no registry and touches no
+/// activation state (issue #1250).
+pub(crate) const fn available_families() -> &'static [&'static str] {
+    AVAILABLE_FAMILIES
 }
 
 pub(crate) fn is_reserved_detector_id(id: &str) -> bool {

@@ -378,12 +378,12 @@ mapped to the same fixed error vocabulary.
 
 ## Public API
 
-Runtime values: `initialize`, `artifact`, `scan`, `redact`, `scanAndRedact`,
-`compareActionPolicies`, `piiActivation`, `status`, `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
+Runtime values: `initialize`, `artifact`, `artifactManifest`, `resolveConfig`, `describeConfig`, `scan`, `redact`, `scanAndRedact`,
+`compareActionPolicies`, `compareConfigurations`, `piiActivation`, `status`, `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
 `defaultPolicy`, `typedPlaceholderFormatter`, `SecretScanError`, `RANGE_UNIT`,
 `VERSION`, `PROFILE`.
 
-Types: `InitializeOptions`, `CoreStatus`, `ArtifactKind`, `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
+Types: `InitializeOptions`, `CoreStatus`, `ArtifactKind`, `ArtifactManifest`, `ArtifactManifestDetector`, `DetectionSelection`, `RuntimeConfig`, `ResolveConfigOptions`, `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic`, `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
 `SecretConfidence`, `SecretObfuscation`, `SecretPolicy`, `PolicyContext`, `PlaceholderFormatter`,
 `PlaceholderContext`, `ScanOptions`, `RedactOptions`, `ScanAndRedactOptions`,
 `ScanResult`, `WholeInputLimits`, `IncrementalSanitizer`, `IncrementalSanitizerOptions`,
@@ -394,7 +394,104 @@ Types: `InitializeOptions`, `CoreStatus`, `ArtifactKind`, `DetectedSecretFinding
 `CompareActionPoliciesOptions`, `ComparedPolicy`, `ComparedPolicyKind`,
 `ActionComparison`, `ComparedPolicySummary`, `ComparisonDetection`,
 `ComparedFinding`, `ActionDecision`, `ActionCounts`, `DecisionBasis`,
+`CompareConfigurationsOptions`, `ConfigurationComparison`, `ConfigurationSideResult`,
+`ConfigurationFinding`, `ConfigurationDifferences`, `ConfigurationDifference`,
+`ConfigurationChange`, `ComparedConfigurationSummary`, `ComparedSideStatus`,
 `RangeUnit`, `SecretScanErrorCode`.
+
+`compareConfigurations(input, { configs, actionPolicy?, policy? })` previews what a
+change of detector selection, PII selection, ruleset, action policy or limits does to
+one input: one independent pass per `RuntimeConfig` side (one to four, the first is
+the baseline), each over a temporary registry, then the differences against the first
+side (`added`, `removed`, `changed` with the changed attributes, and the ambiguous
+`split`, `merged`, `regrouped`). It is a preview scoped to that input, never
+enforcement, changes no owner and returns no text; a side that cannot be built or hits
+a limit is reported with a fixed code and gets no difference. See the
+[API contract](https://github.com/redact-secret/redact-secret/blob/main/docs/reference/api-contract.md#configuration-comparison).
+
+`artifactManifest()` returns what the loaded artifact contains and supports
+(`artifact-manifest/v1`): the built-in detectors in canonical order with the
+finding types each can emit, the `variant` (`full` or `common`), whether the PII
+runtime is linked, capabilities, defaults, bounds and a `digest`. It reads the
+artifact `initialize()` loaded, takes no input, builds no registry and reads or
+changes no PII activation. The result is frozen and holds no input or secret.
+Each `types` list is that detector's declared types, not a closed vocabulary
+(`typeVocabulary.complete` is `false`), and `capabilities.detectorSelection`
+says whether the artifact supports runtime detector selection (it does here).
+
+```ts
+import { artifactManifest, initialize } from "@redact-secret/core";
+
+await initialize();
+const manifest = artifactManifest();
+const ids = manifest.detectors.map((detector) => detector.id); // canonical order
+console.log(manifest.artifact.variant, ids.length);
+```
+
+### Choosing detectors and resolving the effective configuration
+
+`initialize({ detection })` chooses which of the artifact's included built-in
+detectors are enabled, by `Finding.detector` id: `include` is an allowlist (a
+detector added in a later release stays off), `exclude` a denylist (a later
+detector is on), never both, at most 256 ids. It is applied when the registry is
+built, before the prefilter and overlap, so a disabled detector produces no
+candidate and no overlap competitor; the enabled set is the artifact's canonical
+order whatever order you wrote. Like `pii` it is fixed by the first successful
+`initialize()`: an equivalent later request is idempotent, a different one
+(including a plain `initialize()`) is `DETECTION_CONFIG_CONFLICT`, and a
+rejected or conflicting request changes nothing. An unknown, repeated or
+not-included id is `INVALID_DETECTION_CONFIG` (the `common` entry point never
+loads `full` to satisfy a provider id), a selection that leaves nothing enabled
+is `EMPTY_DETECTION_SET`, and a `detection` key on `scan`, `scanAndRedact`,
+`redact` or a session is `INVALID_OPTIONS`: there is no per-call or later
+detection setting. A session takes the owner's selection when it is created.
+Disabling a built-in can move a span to a weaker detector's type and action
+rather than remove it, and it weakens coverage: keep server-side enforcement on
+an unselected `full`.
+
+`resolveConfig(config?, options?)` shows the effect before you commit. It resolves
+what you ask for (`detection`, `pii`, `ruleset`, `actionPolicy`, `limits`, and a
+callback as `options.policy`) over the artifact's defaults into a frozen
+snapshot and every safe diagnostic. Absent inherits, an explicit empty disables,
+arrays and policy documents replace and are never merged, and the table is the
+Rust core's, not this package's. Invalid input is `ok: false` with diagnostics,
+not a throw; it scans nothing, builds no registry and changes nothing.
+`describeConfig()` takes no input and returns the configuration this runtime is
+fixed to; `status().configuration` is its `digest`. The snapshot reports compiled,
+enabled, disabled and unavailable detectors separately (an `allow` rule is not a
+disabled detector), where each value came from, and the identity of the
+artifact, the detection, the exact policy document and the snapshot. It holds
+ids, counts and digests only, and withholds a ruleset's ids and digest unless
+`discloseRulesetIdentity` is set. A callback is recorded as a dynamic reference,
+`explainable: false`.
+
+When you pass an `actionPolicy`, the diagnostics also check it against the
+artifact's catalog and your selection, without changing how it loads. They warn
+about a rule `type` no included detector declares
+(`ACTION_POLICY_UNKNOWN_TYPE`), a `detector` nobody knows
+(`ACTION_POLICY_UNKNOWN_DETECTOR`), a detector that is compiled but disabled
+(`ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR`) or not in this artifact
+(`ACTION_POLICY_RULE_ON_NOT_INCLUDED_DETECTOR`), and a rule an earlier rule
+provably covers (`ACTION_POLICY_SHADOWED_RULE`; `related` points at the earlier
+rule). A callback, or a name a ruleset or PII selection could emit, is reported
+as `info` `ACTION_POLICY_ANALYSIS_UNCERTAIN`. No input name is echoed, only its
+position. See the [action policy guide](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/action-policy.md#diagnose-a-policy-before-use).
+
+```ts
+import { describeConfig, initialize, resolveConfig, status } from "@redact-secret/core";
+
+// Look first: nothing is initialized or changed by a preview.
+await initialize();
+const preview = resolveConfig({ detection: { exclude: ["jwt"] } });
+if (preview.ok && preview.snapshot !== null) {
+  console.log(preview.snapshot.detection.mode, preview.snapshot.detection.disabled);
+  console.log(preview.snapshot.effects.overlapOutcomesMayChange);
+}
+for (const item of preview.diagnostics.items) console.log(item.severity, item.code, item.path);
+
+// What this runtime is fixed to (the default selection, here).
+console.log(describeConfig().digest === status().configuration); // true
+```
 
 PII activation is opt-in and off by default. Pass `pii` selectors to
 `initialize`, for example `await initialize({ pii: ["pii"] })`, then read the

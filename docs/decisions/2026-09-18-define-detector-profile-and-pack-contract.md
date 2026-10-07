@@ -47,7 +47,9 @@ Two **profiles** are supported: `full`, the default, and `common`. Their
 membership comes from exactly two internal **packs**. Compile-time composition
 works through **reachability of a per-profile registry constructor**. It does
 not use Cargo features on the published crates. Runtime detector selection by
-detector id is not offered on any surface.
+detector id is not offered on any surface. (Amended by [`decision-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support`](2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md):
+selection by id is offered inside an artifact's compiled ceiling on Rust, Node and
+WebAssembly.)
 
 ### Terms
 
@@ -76,7 +78,8 @@ detector id is not offered on any surface.
   should run `full`.
 
 Profiles are nested (`common` ⊂ `full`). A new profile must be a union of
-declared packs. Consumers never compose profiles at build time.
+declared packs. Consumers never compose profiles at build time. (Amended by [`decision-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support`](2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md): a static custom
+**composition** is allowed, qualified per exact artifact, and is not a profile.)
 
 ### Pack membership
 
@@ -321,7 +324,8 @@ For every supported profile and surface that exposes it:
   would still be downloaded (#377: runtime selection alone is not enough). It is
   kept only where size does not matter: the Node addon, whose semantics match
   the compiled `common` artifact.
-- **Runtime allow or deny lists by detector id.** These create unqualifiable
+- **Runtime allow or deny lists by detector id.** (Superseded in part by [`decision-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support`](2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md),
+  which bounds these costs with strict rejection, diagnostics and an oracle.) These create unqualifiable
   combinations and change overlap outcomes without review. They also invite
   silent coverage loss at enforcement boundaries.
 - **A `build.rs`-generated registry from an external manifest.** This adds a
@@ -347,7 +351,7 @@ For every supported profile and surface that exposes it:
   a dynamically loaded, network-fetched, or callback-shaped extension
   mechanism, which stays excluded.)
 - No online credential validation.
-- No custom detector callbacks across FFI, and no user-composed profiles.
+- No custom detector callbacks across FFI, and no user-composed profiles. (Amended by [`decision-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support`](2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md): the second clause now concerns profiles only; a composition is not a profile.)
 - No `common` profile for Python or the CLI in this contract.
 - No change to `full` membership, canonical order, findings, or default exports.
 - No release, version choice, or publication. That remains under

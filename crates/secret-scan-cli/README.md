@@ -24,6 +24,7 @@ usage: redact-secret [--json] [--ruleset <path>] [--action-policy <path>] [--pii
        redact-secret --redact [--ruleset <path>] [--action-policy <path>] [--pii <selector>]... [--] [<path>]
        redact-secret --compare-action-policy <path>... [--action-policy <path>] [--json] [--ruleset <path>] [--pii <selector>]... [--] <path>
        redact-secret --print-pii-activation [--pii <selector>]...
+       redact-secret --print-artifact-manifest
        redact-secret --version | -V
        redact-secret --help | -h
 ```

@@ -61,6 +61,9 @@ Current rules: `docs/specs/engine.md`.
 - [Define the versioned declarative action policy and its default overlay](2026-10-06-define-the-versioned-declarative-action-policy-and-default-overlay.md)
 - [Explain and compare action policies over one detection pass](2026-10-06-explain-and-compare-action-policies-over-one-detection-pass.md)
 - [Keep the configuration-bound scanner handle out of 0.1.x for Node, WebAssembly and Python](2026-10-06-keep-the-configuration-bound-scanner-handle-out-of-0-1-x-for-node-webassembly-and-python.md)
+- [Define detector-id selection and configuration replacement precedence](2026-10-07-define-detector-id-selection-and-configuration-replacement-precedence.md)
+- [Define the artifact manifest and configuration data contracts](2026-10-07-define-the-artifact-manifest-and-configuration-data-contracts.md)
+- [Define the configuration capability ceiling, runtime ownership and surface support](2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md)
 
 ## Distribution
 

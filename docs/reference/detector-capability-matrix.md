@@ -32,15 +32,17 @@ only layer that changes what can be found at all.
 | `full` profile | supported (`with_built_in*`) | supported (root export) | supported (default artifact) | supported (the only profile) | supported (the only profile) |
 | `common` profile | supported (`with_common_built_in*`) | supported (`@redact-secret/core/common`; the addon links both and exposes `*Common` functions) | supported (separate `common` artifact, chosen at build time by the `full` Cargo feature) | **extension** (`profile()` is the constant `full`; adding `*_common` functions follows the Node pattern) | **extension** (no profile flag; `Profile::Full` only) |
 | Both profiles in one process | supported | supported (independent registries and PII cells per profile) | supported (two module instances) | unsupported | unsupported (one profile per invocation) |
-| Disable or select one detector by id at run time | unsupported | unsupported | unsupported | unsupported | unsupported |
+| Disable or select one detector by id at run time | **proposed** (accepted by the [#1249 records](#6-configuration-epic-1246-surface-matrix), not built) | **proposed** (`initialize`) | **proposed** (`initialize`) | unsupported | unsupported |
 | Register a custom Rust `Detector` | supported (`DetectorRegistry::register`, `!Send`) | unsupported | unsupported | unsupported | unsupported |
 | Declarative ruleset (adds detectors) | supported (`load_ruleset` into `DetectorRegistry`; not `BuiltInRegistry`) | supported (argument of `scan`, `scanAndRedact`; not incremental) | supported (same, per module instance) | supported (`ruleset=` of `scan`, `scan_and_redact`; not incremental) | supported (`--ruleset <path>`; refused with standard input) |
 | PII selector | per registry or session (`PiiSelection`) | one-shot per thread and profile (`initialize({ pii })`) | one-shot per module instance; only the `pii` artifact variant accepts a selection | one-shot per process (`initialize(pii=...)`) | per invocation (`--pii`, repeatable) |
 
-Per-detector runtime selection is excluded by the
-[profile and pack contract](../decisions/2026-09-18-define-detector-profile-and-pack-contract.md)
-("Runtime detector selection by detector id is not offered on any surface"). A
-profile is the unit of selection; a ruleset only adds.
+The [profile and pack contract](../decisions/2026-09-18-define-detector-profile-and-pack-contract.md)
+excluded per-detector runtime selection; the [#1249 records](../decisions/2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md)
+amended that for Rust, Node and WebAssembly, and section 6 has what shipped
+with #1251: a selection by detector id, fixed once by the initialization owner,
+within the artifact's compiled detectors. A profile is still the named unit; a
+ruleset only adds; Python and the CLI stay profile-only.
 
 ### Detector disabling and overlap
 
@@ -159,9 +161,102 @@ Effects:
   Node and Python ship native code, so a profile or PII choice does not change
   their download size.
 
-## 6. What this does not authorize
+## 6. Configuration epic #1246 surface matrix
 
-- No per-detector selection, no numeric sensitivity or confidence threshold,
+Decided by the [#1249 records](../decisions/2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md) ([data contracts](../decisions/2026-10-07-define-the-artifact-manifest-and-configuration-data-contracts.md), [selection and precedence](../decisions/2026-10-07-define-detector-id-selection-and-configuration-replacement-precedence.md)).
+**existing** is shipped; **proposed** is accepted but not built, so do not
+promise it before its issue lands; **unsupported** is excluded until a consumer
+requirement with evidence reopens it. The rows above are unchanged unless named.
+
+| Capability (issue) | Rust | Node | WASM, browser | Python | CLI |
+| --- | --- | --- | --- | --- | --- |
+| `full`, `common` profiles | existing | existing | existing | existing (`full`) | existing (`full`) |
+| Artifact manifest, generated from the real composition (#1250) | existing (`ArtifactManifest`) | existing (`artifactManifest()`; addon `artifactManifest`, `artifactManifestCommon`) | existing (`artifactManifest()`; one manifest per built artifact) | existing (`artifact_manifest()`) | existing (`--print-artifact-manifest`) |
+| `resolveConfig`, `describeConfig`, `status().configuration` (#1251) | existing (`resolve_config`, `describe_config`) | existing (`resolveConfig()`, `describeConfig()`, `status().configuration`; addon `resolveConfig`, `resolveConfigCommon`) | existing (`resolveConfig()`, `describeConfig()`; module export `resolveConfig`) | unsupported | unsupported |
+| Safe diagnostics, including action policy typos, unavailable detectors and provably shadowed rules (#1252) | existing (`resolve_config`; `ConfigRequest::closed_types`, `closed_detectors` and `SampleRuleHits` are Rust only) | existing (`resolveConfig()` diagnostics) | existing (`resolveConfig()` diagnostics) | unsupported | unsupported |
+| Runtime detector-id selection, owned by `initialize` or the registry (#1251) | existing (`DetectorRegistry::with_detection`) | existing (`initialize({ detection })`; addon `initializeDetection`, `initializeCommonDetection`) | existing (`initialize({ detection })`; module `initialize(pii, detection)`) | unsupported | unsupported |
+| Static custom composition (#1253) | existing (`redact_secret::composition`, `DetectorRegistry::with_composition`) | unsupported | existing (`npm run wasm:build:custom`; a generated leaf crate, `PROFILE` `"custom"`; [guide](../guides/custom-composition.md)) | unsupported | unsupported |
+| `compareConfigurations`, per call, preview only (#1254) | existing (`compare_configurations` over registries the caller builds) | existing (`compareConfigurations()`; addon `scanConfigurationSide`, `scanConfigurationSideCommon`) | existing (`compareConfigurations()`; module `scanConfigurationSide`) | unsupported | unsupported |
+| Action policy and `compareActionPolicies` | existing | existing | existing | policy only | existing |
+| Configuration-bound handle for Node, WASM, Python | n/a | unsupported (#1222) | unsupported (#1222) | unsupported (#1222) | n/a |
+| NER, sensitivity percentage, identity-gate control | unsupported | unsupported | unsupported | unsupported | unsupported |
+
+Included, enabled, emitted and action are four levels, and a later level never
+exceeds the earlier one; an unsupported request is rejected, never ignored or
+fetched.
+
+### The artifact manifest (#1250)
+
+`artifact-manifest/v1` is the **included** level, read without a scan and
+without initialization. The Rust core generates it from the registration rows
+the artifact links, so a binding forwards one value and keeps no detector,
+pack or type table of its own. What it says and does not say:
+
+- **Native linking is described as it is.** The Node addon and the Python wheel
+  link the `full` registry (the addon also links `common`, exposing a second
+  manifest through `artifactManifestCommon`); the manifest reports what each
+  profile contains. Importing `@redact-secret/core/common` selects the `common`
+  registry and a `common` manifest, but the addon file is the same one: it makes
+  no claim of a smaller native download. Only the WebAssembly `common` build is
+  smaller, and its manifest names the `full` ids it lacks as ids only.
+- **Types are declared, not closed.** `detectors[].types` is each built-in's
+  reviewed declaration (`docs/coverage/detector-inventory.json`, reconciled in
+  the Rust drift tests). A ruleset, a custom Rust detector and the PII adapter
+  emit types the list does not name, so `typeVocabulary.complete` is `false`
+  and `dynamicSources` says which.
+- **No side effect.** Reading it builds no registry and reads no PII
+  selection, so it cannot start or lock the legacy PII activation: a later
+  `initialize({ pii })` still applies. The JavaScript `artifactManifest()`
+  reports the artifact `initialize()` loaded, so it follows a successful
+  `initialize()` there; the Python function, the CLI flag and the Rust API need
+  none.
+- **Bound to the artifact, not to a second pipeline.** The manifest is part of the
+  binary, so the artifact digests the release process already records cover it;
+  its own `digest` is the SHA-256 of its canonical JSON, and the facade checks it
+  at `initialize()`. Its `sourceRevision` is `null` unless the build set
+  `REDACT_SECRET_SOURCE_REVISION`. It is not the release manifest and carries no
+  provenance record.
+- **Fixed diagnostics.** A manifest that is missing, of another schema or
+  version, of another variant, or whose digest is not its own fails
+  `initialize()` with `INITIALIZATION_FAILED` and echoes none of the document.
+
+### Detector selection and configuration resolution (#1251)
+
+Implemented once in the Rust core; every binding forwards to it and keeps no
+precedence table, detector list or default of its own. What it does and does
+not say:
+
+- **Selection acts at composition.** A disabled detector is not prefiltered and
+  has no candidate or overlap role. The prefilter is recompiled over the
+  survivors, so a disabled detector costs nothing at scan time, and the PII
+  activation identity is unchanged. The cost is the one this matrix measured:
+  with `common`, a bare provider token disappears, and after `API_KEY=` a span
+  becomes `contextual_secret` with another default action. The snapshot flags
+  it (`effects.overlapOutcomesMayChange`) and `resolveConfig` reports
+  `OVERLAP_OUTCOMES_MAY_CHANGE`.
+- **The four levels are separate in the snapshot.** Compiled
+  (`detection.compiledCount`), enabled and disabled (`detection.enabled`,
+  `detection.disabled`) and unavailable (`detection.unavailable`, the `full`
+  built-ins this artifact lacks) are distinct lists; an action policy never
+  appears in them, and an `allow` rule changes nothing in `detection`.
+- **Above the ceiling is refused, not ignored.** `common` rejects a `provider`
+  id as `DETECTOR_NOT_INCLUDED` and never loads `full`; an artifact without
+  the PII runtime rejects a PII selection as `PII_SELECTOR_UNAVAILABLE`; the
+  Python wheel and the CLI report `detectorSelection: false` and reject a
+  selection as `DETECTION_SELECTION_UNSUPPORTED`.
+- **One owner, fixed once.** Selection joins the one-shot contract of the PII
+  selection; nothing reconfigures an owner, a session fixes the owner's
+  configuration at creation and takes no ruleset, and a second JavaScript
+  wrapper still shares the entry singleton. An owner that enables nothing is
+  `EMPTY_DETECTION_SET`.
+- **Snapshots are data.** They cannot scan, hold no input, ruleset body, rule
+  pattern, value or path, withhold the ruleset's ids and digest by default, and
+  carry no scalar sensitivity or percentage. A callback is a labelled dynamic
+  reference, not reproducible behavior.
+
+## 7. What this does not authorize
+
+- No per-detector selection beyond the rows of section 6 (Rust, Node and WebAssembly only), no numeric sensitivity or confidence threshold,
   and no change to the identity and sensitivity gate is offered.
 - No second, reconfigurable global; a handle, when one is added, is built
   once with a fixed selection and never mutated.

@@ -980,11 +980,16 @@ pub fn sanitize(input: &str) -> Result<ScanResult, SecretScanError> {
 ///
 /// # Errors
 ///
-/// See [`sanitize`].
+/// See [`sanitize`]. [`Profile::Custom`] is not a selectable profile (a
+/// composition is built with [`composition::Composition`](crate::composition::Composition)),
+/// so it fails with [`SecretScanErrorCode::InvalidOptions`].
 pub fn sanitize_with_profile(input: &str, profile: Profile) -> Result<ScanResult, SecretScanError> {
     let registry = match profile {
         Profile::Full => DetectorRegistry::with_built_in([])?,
         Profile::Common => DetectorRegistry::with_common_built_in([])?,
+        // A composition is not selectable by profile: its registry is built
+        // from a `Composition`, which holds the detectors this call lacks.
+        Profile::Custom => return Err(SecretScanErrorCode::InvalidOptions.into()),
     };
     scan_and_redact(
         input,

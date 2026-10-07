@@ -34,6 +34,14 @@ crate-type = ["cdylib", "rlib"]
 default = ["full"]
 full = []
 pii = []
+# `custom` (issue #1253) is the third build shape: a static custom composition.
+# It replaces `full` and `common`, so it is built with `--no-default-features`
+# by a generated leaf crate, which names the selected per-detector constructors
+# of `redact_secret::composition` and installs them through `custom::install`.
+# This crate then references no built-in constructor of its own. Enabling both
+# `full` and `custom` is a mistake the artifact's `profile()` ("custom") makes
+# visible.
+custom = []
 
 [dependencies]
 redact-secret.workspace = true

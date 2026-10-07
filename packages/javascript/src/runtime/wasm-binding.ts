@@ -127,8 +127,18 @@ export interface WasmModule {
   default(source?: { module_or_path: Uint8Array | object }): Promise<unknown>;
   version(): string;
   profile(): string;
-  initialize(pii: readonly string[]): void;
+  initialize(pii: readonly string[], detection?: string): void;
   piiActivation(): string;
+  /** The artifact's `artifact-manifest/v1` document as JSON text (side-effect free). */
+  artifactManifest?(): string;
+  /** The `config-resolution/v1` document as JSON text (pure; `bindings/wasm/src/lib.rs`). */
+  resolveConfig?(
+    config: string | undefined,
+    ruleset: Uint8Array | undefined,
+    actionPolicy: Uint8Array | undefined,
+    callback: boolean,
+    disclose: boolean,
+  ): string;
   scan(
     input: string,
     policy?: WasmPolicyCallback,
@@ -176,6 +186,20 @@ export interface WasmModule {
     maxInputBytes?: number,
     maxFindings?: number,
     ruleset?: Uint8Array,
+  ): readonly unknown[];
+  /**
+   * One side of a configuration comparison (`bindings/wasm/src/lib.rs`): a
+   * temporary registry from `config` and `ruleset`, one policy side as the
+   * parallel arrays above, and the same flat array for one side. Absent on an
+   * artifact built before the comparison existed.
+   */
+  scanConfigurationSide?(
+    input: string,
+    config: string | undefined,
+    ruleset: Uint8Array | undefined,
+    kinds: string[],
+    documents: Uint8Array[],
+    callbacks: WasmPolicyCallback[],
   ): readonly unknown[];
   defaultPolicy(
     id: string,
@@ -380,14 +404,42 @@ export function decodeComparison(flat: readonly unknown[]): NativeActionComparis
  * artifact itself.
  */
 export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
+  const readManifest = wasm.artifactManifest;
+  const resolve = wasm.resolveConfig;
+  const scanSide = wasm.scanConfigurationSide;
   return {
     version: () => wasm.version(),
     profile: () => wasm.profile(),
     artifact: () => "wasm",
-    initialize: (pii = []) => {
-      wasm.initialize(pii);
+    initialize: (pii = [], detection) => {
+      wasm.initialize(pii, detection);
     },
     piiActivation: () => wasm.piiActivation(),
+    ...(readManifest === undefined ? {} : { artifactManifest: () => readManifest.call(wasm) }),
+    ...(resolve === undefined
+      ? {}
+      : {
+          resolveConfig: (config, ruleset, actionPolicy, callback, disclose) =>
+            resolve.call(wasm, config, ruleset, actionPolicy, callback, disclose),
+        }),
+    ...(scanSide === undefined
+      ? {}
+      : {
+          scanConfigurationSide: (input, config, ruleset, side) => {
+            const { kinds, documents, callbacks } = splitNativeSides([side]);
+            return decodeComparison(
+              scanSide.call(
+                wasm,
+                input,
+                config,
+                ruleset,
+                kinds,
+                documents,
+                callbacks.map((callback) => toWasmPolicyCallback(callback) as WasmPolicyCallback),
+              ),
+            );
+          },
+        }),
     scan: (input, policy, limits, ruleset, actionPolicy) =>
       wasm
         .scan(input, toWasmPolicyCallback(policy), limits?.maxInputBytes, limits?.maxFindings, ruleset, actionPolicy)

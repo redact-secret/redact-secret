@@ -529,7 +529,7 @@ fn decide(
     })
 }
 
-fn binding_of(policy: &ComparedPolicy<'_>) -> PolicyBinding {
+pub(crate) fn binding_of(policy: &ComparedPolicy<'_>) -> PolicyBinding {
     match policy {
         ComparedPolicy::Default => PolicyBinding::Default,
         ComparedPolicy::ActionPolicy(document) => PolicyBinding::ActionPolicy {

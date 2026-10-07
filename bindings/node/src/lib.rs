@@ -18,15 +18,20 @@ use std::rc::Rc;
 use napi::bindgen_prelude::{Buffer, FnArgs, Function};
 use napi_derive::napi;
 use redact_secret::{
-    Action, ActionComparison, ActionPolicy, ByteRange, ComparedPolicy, Confidence, DefaultPolicy,
-    DetectedFinding, DetectorRegistry, Finding, FormatterFailure, MAX_COMPARED_POLICIES,
-    Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
-    PolicyFailure, Profile, SecretScanError, SecretScanErrorCode, WholeInputLimits,
-    compare_action_policies_with_limits, default_placeholder_formatter, load_action_policy,
-    load_ruleset, redact_with_limits as core_redact_with_limits, run_detector_pipeline,
+    Action, ActionComparison, ActionPolicy, ArtifactKind, ArtifactManifest, ByteRange,
+    ComparedPolicy, Confidence, ConfigRequest, DefaultPolicy, DetectedFinding, DetectionSelection,
+    DetectorRegistry, Finding, FormatterFailure, MAX_COMPARED_POLICIES, Obfuscation, PiiSelection,
+    PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext, PolicyFailure, Profile,
+    SecretScanError, SecretScanErrorCode, WholeInputLimits, compare_action_policies_with_limits,
+    default_placeholder_formatter, load_action_policy, load_ruleset,
+    redact_with_limits as core_redact_with_limits, resolve_config as core_resolve_config,
+    run_detector_pipeline,
 };
 
-use crate::error::{to_js_action_policy_error, to_js_error, to_js_ruleset_error};
+use crate::error::{
+    to_js_action_policy_error, to_js_detection_error, to_js_error, to_js_manifest_error,
+    to_js_ruleset_error,
+};
 use crate::offsets::{Utf16Offsets, utf16_offsets_to_bytes};
 // Re-exported so the incremental N-API surface (a public export like `scan`
 // or `redact`, just organized in its own module) is part of this crate's
@@ -165,6 +170,24 @@ thread_local! {
     static REGISTRY_COMMON: OnceCell<Result<DetectorRegistry, SecretScanError>> = const { OnceCell::new() };
     static PII_SELECTION: OnceCell<PiiSelection> = const { OnceCell::new() };
     static PII_SELECTION_COMMON: OnceCell<PiiSelection> = const { OnceCell::new() };
+    /// The detector selection each profile's owner is fixed to (issue
+    /// #1251), set by the first successful initialization that carries one
+    /// and never changed afterwards: no call reconfigures detection.
+    static DETECTION_SELECTION: OnceCell<DetectionSelection> = const { OnceCell::new() };
+    static DETECTION_SELECTION_COMMON: OnceCell<DetectionSelection> = const { OnceCell::new() };
+}
+
+fn detection_cell<T>(profile: Profile, f: impl FnOnce(&OnceCell<DetectionSelection>) -> T) -> T {
+    match profile {
+        Profile::Common => DETECTION_SELECTION_COMMON.with(f),
+        _ => DETECTION_SELECTION.with(f),
+    }
+}
+
+/// The detector selection `profile`'s owner is fixed to, or every included
+/// detector before one is set.
+pub(crate) fn detection_selection(profile: Profile) -> DetectionSelection {
+    detection_cell(profile, |cell| cell.get().cloned().unwrap_or_default())
 }
 
 fn selection_cell<T>(profile: Profile, f: impl FnOnce(&OnceCell<PiiSelection>) -> T) -> T {
@@ -224,6 +247,139 @@ pub fn profile_common() -> String {
     Profile::Common.as_str().to_owned()
 }
 
+/// The 40-hex source commit this addon was built from, when the build
+/// supplied one at compile time; `None` otherwise. The core reads no
+/// environment; this is a value fixed in the binary by the build.
+const SOURCE_REVISION: Option<&str> = option_env!("REDACT_SECRET_SOURCE_REVISION");
+
+/// The `artifact-manifest/v1` document of the `full` profile of this addon,
+/// as JSON text (issue #1250). Generated from the registration rows the
+/// addon links; builds no registry and reads no PII selection, so it is
+/// safe before and without [`initialize`] and cannot lock the thread's PII
+/// activation.
+///
+/// # Errors
+///
+/// Returns the fixed `ARTIFACT_MANIFEST_INVALID_SOURCE_REVISION` class when
+/// the compile-time source revision is malformed.
+#[napi(js_name = "artifactManifest")]
+pub fn artifact_manifest() -> napi::Result<String, String> {
+    ArtifactManifest::full(ArtifactKind::NodeAddon, true, SOURCE_REVISION)
+        .map(|manifest| manifest.as_json().to_owned())
+        .map_err(to_js_manifest_error)
+}
+
+/// The `artifact-manifest/v1` document of the `common` profile of this
+/// addon. Same guarantees as [`artifact_manifest`]; the `provider`
+/// detectors are listed as `notIncluded` ids only.
+///
+/// # Errors
+///
+/// As [`artifact_manifest`].
+#[napi(js_name = "artifactManifestCommon")]
+pub fn artifact_manifest_common() -> napi::Result<String, String> {
+    ArtifactManifest::common(ArtifactKind::NodeAddon, true, SOURCE_REVISION)
+        .map(|manifest| manifest.as_json().to_owned())
+        .map_err(to_js_manifest_error)
+}
+
+/// Resolves explicit runtime input over the `full` profile's build defaults
+/// into the `config-resolution/v1` document (issue #1251), as JSON text.
+///
+/// `config` is the `runtime-config/v1` text for the data members (`schema`,
+/// `detection`, `pii`, `limits`); `ruleset` and `action_policy` are the exact
+/// bytes a call would load, so the policy identity is the digest of those
+/// bytes; `callback` says a callback policy is in force, recorded as a
+/// dynamic reference without content. `disclose` includes the ruleset's
+/// detector ids and byte digest, which are withheld by default.
+///
+/// Pure: it scans nothing, builds no registry, reads no PII selection and
+/// changes no owner, so it is safe before and without [`initialize`]. Invalid
+/// input is data in the returned document, never a thrown error.
+///
+/// # Errors
+///
+/// Returns the fixed `ARTIFACT_MANIFEST_INVALID_SOURCE_REVISION` class when
+/// the compile-time source revision is malformed.
+// N-API's generated argument conversion produces owned values; there is no
+// borrowed form to take instead.
+#[allow(clippy::needless_pass_by_value)]
+#[napi(js_name = "resolveConfig")]
+pub fn resolve_config(
+    config: Option<String>,
+    ruleset: Option<Buffer>,
+    action_policy: Option<Buffer>,
+    callback: bool,
+    disclose: bool,
+) -> napi::Result<String, String> {
+    resolve_config_for(
+        ArtifactManifest::full(ArtifactKind::NodeAddon, true, SOURCE_REVISION),
+        config.as_deref(),
+        ruleset.as_deref(),
+        action_policy.as_deref(),
+        callback,
+        disclose,
+    )
+}
+
+/// The `common`-profile analogue of [`resolve_config`]: resolved against the
+/// `common` manifest, so a `provider` detector id is `DETECTOR_NOT_INCLUDED`.
+///
+/// # Errors
+///
+/// As [`resolve_config`].
+// See `resolve_config`'s attribute: owned params are what N-API hands back.
+#[allow(clippy::needless_pass_by_value)]
+#[napi(js_name = "resolveConfigCommon")]
+pub fn resolve_config_common(
+    config: Option<String>,
+    ruleset: Option<Buffer>,
+    action_policy: Option<Buffer>,
+    callback: bool,
+    disclose: bool,
+) -> napi::Result<String, String> {
+    resolve_config_for(
+        ArtifactManifest::common(ArtifactKind::NodeAddon, true, SOURCE_REVISION),
+        config.as_deref(),
+        ruleset.as_deref(),
+        action_policy.as_deref(),
+        callback,
+        disclose,
+    )
+}
+
+fn resolve_config_for(
+    manifest: Result<ArtifactManifest, redact_secret::ArtifactManifestError>,
+    config: Option<&str>,
+    ruleset: Option<&[u8]>,
+    action_policy: Option<&[u8]>,
+    callback: bool,
+    disclose: bool,
+) -> napi::Result<String, String> {
+    // The manifest fails only on a malformed compile-time revision; the
+    // resolver then has no artifact to resolve against.
+    let manifest = manifest.map_err(to_js_manifest_error)?;
+    let mut request = ConfigRequest::new();
+    if let Some(config) = config {
+        request = request.runtime_config(config);
+    }
+    if let Some(bytes) = ruleset {
+        request = request.ruleset(bytes);
+    }
+    if let Some(bytes) = action_policy {
+        request = request.action_policy(bytes);
+    }
+    if callback {
+        request = request.callback_policy();
+    }
+    if disclose {
+        request = request.disclose_ruleset_identity();
+    }
+    Ok(core_resolve_config(&manifest, &request)
+        .as_json()
+        .to_owned())
+}
+
 /// Idempotent initialization hook required by the cross-runtime contract:
 /// every host, including Node, supports `await initialize()` before
 /// scanning, even though Node's own loading has nothing to await. Calling it
@@ -259,13 +415,23 @@ fn initialize_profile(profile: Profile, pii: &[String]) -> napi::Result<(), Stri
     let borrowed: Vec<&str> = pii.iter().map(String::as_str).collect();
     let selection = PiiSelection::parse(&borrowed).map_err(to_js_error)?;
     let identity = selection.activation_identity(profile);
-    let existing = with_profile_registry(profile, |registry| {
-        Ok(registry.activation_identity().to_owned())
+    let (existing, narrowed) = with_profile_registry(profile, |registry| {
+        Ok((
+            registry.activation_identity().to_owned(),
+            !registry.detection().is_all(),
+        ))
     })
     .map_err(to_js_error)?;
     if existing != identity {
         return Err(to_js_error(
             SecretScanErrorCode::PiiActivationConflict.into(),
+        ));
+    }
+    // A request that names no detection asks for every included detector, so
+    // an owner already narrowed by an earlier selection is a conflict.
+    if narrowed {
+        return Err(to_js_error(
+            SecretScanErrorCode::DetectionConfigConflict.into(),
         ));
     }
     selection_cell(profile, |cell| {
@@ -307,15 +473,66 @@ pub fn initialize_common_pii(pii: Vec<String>) -> napi::Result<(), String> {
 }
 
 fn initialize_profile_with_selection(profile: Profile, pii: &[String]) -> napi::Result<(), String> {
+    initialize_profile_with_detection(profile, pii, &DetectionSelection::all())
+}
+
+/// Initializes the full profile with a PII selector list and a detector-id
+/// selection (issue #1251). `detection` is the JSON text of the `detection`
+/// object of `runtime-config/v1`: `{}`, `{"include":[ids]}` or
+/// `{"exclude":[ids]}`.
+///
+/// An equivalent resolved selection is idempotent, a differing one is
+/// `DETECTION_CONFIG_CONFLICT`, and a rejected or conflicting request changes
+/// nothing. An unknown, not-included or repeated id is
+/// `INVALID_DETECTION_CONFIG` with the fixed class and the id's position in
+/// the message; a configuration that enables nothing is
+/// `EMPTY_DETECTION_SET`. Never loads another artifact to satisfy a request.
+///
+/// # Errors
+///
+/// Returns a fixed selector, selection, conflict or registry error.
+#[napi(js_name = "initializeDetection")]
+#[allow(clippy::needless_pass_by_value, reason = "N-API owns vector arguments")]
+pub fn initialize_detection(pii: Vec<String>, detection: String) -> napi::Result<(), String> {
+    let detection = DetectionSelection::from_json(&detection).map_err(to_js_detection_error)?;
+    initialize_profile_with_detection(Profile::Full, &pii, &detection)
+}
+
+/// The `common`-profile analogue of [`initialize_detection`].
+///
+/// # Errors
+///
+/// As [`initialize_detection`].
+#[napi(js_name = "initializeCommonDetection")]
+#[allow(clippy::needless_pass_by_value, reason = "N-API owns vector arguments")]
+pub fn initialize_common_detection(
+    pii: Vec<String>,
+    detection: String,
+) -> napi::Result<(), String> {
+    let detection = DetectionSelection::from_json(&detection).map_err(to_js_detection_error)?;
+    initialize_profile_with_detection(Profile::Common, &pii, &detection)
+}
+
+fn initialize_profile_with_detection(
+    profile: Profile,
+    pii: &[String],
+    detection: &DetectionSelection,
+) -> napi::Result<(), String> {
     let borrowed: Vec<&str> = pii.iter().map(String::as_str).collect();
     let selection = PiiSelection::parse(&borrowed).map_err(to_js_error)?;
     let identity = selection.activation_identity(profile);
     let result = match profile {
         Profile::Common => REGISTRY_COMMON
-            .with(|cell| initialize_registry_cell(cell, profile, &selection, &identity)),
-        _ => REGISTRY.with(|cell| initialize_registry_cell(cell, profile, &selection, &identity)),
+            .with(|cell| initialize_registry_cell(cell, profile, &selection, &identity, detection)),
+        _ => REGISTRY
+            .with(|cell| initialize_registry_cell(cell, profile, &selection, &identity, detection)),
     };
-    result.map_err(to_js_error)?;
+    result?;
+    detection_cell(profile, |cell| {
+        if cell.get().is_none() {
+            let _ = cell.set(detection.clone());
+        }
+    });
     selection_cell(profile, |cell| {
         if let Some(active) = cell.get() {
             if active != &selection {
@@ -330,26 +547,56 @@ fn initialize_profile_with_selection(profile: Profile, pii: &[String]) -> napi::
     })
 }
 
+/// Builds the registry the owner would hold for `selection` and `detection`.
+/// A rejected selection is reported here, before anything is cached.
+fn build_owner_registry(
+    profile: Profile,
+    selection: &PiiSelection,
+    detection: &DetectionSelection,
+) -> napi::Result<DetectorRegistry, String> {
+    let registry = match profile {
+        Profile::Common => DetectorRegistry::with_common_built_in_and_pii(selection),
+        _ => DetectorRegistry::with_built_in_and_pii(selection),
+    }
+    .map_err(to_js_error)?;
+    registry
+        .with_detection(detection)
+        .map_err(to_js_detection_error)
+}
+
 fn initialize_registry_cell(
     cell: &OnceCell<Result<DetectorRegistry, SecretScanError>>,
     profile: Profile,
     selection: &PiiSelection,
     identity: &str,
-) -> Result<(), SecretScanError> {
+    detection: &DetectionSelection,
+) -> napi::Result<(), String> {
     if let Some(existing) = cell.get() {
         return match existing {
-            Ok(registry) if registry.activation_identity() == identity => Ok(()),
-            Ok(_) => Err(SecretScanErrorCode::PiiActivationConflict.into()),
-            Err(error) => Err(*error),
+            Ok(registry) if registry.activation_identity() == identity => {
+                // Equivalent resolved selections are idempotent: the same
+                // enabled detectors in the same order. Anything else is a
+                // conflict, and nothing changes.
+                let candidate = build_owner_registry(profile, selection, detection)?;
+                if registry.ids().eq(candidate.ids()) {
+                    Ok(())
+                } else {
+                    Err(to_js_error(
+                        SecretScanErrorCode::DetectionConfigConflict.into(),
+                    ))
+                }
+            }
+            Ok(_) => Err(to_js_error(
+                SecretScanErrorCode::PiiActivationConflict.into(),
+            )),
+            Err(error) => Err(to_js_error(*error)),
         };
     }
-    let registry = match profile {
-        Profile::Common => DetectorRegistry::with_common_built_in_and_pii(selection),
-        _ => DetectorRegistry::with_built_in_and_pii(selection),
-    };
-    let outcome = registry.as_ref().map(|_| ()).map_err(|error| *error);
-    let _ = cell.set(registry);
-    outcome
+    // Validate before caching: a rejected selection leaves the owner as it
+    // was, so a later valid initialization can still succeed.
+    let candidate = build_owner_registry(profile, selection, detection)?;
+    let _ = cell.set(Ok(candidate));
+    Ok(())
 }
 
 /// Canonical full-profile PII activation identity.
@@ -644,6 +891,7 @@ fn run_redact(
 struct RulesetEntry {
     profile: Profile,
     selection: PiiSelection,
+    detection: DetectionSelection,
     ruleset: Vec<u8>,
     registry: DetectorRegistry,
 }
@@ -669,13 +917,17 @@ fn with_ruleset_registry<T>(
     f: impl FnOnce(&DetectorRegistry) -> Result<T, SecretScanError>,
 ) -> napi::Result<T, String> {
     let selection = pii_selection(profile);
+    let detection = detection_selection(profile);
     // The entry is cloned out so the cache is not borrowed while `f` runs: a
     // JavaScript policy or formatter callback inside `f` may itself call back
     // into a ruleset export on this thread.
     let entry = RULESET_REGISTRY.with(|cache| -> napi::Result<Rc<RulesetEntry>, String> {
         let mut cache = cache.borrow_mut();
         if let Some(entry) = cache.as_ref().filter(|entry| {
-            entry.profile == profile && entry.selection == selection && entry.ruleset == ruleset
+            entry.profile == profile
+                && entry.selection == selection
+                && entry.detection == detection
+                && entry.ruleset == ruleset
         }) {
             return Ok(Rc::clone(entry));
         }
@@ -687,11 +939,17 @@ fn with_ruleset_registry<T>(
             _ => DetectorRegistry::with_built_in_and_pii_custom(&selection, detectors),
         }
         .map_err(to_js_error)?;
+        // The owner's detector selection applies to the built-ins; the
+        // ruleset's detectors stay, so the registry is never inert here.
+        let registry = registry
+            .with_detection(&detection)
+            .map_err(to_js_detection_error)?;
         #[cfg(test)]
         RULESET_BUILDS.with(|builds| builds.set(builds.get() + 1));
         let entry = Rc::new(RulesetEntry {
             profile,
             selection,
+            detection,
             ruleset: ruleset.to_vec(),
             registry,
         });
@@ -1369,12 +1627,162 @@ pub fn compare_action_policies_common(
     )
 }
 
+// ---------------------------------------------------------------------
+// One side of a configuration comparison (issue #1254)
+// ---------------------------------------------------------------------
+
+/// Scans `input` under one explicit configuration and evaluates one policy
+/// over the finalized findings: one side of `compareConfigurations`, whose
+/// wrapper calls it once per side and relates the sides.
+///
+/// The registry is **temporary**: built from `config` (the `runtime-config/v1`
+/// text) and `ruleset` for this call, never cached and dropped with it. It
+/// reads and changes no owner state, so it needs no `initialize`. The
+/// whole-input limits are the configuration's own.
+fn scan_configuration_side_for(
+    profile: Profile,
+    input: &str,
+    config: Option<&str>,
+    ruleset: Option<&[u8]>,
+    kinds: &[String],
+    documents: &[Buffer],
+    callbacks: &[PolicyCallback<'_>],
+) -> napi::Result<JsActionComparison, String> {
+    let plans = plan_compared_sides(kinds, documents, callbacks.len())?;
+    let invalid = |code: SecretScanErrorCode| to_js_error(code.into());
+    if plans.len() != 1 {
+        return Err(invalid(SecretScanErrorCode::InvalidOptions));
+    }
+    let manifest = match profile {
+        Profile::Common => ArtifactManifest::common(ArtifactKind::NodeAddon, true, SOURCE_REVISION),
+        _ => ArtifactManifest::full(ArtifactKind::NodeAddon, true, SOURCE_REVISION),
+    }
+    .map_err(to_js_manifest_error)?;
+    let mut request = ConfigRequest::new();
+    if let Some(config) = config {
+        request = request.runtime_config(config);
+    }
+    if let Some(bytes) = ruleset {
+        request = request.ruleset(bytes);
+    }
+    let resolution = core_resolve_config(&manifest, &request);
+    let Some(snapshot) = resolution.snapshot() else {
+        return Err(invalid(SecretScanErrorCode::InvalidOptions));
+    };
+    if snapshot.is_inert() {
+        return Err(invalid(SecretScanErrorCode::EmptyDetectionSet));
+    }
+    let pii = snapshot.pii_selection();
+    let registry = match (profile, ruleset) {
+        (Profile::Common, None) => DetectorRegistry::with_common_built_in_and_pii(pii),
+        (Profile::Common, Some(bytes)) => DetectorRegistry::with_common_built_in_and_pii_custom(
+            pii,
+            load_ruleset(bytes).map_err(to_js_ruleset_error)?,
+        ),
+        (_, None) => DetectorRegistry::with_built_in_and_pii(pii),
+        (_, Some(bytes)) => DetectorRegistry::with_built_in_and_pii_custom(
+            pii,
+            load_ruleset(bytes).map_err(to_js_ruleset_error)?,
+        ),
+    }
+    .map_err(to_js_error)?
+    .with_detection(snapshot.detection_selection())
+    .map_err(to_js_detection_error)?;
+    run_compare(
+        input,
+        &registry,
+        &plans,
+        callbacks,
+        &snapshot.whole_input_limits(),
+    )
+    .map_err(to_js_error)
+}
+
+/// One side of `compareConfigurations` against the `full` profile (see
+/// `scan_configuration_side_for`).
+///
+/// # Errors
+///
+/// `INVALID_OPTIONS` when `kinds` does not hold exactly one side or the
+/// configuration does not resolve, `EMPTY_DETECTION_SET`, the limit errors
+/// exactly as [`scan`], `INVALID_ACTION_POLICY`, `INVALID_RULESET`, and
+/// `POLICY_FAILURE` or `INVALID_POLICY_ACTION` when the callback fails.
+// See `scan`'s attribute: owned params are what N-API hands back.
+#[allow(clippy::needless_pass_by_value)]
+#[napi(js_name = "scanConfigurationSide")]
+pub fn scan_configuration_side(
+    input: String,
+    config: Option<String>,
+    ruleset: Option<Buffer>,
+    kinds: Vec<String>,
+    #[napi(ts_arg_type = "Uint8Array[]")] documents: Vec<Buffer>,
+    #[napi(ts_arg_type = "((finding: JsDetectedFinding, context: JsPolicyContext) => string)[]")]
+    callbacks: Vec<PolicyCallback<'_>>,
+) -> napi::Result<JsActionComparison, String> {
+    scan_configuration_side_for(
+        Profile::Full,
+        &input,
+        config.as_deref(),
+        ruleset.as_deref(),
+        &kinds,
+        &documents,
+        &callbacks,
+    )
+}
+
+/// The `common`-profile analogue of [`scan_configuration_side`].
+///
+/// # Errors
+///
+/// The same as [`scan_configuration_side`].
+// See `scan`'s attribute: owned params are what N-API hands back.
+#[allow(clippy::needless_pass_by_value)]
+#[napi(js_name = "scanConfigurationSideCommon")]
+pub fn scan_configuration_side_common(
+    input: String,
+    config: Option<String>,
+    ruleset: Option<Buffer>,
+    kinds: Vec<String>,
+    #[napi(ts_arg_type = "Uint8Array[]")] documents: Vec<Buffer>,
+    #[napi(ts_arg_type = "((finding: JsDetectedFinding, context: JsPolicyContext) => string)[]")]
+    callbacks: Vec<PolicyCallback<'_>>,
+) -> napi::Result<JsActionComparison, String> {
+    scan_configuration_side_for(
+        Profile::Common,
+        &input,
+        config.as_deref(),
+        ruleset.as_deref(),
+        &kinds,
+        &documents,
+        &callbacks,
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     fn offsets_for(input: &str) -> RefCell<Utf16Offsets<'_>> {
         RefCell::new(Utf16Offsets::new(input))
+    }
+
+    #[test]
+    fn artifact_manifests_name_each_profile_and_touch_no_activation() {
+        // Generation builds no registry: the thread's profile cells stay
+        // empty, so a later initialization with a PII selection still works.
+        let full = artifact_manifest().unwrap();
+        let common = artifact_manifest_common().unwrap();
+        assert!(full.starts_with("{\"schema\":\"artifact-manifest/v1\","));
+        assert!(full.contains("\"kind\":\"node-addon\""));
+        assert!(full.contains("\"variant\":\"full\""));
+        assert!(common.contains("\"variant\":\"common\""));
+        assert!(common.contains("\"notIncluded\":[\"aws-access-key\""));
+        assert_ne!(full, common);
+        assert_eq!(full, artifact_manifest().unwrap());
+        assert!(pii_selection(Profile::Full).is_off());
+        assert!(pii_selection(Profile::Common).is_off());
+        REGISTRY.with(|cell| assert!(cell.get().is_none()));
+        REGISTRY_COMMON.with(|cell| assert!(cell.get().is_none()));
     }
 
     fn from_one_js_finding(input: &str, finding: &JsFinding) -> Result<Finding, SecretScanError> {
@@ -2255,5 +2663,156 @@ validator: none\n";
                 .collect();
             assert_eq!(actual, expected, "{}", case["id"].as_str().unwrap());
         }
+    }
+
+    // -- Detector selection (issue #1251). Each test runs on its own thread,
+    // so each sees its own thread-local owner state.
+
+    const KEYED: &str = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000";
+
+    fn detectors_for(input: &str) -> Vec<String> {
+        scan_for_profile(Profile::Full, input, None, None, None, None)
+            .unwrap()
+            .into_iter()
+            .map(|finding| finding.detector)
+            .collect()
+    }
+
+    #[test]
+    fn a_selection_narrows_the_owner_and_every_scan_path_uses_it() {
+        initialize_detection(vec![], r#"{"exclude":["github-token"]}"#.to_owned()).unwrap();
+        assert!(!detectors_for(KEYED).contains(&"github-token".to_owned()));
+        // The cached ruleset path applies the same owner selection.
+        let found = scan_for_profile(
+            Profile::Full,
+            KEYED,
+            None,
+            None,
+            Some(RULESET_FIXTURE),
+            None,
+        )
+        .unwrap();
+        assert!(
+            found
+                .iter()
+                .all(|finding| finding.detector != "github-token")
+        );
+        // And so does a session created now.
+        let selection = pii_selection(Profile::Full);
+        let detection = detection_selection(Profile::Full);
+        assert_eq!(detection.mode(), "exclude");
+        let registry = redact_secret::BuiltInRegistry::with_built_in_and_pii(&selection)
+            .unwrap()
+            .with_detection(&detection)
+            .unwrap();
+        assert!(!registry.contains("github-token"));
+    }
+
+    #[test]
+    fn an_equivalent_selection_is_idempotent_and_a_different_one_is_a_conflict_that_changes_nothing()
+     {
+        initialize_detection(vec![], r#"{"include":["jwt","private-key"]}"#.to_owned()).unwrap();
+        // Same resolved set, other spelling and order.
+        initialize_detection(vec![], r#"{"include":["private-key","jwt"]}"#.to_owned()).unwrap();
+        let before = with_profile_registry(Profile::Full, |registry| {
+            Ok(registry.ids().map(str::to_owned).collect::<Vec<_>>())
+        })
+        .unwrap();
+        for different in [r#"{"include":["jwt"]}"#, r#"{"exclude":["jwt"]}"#, "{}"] {
+            let error = initialize_detection(vec![], different.to_owned()).expect_err("conflict");
+            assert_eq!(error.status, "DETECTION_CONFIG_CONFLICT", "{different}");
+        }
+        // A legacy initialize, which names no detection, conflicts too.
+        assert_eq!(
+            initialize().expect_err("conflict").status,
+            "DETECTION_CONFIG_CONFLICT"
+        );
+        let after = with_profile_registry(Profile::Full, |registry| {
+            Ok(registry.ids().map(str::to_owned).collect::<Vec<_>>())
+        })
+        .unwrap();
+        assert_eq!(before, after);
+        assert_eq!(detection_selection(Profile::Full).mode(), "include");
+    }
+
+    #[test]
+    fn a_default_owner_already_in_place_conflicts_with_a_narrowing_request() {
+        initialize().unwrap();
+        let error = initialize_detection(vec![], r#"{"exclude":["jwt"]}"#.to_owned())
+            .expect_err("conflict");
+        assert_eq!(error.status, "DETECTION_CONFIG_CONFLICT");
+        assert!(detection_selection(Profile::Full).is_all());
+        // The same request for the default is idempotent.
+        initialize_detection(vec![], "{}".to_owned()).unwrap();
+        initialize_detection(vec![], r#"{"exclude":[]}"#.to_owned()).unwrap();
+    }
+
+    #[test]
+    fn a_rejected_selection_changes_nothing_and_a_later_valid_one_succeeds() {
+        for (config, status, reason) in [
+            (
+                r#"{"include":["jwt","no-such-detector"]}"#,
+                "INVALID_DETECTION_CONFIG",
+                "The detector selection is invalid. (UNKNOWN_DETECTOR_ID, id 1)",
+            ),
+            (
+                r#"{"include":[]}"#,
+                "EMPTY_DETECTION_SET",
+                "The configuration enables no detector. (EMPTY_DETECTION_SET)",
+            ),
+            (
+                r#"{"include":["jwt"],"exclude":["jwt"]}"#,
+                "INVALID_DETECTION_CONFIG",
+                "The detector selection is invalid. (DETECTION_SELECTOR_CONFLICT)",
+            ),
+        ] {
+            let error = initialize_detection(vec![], config.to_owned()).expect_err("rejected");
+            assert_eq!(error.status, status, "{config}");
+            assert_eq!(error.reason, reason, "{config}");
+            assert!(!error.reason.contains("no-such-detector"));
+        }
+        assert!(detection_selection(Profile::Full).is_all());
+        REGISTRY.with(|cell| assert!(cell.get().is_none(), "nothing was cached"));
+        initialize_detection(vec![], r#"{"include":["jwt"]}"#.to_owned()).unwrap();
+        assert_eq!(detection_selection(Profile::Full).mode(), "include");
+    }
+
+    #[test]
+    fn the_common_owner_rejects_a_provider_detector_and_never_loads_full() {
+        let error =
+            initialize_common_detection(vec![], r#"{"include":["github-token"]}"#.to_owned())
+                .expect_err("not included");
+        assert_eq!(error.status, "INVALID_DETECTION_CONFIG");
+        assert_eq!(
+            error.reason,
+            "The detector selection is invalid. (DETECTOR_NOT_INCLUDED, id 0)"
+        );
+        REGISTRY_COMMON.with(|cell| assert!(cell.get().is_none()));
+        REGISTRY.with(|cell| assert!(cell.get().is_none()));
+        initialize_common_detection(vec![], r#"{"include":["jwt"]}"#.to_owned()).unwrap();
+    }
+
+    #[test]
+    fn resolve_config_is_pure_and_matches_the_core() {
+        let config = r#"{"detection":{"exclude":["github-token"]}}"#.to_owned();
+        let first = resolve_config(Some(config.clone()), None, None, false, false).unwrap();
+        let second = resolve_config(Some(config), None, None, false, false).unwrap();
+        assert_eq!(first, second);
+        assert!(first.starts_with("{\"schema\":\"config-resolution/v1\","));
+        assert!(first.contains("\"ok\":true"));
+        // It created no registry and fixed no owner.
+        REGISTRY.with(|cell| assert!(cell.get().is_none()));
+        assert!(detection_selection(Profile::Full).is_all());
+        // The common manifest does not include a provider detector.
+        let rejected = resolve_config_common(
+            Some(r#"{"detection":{"include":["github-token"]}}"#.to_owned()),
+            None,
+            None,
+            false,
+            false,
+        )
+        .unwrap();
+        assert!(rejected.contains("\"code\":\"DETECTOR_NOT_INCLUDED\""));
+        assert!(rejected.contains("\"ok\":false"));
     }
 }

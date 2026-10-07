@@ -116,6 +116,13 @@ other than the documented protocol, never propagates its own error: it becomes
 one of the fixed `SecretScanError` subclasses. There is no custom detector
 callback surface.
 
+`redact_secret.artifact_manifest()` returns the wheel's `artifact-manifest/v1`
+document as a `dict`: the built-in detectors in canonical order with the finding
+types each can emit, the PII runtime, capabilities, defaults, bounds and a
+`digest`. It takes no input, builds no registry and reads no PII selection, so
+calling it never initializes or locks `initialize(pii=...)`. Each `types` list
+is a detector's declared types, not a closed vocabulary.
+
 The package is typed (PEP 561): the wheel ships `py.typed` and a `_native.pyi`
 stub, so type checkers resolve the API without a stub package.
 

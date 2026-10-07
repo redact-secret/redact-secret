@@ -9,8 +9,8 @@
 //! `INVALID_INPUT` and `INVALID_OPTIONS` are host-produced codes.
 
 use redact_secret::{
-    ActionPolicyError, ActionPolicyErrorClass, RulesetError, RulesetErrorClass, SecretScanError,
-    SecretScanErrorCode,
+    ActionPolicyError, ActionPolicyErrorClass, ArtifactManifestError, DetectionConfigError,
+    RulesetError, RulesetErrorClass, SecretScanError, SecretScanErrorCode,
 };
 use wasm_bindgen::JsValue;
 
@@ -37,18 +37,28 @@ pub(crate) enum WasmErrorCode {
     /// class and, inside a rule, its zero-based index are folded into
     /// [`Self::message`].
     ActionPolicy(ActionPolicyErrorClass, Option<usize>),
+    /// The artifact manifest could not be generated (issue #1250). The code
+    /// and message are the manifest class's fixed strings.
+    Manifest(ArtifactManifestError),
+    /// A detector selection was rejected (issue #1251). The code is the
+    /// core's fixed `INVALID_DETECTION_CONFIG` (or `EMPTY_DETECTION_SET`); the
+    /// fixed class and, for one id, its array position are folded into
+    /// [`Self::message`], never the id itself.
+    Detection(DetectionConfigError),
 }
 
 impl WasmErrorCode {
     /// The stable `SCREAMING_SNAKE_CASE` code string, matching the core's
     /// convention for the codes this binding shares with it.
-    fn as_str(self) -> &'static str {
+    pub(crate) fn as_str(self) -> &'static str {
         match self {
             Self::NotInitialized => "NOT_INITIALIZED",
             Self::InitializationFailed => "INITIALIZATION_FAILED",
             Self::Core(code) => code.as_str(),
             Self::Ruleset(_) => SecretScanErrorCode::InvalidRuleset.as_str(),
             Self::ActionPolicy(..) => SecretScanErrorCode::InvalidActionPolicy.as_str(),
+            Self::Manifest(error) => error.code(),
+            Self::Detection(error) => error.code().as_str(),
         }
     }
 
@@ -85,6 +95,16 @@ impl WasmErrorCode {
                 SecretScanErrorCode::InvalidActionPolicy.message(),
                 class.as_str()
             ),
+            Self::Manifest(error) => error.message().to_owned(),
+            // The same text `bindings/node` builds.
+            Self::Detection(error) => match error.index() {
+                Some(index) => format!(
+                    "{} ({}, id {index})",
+                    error.code().message(),
+                    error.class_name()
+                ),
+                None => format!("{} ({})", error.code().message(), error.class_name()),
+            },
         }
     }
 }
@@ -104,6 +124,18 @@ impl From<SecretScanError> for WasmErrorCode {
 impl From<RulesetError> for WasmErrorCode {
     fn from(error: RulesetError) -> Self {
         Self::Ruleset(error.class())
+    }
+}
+
+impl From<ArtifactManifestError> for WasmErrorCode {
+    fn from(error: ArtifactManifestError) -> Self {
+        Self::Manifest(error)
+    }
+}
+
+impl From<DetectionConfigError> for WasmErrorCode {
+    fn from(error: DetectionConfigError) -> Self {
+        Self::Detection(error)
     }
 }
 
@@ -140,6 +172,31 @@ mod tests {
             "INITIALIZATION_FAILED"
         );
         assert!(!WasmErrorCode::InitializationFailed.message().is_empty());
+    }
+
+    #[test]
+    fn manifest_errors_carry_the_fixed_class_code_and_message() {
+        let wrapped = WasmErrorCode::from(ArtifactManifestError::SchemaMismatch);
+        assert_eq!(wrapped.as_str(), "ARTIFACT_MANIFEST_SCHEMA_MISMATCH");
+        assert_eq!(
+            wrapped.message(),
+            "The artifact manifest schema is not supported."
+        );
+    }
+
+    #[test]
+    fn detection_errors_carry_the_fixed_code_class_and_position_only() {
+        let rejection = redact_secret::DetectionSelection::from_json(
+            r#"{"include":["jwt","Not-An-Identifier"]}"#,
+        )
+        .expect_err("expected the malformed id to be rejected");
+        let wrapped = WasmErrorCode::from(rejection);
+        assert_eq!(wrapped.as_str(), "INVALID_DETECTION_CONFIG");
+        assert_eq!(
+            wrapped.message(),
+            "The detector selection is invalid. (INVALID_IDENTIFIER, id 1)"
+        );
+        assert!(!wrapped.message().contains("Not-An-Identifier"));
     }
 
     #[test]

@@ -828,9 +828,13 @@ pub fn create_incremental_sanitizer(
     options: JsIncrementalOptions<'_>,
 ) -> napi::Result<JsIncrementalSanitizer, String> {
     let selection = crate::pii_selection(Profile::Full);
+    let detection = crate::detection_selection(Profile::Full);
     build(options, move |limits, policy, formatter| {
-        IncrementalSanitizer::with_built_in_and_pii_policy_and_formatter(
-            limits, &selection, policy, formatter,
+        // The session captures the owner's configuration here, once. With no
+        // detector selection this is the legacy constructor's registry,
+        // byte for byte.
+        IncrementalSanitizer::with_built_in_and_pii_detection_policy_and_formatter(
+            limits, &selection, &detection, policy, formatter,
         )
     })
 }
@@ -850,9 +854,10 @@ pub fn create_incremental_sanitizer_common(
     options: JsIncrementalOptions<'_>,
 ) -> napi::Result<JsIncrementalSanitizer, String> {
     let selection = crate::pii_selection(Profile::Common);
+    let detection = crate::detection_selection(Profile::Common);
     build(options, move |limits, policy, formatter| {
-        IncrementalSanitizer::with_common_built_in_and_pii_policy_and_formatter(
-            limits, &selection, policy, formatter,
+        IncrementalSanitizer::with_common_built_in_and_pii_detection_policy_and_formatter(
+            limits, &selection, &detection, policy, formatter,
         )
     })
 }

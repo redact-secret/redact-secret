@@ -21,6 +21,7 @@ mod bearer_token;
 mod bitwarden;
 mod browserbase;
 mod buildkite;
+mod catalog;
 mod cerebras;
 mod clickhouse_cloud;
 mod clojars;
@@ -82,6 +83,7 @@ mod rubygems;
 mod ruleset_adapter;
 mod runpod;
 mod scoped_context;
+pub(crate) mod selected;
 mod sendgrid;
 mod sentry;
 mod shopify;
@@ -107,6 +109,7 @@ use crate::types::Detector;
 use connection_string::ConnectionStringDetector;
 use private_key::PrivateKeyDetector;
 
+pub(crate) use catalog::{declared_common_types, declared_types};
 use prefilter::Literals;
 pub(crate) use prefilter::{LiteralMatcher, RequiredLiterals, ScanScope};
 
@@ -814,6 +817,22 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         )],
     ),
 ];
+
+/// The prefilter declaration groups of the declared built-in `id`, resolved
+/// when the crate is compiled (issue #1253): `None` for a detector that is
+/// not in [`DECLARED_LITERALS`]. Evaluated in a `const` item, only the one
+/// declaration it returns is linked, so a composed artifact carries the
+/// literals of its selected detectors and none of the others.
+const fn declared_literals(id: &str) -> Option<&'static [Literals]> {
+    let mut index = 0;
+    while index < DECLARED_LITERALS.len() {
+        if catalog::const_str_eq(DECLARED_LITERALS[index].0, id) {
+            return Some(DECLARED_LITERALS[index].1);
+        }
+        index += 1;
+    }
+    None
+}
 
 /// The prefilter declaration of the built-in detector `id`, or `None` when
 /// it runs on every call.

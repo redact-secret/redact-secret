@@ -152,6 +152,13 @@ jobs:
           cargo clippy -p redact-secret-wasm --all-targets --features pii --locked -- -D warnings
           cargo clippy -p redact-secret-wasm --all-targets --no-default-features --features pii --locked -- -D warnings
 
+      # Issue #1253: the third build shape, a static custom composition, is
+      # the same crate with its `custom` feature in place of `full`.
+      - name: Run Clippy on the custom-composition browser binding
+        run: |
+          cargo clippy -p redact-secret-wasm --all-targets --no-default-features --features custom --locked -- -D warnings
+          cargo clippy -p redact-secret-wasm --all-targets --no-default-features --features custom,pii --locked -- -D warnings
+
       - name: Check API surface, boundaries, versions, MSRV, and package contents
         run: npm run rust:check
 
@@ -460,6 +467,14 @@ jobs:
         run: |
           cargo test -p redact-secret-wasm --features pii --locked
           cargo test -p redact-secret-wasm --no-default-features --features pii --locked
+
+      # Issue #1253: under test a stand-in composition (the six `common`
+      # detectors) is installed, so every shared assertion of this crate runs
+      # against the custom build shape too.
+      - name: Test the custom-composition browser binding natively
+        run: |
+          cargo test -p redact-secret-wasm --no-default-features --features custom --locked
+          cargo test -p redact-secret-wasm --no-default-features --features custom,pii --locked
 
       - name: Test the full pii browser binding for wasm32 (via Node)
         env:

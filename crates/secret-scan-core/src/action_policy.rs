@@ -245,7 +245,7 @@ impl std::error::Error for ActionPolicyError {}
 
 /// What a rule does once it matches.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum RuleAction {
+pub(crate) enum RuleAction {
     /// Stop at this rule and return this action.
     Fixed(Action),
     /// Stop at this rule and return the base action.
@@ -256,13 +256,13 @@ enum RuleAction {
 /// part of the match": a document can never write an empty set, so the two are
 /// never confused.
 #[derive(Clone, Debug)]
-struct Rule {
-    id: Box<str>,
-    action: RuleAction,
-    types: Box<[Box<str>]>,
-    detectors: Box<[Box<str>]>,
-    confidences: u8,
-    obfuscations: u8,
+pub(crate) struct Rule {
+    pub(crate) id: Box<str>,
+    pub(crate) action: RuleAction,
+    pub(crate) types: Box<[Box<str>]>,
+    pub(crate) detectors: Box<[Box<str>]>,
+    pub(crate) confidences: u8,
+    pub(crate) obfuscations: u8,
 }
 
 const CONFIDENCE_HIGH: u8 = 0b001;
@@ -300,7 +300,7 @@ fn contains(set: &[Box<str>], value: &str) -> bool {
 }
 
 impl Rule {
-    fn matches(&self, finding: &DetectedFinding) -> bool {
+    pub(crate) fn matches(&self, finding: &DetectedFinding) -> bool {
         (self.types.is_empty() || contains(&self.types, finding.type_name()))
             && (self.detectors.is_empty() || contains(&self.detectors, finding.detector()))
             && (self.confidences == 0
@@ -387,6 +387,17 @@ impl ActionPolicy {
 
     fn action_for(&self, finding: &DetectedFinding) -> Action {
         self.explain(finding).0
+    }
+
+    /// The number of rules, for the configuration snapshot.
+    pub(crate) fn rule_count(&self) -> usize {
+        self.rules.len()
+    }
+
+    /// The validated rules in document order, for the diagnostic layer. The
+    /// layer only reads them: loading and evaluation are unchanged.
+    pub(crate) fn rules(&self) -> &[Rule] {
+        &self.rules
     }
 
     /// The SHA-256 of the exact document bytes this policy was loaded from:

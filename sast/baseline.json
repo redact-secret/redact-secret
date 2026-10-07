@@ -63,13 +63,6 @@
       "rationale": "The process arguments are collected only to serialize the assessment invocation as JSON provenance. They are never interpreted as a command, passed to a shell, or used to launch another process, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
     },
-    "a16e6e837f3c79dc": {
-      "classification": "false_positive",
-      "line": 141,
-      "path": "crates/secret-scan-core/examples/shadow_evaluation.rs",
-      "rationale": "The maintainer-local shadow evaluation example reads only two options from its arguments: a --profile name matched against the closed set full/common, and an --artifact path read as JSON. They are never interpreted as a command, passed to a shell, or used to launch another process, and the example is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
-      "rule_id": "sast.rules.rust.lang.security.args"
-    },
     "e59ba1065557f649": {
       "classification": "false_positive",
       "line": 349,
@@ -518,13 +511,6 @@
       "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-dynamic-method",
       "rationale": "The dynamic lookup selects a lane function from a literal three-entry object (`node`/`python`/`browser`); `options.lane` is validated against the fixed `LANES` list during argument parsing, before this call, so the invoked function is always one of the three lane functions defined in this file, never externally controlled. This is a local qualification script, not a network-facing service."
     },
-    "4240b15f2c8c9d92": {
-      "classification": "false_positive",
-      "line": 139,
-      "path": "crates/secret-scan-core/examples/pii_identity_evaluation.rs",
-      "rationale": "The maintainer-local PII identity evaluation example reads `env::args().skip(1)`, discarding argv[0], and accepts one option: --family, whose value must name one of the six closed production PII family ids or the example exits with an error. Arguments are never interpreted as a command, passed to a shell, used to launch a process, or used for an authorization decision, and the example is outside every published package, so neither the argv[0] nor the command-argument injection concern this generic rule targets applies.",
-      "rule_id": "sast.rules.rust.lang.security.args"
-    },
     "30911d02b54979a8": {
       "classification": "false_positive",
       "line": 142,
@@ -546,9 +532,9 @@
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here.",
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string"
     },
-    "6974f95ad17a4c3c": {
+    "1d63727bd91c59b9": {
       "classification": "false_positive",
-      "line": 73,
+      "line": 74,
       "path": "crates/secret-scan-cli/src/main.rs",
       "rationale": "The flagged call is `env::args_os().skip(1)`: argv[0] is explicitly discarded before the remaining arguments are used as scan-target paths, so the exact property this audit rule warns about (relying on argv[0] for a security decision) does not apply.",
       "rule_id": "sast.rules.rust.lang.security.args-os"
@@ -608,6 +594,34 @@
       "path": "scripts/contrib-new-detector.mjs",
       "rationale": "The template string is the CLI `--help` usage text, containing `<detector-id>`-style placeholders for the terminal. It is printed to stdout, never assigned to `innerHTML`, rendered into a DOM, or interpreted as markup.",
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string"
+    },
+    "a636f03dad798cac": {
+      "classification": "false_positive",
+      "line": 149,
+      "path": "crates/secret-scan-core/examples/shadow_evaluation.rs",
+      "rationale": "The maintainer-local shadow evaluation example reads only two options from its arguments: a --profile name matched against the closed set full/common, and an --artifact path read as JSON. They are never interpreted as a command, passed to a shell, or used to launch another process, and the example is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
+      "rule_id": "sast.rules.rust.lang.security.args"
+    },
+    "9ea155069748168c": {
+      "classification": "false_positive",
+      "line": 147,
+      "path": "crates/secret-scan-core/examples/pii_identity_evaluation.rs",
+      "rationale": "The maintainer-local PII identity evaluation example reads `env::args().skip(1)`, discarding argv[0], and accepts one option: --family, whose value must name one of the six closed production PII family ids or the example exits with an error. Arguments are never interpreted as a command, passed to a shell, used to launch a process, or used for an authorization decision, and the example is outside every published package, so neither the argv[0] nor the command-argument injection concern this generic rule targets applies.",
+      "rule_id": "sast.rules.rust.lang.security.args"
+    },
+    "a4d4738193d11038": {
+      "classification": "false_positive",
+      "line": 202,
+      "path": "scripts/build-custom-artifact.mjs",
+      "rationale": "The pattern is built inside verifyLockUnchanged from a field name that is one of four string literals written in the same function (name, version, source, checksum); no composition input, file content or environment value reaches it, and the pattern it forms has no nested quantifier. The text it is matched against is a Cargo.lock the build itself copied, so the non-literal construction cannot be steered by a consumer.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-non-literal-regexp"
+    },
+    "ab83b227f388c1ec": {
+      "classification": "false_positive",
+      "line": 59,
+      "path": "scripts/lib/composition.mjs",
+      "rationale": "The identifier pattern has no ambiguous nested quantifier: every repeated group begins with a single separator character that the preceding class excludes, so each input position has one parse and matching is linear. isIdentifier also checks the 64-character bound before the pattern is evaluated, so the input is short as well. It runs in build tooling over a composition file the developer wrote, never in the core runtime.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
     }
   },
   "known_errors": {
@@ -623,38 +637,38 @@
       "line": 30,
       "rationale": "OpenGrep 1.30.0's TypeScript parser does not yet support the `unique symbol` type annotation; this is a parser limitation in the pinned tool version, not a defect in this file. Tracked for re-check on the next reviewed OpenGrep version bump."
     },
-    "50356e61a9f395a1": {
-      "line": 503,
+    "dd41e68346c5e608": {
+      "line": 511,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "899bd1e27bfc863a": {
-      "line": 512,
+    "870cb1e2388edf11": {
+      "line": 520,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "ce0b135fe2fc29d8": {
-      "line": 806,
+    "f071e8780e14982e": {
+      "line": 814,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "f4a07cf67b9a4e33": {
-      "line": 876,
+    "670610e8442e879a": {
+      "line": 884,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "e056b01dd796d246": {
-      "line": 1055,
+    "66bfd2c956f65867": {
+      "line": 1063,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
     },
-    "58ccb4666595a423": {
-      "line": 1145,
+    "d36b689d643385f0": {
+      "line": 1153,
       "path": ".github/workflows/artifact-qualification.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"

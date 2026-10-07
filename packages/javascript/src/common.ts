@@ -72,6 +72,26 @@ export const status = runtime.status;
  */
 export const artifact = runtime.artifact;
 
+/**
+ * The loaded `common` artifact's `artifact-manifest/v1` document (see
+ * `@redact-secret/core`'s `artifactManifest`). Its `variant` is `"common"`
+ * and the `full` built-in ids it lacks are listed in `notIncluded`.
+ */
+export const artifactManifest = runtime.artifactManifest;
+
+/**
+ * Resolves a configuration request over the `common` artifact's defaults (see
+ * `@redact-secret/core`'s `resolveConfig`). A `provider` detector id is
+ * `DETECTOR_NOT_INCLUDED` here, never satisfied by loading `full`.
+ */
+export const resolveConfig = runtime.resolveConfig;
+
+/**
+ * The snapshot of the configuration this `common` runtime is fixed to (see
+ * `@redact-secret/core`'s `describeConfig`).
+ */
+export const describeConfig = runtime.describeConfig;
+
 /** Scans `input` and returns every finding, in input order. */
 export const scan = runtime.scan;
 
@@ -92,6 +112,13 @@ export const scanAndRedact = runtime.scanAndRedact;
  * `@redact-secret/core`'s `compareActionPolicies`). Whole-input only.
  */
 export const compareActionPolicies = runtime.compareActionPolicies;
+
+/**
+ * Compares detection configurations over one input against the `common`
+ * artifact: each side an independent preview pass over a temporary registry
+ * (see `@redact-secret/core`'s `compareConfigurations`). Whole-input only.
+ */
+export const compareConfigurations = runtime.compareConfigurations;
 
 /** Opens a bounded incremental session over text supplied in chunks. */
 export const createIncrementalSanitizer = runtime.createIncrementalSanitizer;

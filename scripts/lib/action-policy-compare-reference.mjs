@@ -895,7 +895,9 @@ export function publicPackageCompareSurface(api, profile) {
         return own;
       }),
     exports: Object.keys(api).filter((name) => /compar/i.test(name)),
-    expectedExports: ["compareActionPolicies"],
+    // compareConfigurations (#1254) is a second whole-input comparison; neither
+    // is incremental, which is what this obligation guards.
+    expectedExports: ["compareActionPolicies", "compareConfigurations"],
     digestForms: (text) => {
       const document = JSON.parse(text);
       const onlyPolicy = (actionPolicy) =>

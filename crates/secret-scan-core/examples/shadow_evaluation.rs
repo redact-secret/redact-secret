@@ -49,6 +49,8 @@
     reason = "the core's public signatures are fixed API, not this executable's choice"
 )]
 
+#[path = "../src/composition.rs"]
+mod composition;
 #[path = "../src/detectors/mod.rs"]
 mod detectors;
 #[path = "../src/entropy.rs"]
@@ -61,6 +63,8 @@ mod evidence;
 mod incremental;
 #[path = "../src/invisible_table.rs"]
 mod invisible_table;
+#[path = "../src/json.rs"]
+mod json;
 #[path = "../src/limits.rs"]
 mod limits;
 #[path = "../src/normalize.rs"]
@@ -77,6 +81,10 @@ mod redact;
 mod registry;
 #[path = "../src/ruleset.rs"]
 mod ruleset;
+#[path = "../src/selection.rs"]
+mod selection;
+#[path = "../src/sha256.rs"]
+mod sha256;
 #[path = "../src/structured_validators.rs"]
 mod structured_validators;
 #[path = "../src/types.rs"]
@@ -202,6 +210,7 @@ fn run() -> Result<(), String> {
     let registry = match options.profile {
         Profile::Full => DetectorRegistry::with_built_in([]),
         Profile::Common => DetectorRegistry::with_common_built_in([]),
+        Profile::Custom => return Err("a custom composition is not a selectable profile".into()),
     }
     .map_err(|error| format!("cannot build the registry: {}", error.code().as_str()))?;
 

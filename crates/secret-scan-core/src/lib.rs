@@ -64,7 +64,12 @@
 //! | Declarative rulesets | [`load_ruleset`], [`RulesetError`], [`RulesetErrorClass`] |
 //! | Declarative action policy | [`load_action_policy`], [`ActionPolicy`], [`ActionPolicyError`], [`ActionPolicyErrorClass`], [`MAX_ACTION_POLICY_BYTES`] |
 //! | Explain and compare action policies | [`compare_action_policies`], [`compare_action_policies_with_limits`], [`ComparedPolicy`], [`ActionComparison`], [`ComparedFinding`], [`ActionDecision`], [`DecisionBasis`], [`ComparedSide`], [`PolicyBinding`], [`ActionCounts`], [`DetectionIdentity`], [`MAX_COMPARED_POLICIES`] |
+//! | Compare detection configurations | [`compare_configurations`], [`ConfigurationSide`], [`ConfigurationComparison`], [`ConfigurationResult`], [`ConfigurationDifferences`], [`ConfigurationDifference`], [`DifferenceKind`], [`Correspondence`], [`SideStatus`] |
 //! | Profiles and PII activation | [`Profile`], [`PiiSelection`] |
+//! | Artifact manifest | [`ArtifactManifest`], [`ArtifactKind`], [`ArtifactManifestError`] |
+//! | Static custom composition | [`composition`] |
+//! | Detector selection | [`DetectionSelection`], [`DetectionConfigError`] |
+//! | Effective configuration | [`resolve_config`], [`describe_config`], [`ConfigRequest`], [`ConfigResolution`], [`ConfigSnapshot`], [`ConfigDiagnostic`], [`ConfigSeverity`], [`SampleRuleHits`] |
 //! | Identifiers and units | [`is_identifier`], [`MAX_IDENTIFIER_LENGTH`], [`RANGE_UNIT`], [`VERSION`] |
 //! | Detector building blocks | [`shannon_entropy`] |
 //!
@@ -134,13 +139,17 @@
 
 mod action_policy;
 mod compare;
+mod config;
+mod configuration_compare;
 mod detectors;
 mod entropy;
 mod error;
 mod evidence;
 mod incremental;
 mod invisible_table;
+mod json;
 mod limits;
+mod manifest;
 mod normalize;
 #[cfg_attr(
     not(test),
@@ -152,12 +161,16 @@ mod normalize;
 mod pii;
 mod pipeline;
 mod policy;
+mod policy_diagnostics;
 mod redact;
 mod registry;
 mod ruleset;
+mod selection;
 mod sha256;
 mod structured_validators;
 mod types;
+
+pub mod composition;
 
 pub use action_policy::{
     ActionPolicy, ActionPolicyError, ActionPolicyErrorClass, MAX_ACTION_POLICY_BYTES,
@@ -168,6 +181,15 @@ pub use compare::{
     DecisionBasis, DetectionIdentity, MAX_COMPARED_POLICIES, PolicyBinding,
     compare_action_policies, compare_action_policies_with_limits,
 };
+pub use config::{
+    ConfigDiagnostic, ConfigRequest, ConfigResolution, ConfigSeverity, ConfigSnapshot,
+    describe_config, resolve_config,
+};
+pub use configuration_compare::{
+    ConfigurationComparison, ConfigurationDifference, ConfigurationDifferences,
+    ConfigurationResult, ConfigurationSide, Correspondence, DifferenceKind, SideStatus,
+    compare_configurations,
+};
 pub use entropy::shannon_entropy;
 pub use error::{
     DetectorFailure, FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode,
@@ -177,18 +199,21 @@ pub use incremental::{
     IncrementalSanitizer, SessionState,
 };
 pub use limits::{DEFAULT_MAX_FINDINGS, DEFAULT_MAX_INPUT_BYTES, WholeInputLimits};
+pub use manifest::{ArtifactKind, ArtifactManifest, ArtifactManifestError};
 pub use pii::PiiSelection;
 pub use pipeline::{
     run_detector_pipeline, sanitize, sanitize_with_profile, scan, scan_and_redact,
     scan_and_redact_with_limits, scan_with_limits,
 };
 pub use policy::DefaultPolicy;
+pub use policy_diagnostics::SampleRuleHits;
 pub use redact::{
     MAX_PLACEHOLDER_LENGTH, default_placeholder_formatter, redact, redact_with_limits,
     typed_placeholder_formatter,
 };
 pub use registry::{BuiltInRegistry, DetectorRegistry, Profile, RegisteredDetector};
 pub use ruleset::{RulesetError, RulesetErrorClass, load_ruleset};
+pub use selection::{DetectionConfigError, DetectionSelection};
 pub use types::{
     Action, ByteRange, Candidate, Confidence, DetectedFinding, Detector, DetectorContext, Finding,
     MAX_IDENTIFIER_LENGTH, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy,

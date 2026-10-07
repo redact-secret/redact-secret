@@ -5,8 +5,9 @@
 //! are always registered before custom ones.
 
 use std::borrow::Cow;
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
 
+use crate::composition::Composition;
 use crate::detectors::{
     BuiltIn, BuiltInDetector, LiteralMatcher, RequiredLiterals, built_in_entries, built_in_ids,
     common_built_in_entries,
@@ -15,6 +16,7 @@ use crate::error::{SecretScanError, SecretScanErrorCode};
 use crate::limits::WholeInputLimits;
 use crate::pii::{PiiSelection, adapter, is_reserved_detector_id};
 use crate::pipeline::{scan_and_redact_in, scan_in};
+use crate::selection::{DetectionConfigError, DetectionSelection, PlanEntry, plan_selection};
 use crate::types::{Detector, Finding, PlaceholderFormatter, Policy, ScanResult, is_identifier};
 
 /// A named, reviewed built-in detector composition
@@ -36,19 +38,27 @@ pub enum Profile {
     /// published structure or a credential-bearing context rather than one
     /// issuer's token format.
     Common,
+    /// A static custom composition of built-in detectors
+    /// ([`Composition`](crate::composition::Composition), issue #1253). It is
+    /// not a profile a caller selects: it is what a registry built from a
+    /// composition reports, and it has no wire name to parse.
+    Custom,
 }
 
 impl Profile {
-    /// The wire name (`"full"`, `"common"`).
+    /// The wire name (`"full"`, `"common"`, `"custom"`).
     #[must_use]
     pub const fn as_str(self) -> &'static str {
         match self {
             Self::Full => "full",
             Self::Common => "common",
+            Self::Custom => "custom",
         }
     }
 
-    /// Parses a wire name.
+    /// Parses the wire name of a selectable profile: `"full"` or `"common"`.
+    /// `"custom"` is not selectable by name; a composition is built with
+    /// [`Composition`](crate::composition::Composition).
     #[must_use]
     pub fn from_name(name: &str) -> Option<Self> {
         match name {
@@ -57,6 +67,44 @@ impl Profile {
             _ => None,
         }
     }
+}
+
+/// The compiled prefilter of a registry: the shared one of a whole profile,
+/// or one compiled for the detectors a selection left enabled.
+#[derive(Clone, Debug)]
+enum Prefilter {
+    Shared(&'static LiteralMatcher),
+    Owned(Arc<LiteralMatcher>),
+}
+
+impl Prefilter {
+    fn matcher(&self) -> &LiteralMatcher {
+        match self {
+            Self::Shared(matcher) => matcher,
+            Self::Owned(matcher) => matcher,
+        }
+    }
+}
+
+/// Compiles the matcher over `declared`, one call shape for every registry so
+/// the generic `LiteralMatcher::compile` is instantiated once rather than per
+/// registry type (it is the same code in every WebAssembly artifact).
+pub(crate) fn compile_matcher(declared: Vec<Option<&RequiredLiterals>>) -> Option<LiteralMatcher> {
+    LiteralMatcher::compile(declared)
+}
+
+/// Drops the entries `keep` rejects and compiles a prefilter over exactly the
+/// survivors, so a disabled detector is neither constructed nor prefiltered
+/// and the matcher's slots stay aligned with registration order.
+fn retain_and_recompile<T>(
+    entries: &mut Vec<T>,
+    keep: &[bool],
+    required: impl Fn(&T) -> Option<&RequiredLiterals>,
+) -> Option<Prefilter> {
+    let mut flags = keep.iter();
+    entries.retain(|_| flags.next().copied().unwrap_or(true));
+    compile_matcher(entries.iter().map(required).collect())
+        .map(|matcher| Prefilter::Owned(Arc::new(matcher)))
 }
 
 /// A detector together with the id captured at registration time.
@@ -149,12 +197,19 @@ pub struct DetectorRegistry {
     detectors: Vec<RegisteredDetector>,
     profile: Option<Profile>,
     activation_identity: String,
+    /// The detector selection applied when this registry was composed
+    /// (issue #1251); [`DetectionSelection::all`] unless
+    /// [`Self::with_detection`] ran.
+    detection: DetectionSelection,
+    /// The PII selection the registry's adapter was built from.
+    pii: PiiSelection,
     /// Every built-in's prefilter declaration compiled into one matcher
     /// (issue #1057), indexed by registry position. Set by the profile
     /// constructors, which register the built-ins first; detectors
     /// appended later declare nothing, so it never goes stale. `None` for a
-    /// registry with no built-ins, where nothing is declared.
-    prefilter: Option<&'static LiteralMatcher>,
+    /// registry with no built-ins, where nothing is declared. A detector
+    /// selection recompiles it over the detectors that stay.
+    prefilter: Option<Prefilter>,
 }
 
 impl DetectorRegistry {
@@ -168,6 +223,8 @@ impl DetectorRegistry {
             }],
             profile: None,
             activation_identity: String::new(),
+            detection: DetectionSelection::all(),
+            pii: PiiSelection::empty(),
             prefilter: None,
         }
     }
@@ -182,6 +239,8 @@ impl DetectorRegistry {
             detectors: Vec::new(),
             profile: None,
             activation_identity: String::new(),
+            detection: DetectionSelection::all(),
+            pii: PiiSelection::empty(),
             prefilter: None,
         }
     }
@@ -229,7 +288,9 @@ impl DetectorRegistry {
         {
             registry.push_validated_built_in(id, detector, required)?;
         }
-        registry.prefilter = registry.compile_prefilter(&FULL_PREFILTER);
+        registry.prefilter = registry
+            .compile_prefilter(&FULL_PREFILTER)
+            .map(Prefilter::Shared);
         for detector in custom {
             registry.push_validated_custom(detector, false)?;
         }
@@ -270,13 +331,75 @@ impl DetectorRegistry {
         {
             registry.push_validated_built_in(id, detector, required)?;
         }
-        registry.prefilter = registry.compile_prefilter(&COMMON_PREFILTER);
+        registry.prefilter = registry
+            .compile_prefilter(&COMMON_PREFILTER)
+            .map(Prefilter::Shared);
         for detector in custom {
             registry.push_validated_custom(detector, true)?;
         }
         registry.profile = Some(Profile::Common);
         registry.activation_identity = PiiSelection::default().activation_identity(Profile::Common);
         Ok(registry)
+    }
+
+    /// Creates a registry holding exactly the detectors of `composition`, in
+    /// its canonical order, followed by `custom` in the given order (issue
+    /// #1253). It reports [`Profile::Custom`].
+    ///
+    /// Only the selected constructors are referenced, so a build that calls
+    /// nothing else links no other built-in detector. Like
+    /// [`Self::with_common_built_in`], a custom detector may not reuse any
+    /// `full` built-in id, including one the composition does not select. This
+    /// constructor never names the PII adapter, so an artifact built without
+    /// the PII runtime links none; use [`Self::with_composition_and_pii`] for
+    /// one that has it.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] when a custom
+    /// detector has a malformed id, repeats an id already registered, or
+    /// reuses any `full` built-in id.
+    pub fn with_composition<I>(
+        composition: &Composition,
+        custom: I,
+    ) -> Result<Self, SecretScanError>
+    where
+        I: IntoIterator<Item = Box<dyn Detector>>,
+    {
+        let mut registry = Self::new();
+        for selected in composition.selected() {
+            registry.push_validated_built_in(selected.id, selected.detector, selected.required)?;
+        }
+        registry.prefilter = composition.prefilter().map(Prefilter::Owned);
+        for detector in custom {
+            registry.push_validated_custom(detector, true)?;
+        }
+        registry.profile = Some(Profile::Custom);
+        registry.activation_identity = PiiSelection::default().activation_identity(Profile::Custom);
+        Ok(registry)
+    }
+
+    /// [`Self::with_composition`] plus the selected PII-domain adapter in its
+    /// fixed slot after the credentials, preserving the custom profile
+    /// identity.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] for a malformed,
+    /// duplicate, built-in, adapter, or internal family id.
+    pub fn with_composition_and_pii<I>(
+        composition: &Composition,
+        selection: &PiiSelection,
+        custom: I,
+    ) -> Result<Self, SecretScanError>
+    where
+        I: IntoIterator<Item = Box<dyn Detector>>,
+    {
+        Self::with_composition(composition, [])?.with_pii_and_custom(
+            Profile::Custom,
+            selection,
+            custom,
+        )
     }
 
     /// Creates the `full` credential profile plus the selected PII-domain
@@ -366,6 +489,7 @@ impl DetectorRegistry {
         }
         registry.profile = Some(profile);
         registry.activation_identity = selection.activation_identity(profile);
+        registry.pii = selection.clone();
         Ok(registry)
     }
 
@@ -380,10 +504,11 @@ impl DetectorRegistry {
     ) -> Option<&'static LiteralMatcher> {
         cache
             .get_or_init(|| {
-                LiteralMatcher::compile(
+                compile_matcher(
                     self.detectors
                         .iter()
-                        .map(RegisteredDetector::required_literals),
+                        .map(RegisteredDetector::required_literals)
+                        .collect(),
                 )
             })
             .as_ref()
@@ -391,8 +516,8 @@ impl DetectorRegistry {
 
     /// The compiled prefilter declarations of this registry's built-ins,
     /// indexed by registry position; `None` when it has none.
-    pub(crate) const fn prefilter(&self) -> Option<&'static LiteralMatcher> {
-        self.prefilter
+    pub(crate) fn prefilter(&self) -> Option<&LiteralMatcher> {
+        self.prefilter.as_ref().map(Prefilter::matcher)
     }
 
     /// Which profile this registry was built from, when it carries one.
@@ -410,6 +535,99 @@ impl DetectorRegistry {
     #[must_use]
     pub fn activation_identity(&self) -> &str {
         &self.activation_identity
+    }
+
+    /// The detector selection this registry was composed with:
+    /// [`DetectionSelection::all`] for every constructor except
+    /// [`Self::with_detection`].
+    #[must_use]
+    pub const fn detection(&self) -> &DetectionSelection {
+        &self.detection
+    }
+
+    /// The PII selection the registry's adapter was built from.
+    pub(crate) const fn pii_selection(&self) -> &PiiSelection {
+        &self.pii
+    }
+
+    /// The registered built-in ids, in registration order.
+    pub(crate) fn built_in_ids(&self) -> impl Iterator<Item = &str> {
+        self.detectors
+            .iter()
+            .filter(|registered| matches!(registered.detector, Held::BuiltIn(_)))
+            .map(RegisteredDetector::id)
+    }
+
+    /// Applies a detector-id selection to this registry's built-in detectors
+    /// (issue #1251, `decision-define-detector-id-selection-and-configuration-replacement-precedence`).
+    ///
+    /// The selection acts here, when the registry is composed, before the
+    /// shared prefilter, candidate collection and overlap resolution: a
+    /// disabled detector is not prefiltered, produces no candidate, is no
+    /// overlap competitor and adds no retention behavior. The enabled set is
+    /// the registry's built-ins in registration order filtered to the
+    /// enabled ids, so request order never matters and an enabled detector's
+    /// candidates equal its candidates in `full`. The PII adapter and custom
+    /// or ruleset detectors are not built-ins: a selection neither names nor
+    /// removes them. The activation identity does not change, and the
+    /// profile identity is kept as the compatibility baseline.
+    ///
+    /// Call it on a registry built from one profile constructor, so a
+    /// `common` build never makes the `full` constructor reachable; every
+    /// id a registry does not hold is judged against the full built-in
+    /// table, which is pure data.
+    ///
+    /// [`DetectionSelection::all`] is a no-op. Applying a selection to a
+    /// registry that already carries one narrows it further only through the
+    /// ids it still holds; ids removed earlier are `DETECTOR_NOT_INCLUDED`.
+    ///
+    /// # Errors
+    ///
+    /// A [`DetectionConfigError`] when an id is repeated, unknown, a `full`
+    /// built-in this registry does not hold, or names a PII or custom
+    /// detector; or `EMPTY_DETECTION_SET` when the selection leaves the
+    /// registry with no detector at all. The registry is consumed either way,
+    /// so no half-applied registry exists.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use redact_secret::{DefaultPolicy, DetectionSelection, DetectorRegistry, scan};
+    ///
+    /// let registry = DetectorRegistry::with_built_in([])?
+    ///     .with_detection(&DetectionSelection::include(["jwt"]))?;
+    /// assert_eq!(registry.ids().collect::<Vec<_>>(), ["jwt"]);
+    ///
+    /// // A provider token is no longer detected: its detector is not enabled.
+    /// let input = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000";
+    /// let findings = scan(input, &registry, &DefaultPolicy)?;
+    /// assert!(findings.iter().all(|finding| finding.detector() != "github-token"));
+    /// # Ok::<(), Box<dyn std::error::Error>>(())
+    /// ```
+    pub fn with_detection(
+        mut self,
+        selection: &DetectionSelection,
+    ) -> Result<Self, DetectionConfigError> {
+        if selection.is_all() {
+            return Ok(self);
+        }
+        let plan: Vec<PlanEntry<'_>> = self
+            .detectors
+            .iter()
+            .map(|registered| PlanEntry {
+                id: registered.id(),
+                built_in: matches!(registered.detector, Held::BuiltIn(_)),
+            })
+            .collect();
+        let keep = plan_selection(selection, &plan)?;
+        drop(plan);
+        self.prefilter = retain_and_recompile(
+            &mut self.detectors,
+            &keep,
+            RegisteredDetector::required_literals,
+        );
+        self.detection = selection.clone();
+        Ok(self)
     }
 
     /// Appends `detector`. This path applies no profile's reserved-id rule,
@@ -524,7 +742,7 @@ pub(crate) trait DetectorSet {
     /// Detectors in registration order.
     fn detector_entries(&self) -> impl Iterator<Item = DetectorEntry<'_>>;
     /// The compiled prefilter indexed by registration position, if any.
-    fn compiled_prefilter(&self) -> Option<&'static LiteralMatcher>;
+    fn compiled_prefilter(&self) -> Option<&LiteralMatcher>;
 }
 
 impl DetectorSet for DetectorRegistry {
@@ -540,7 +758,7 @@ impl DetectorSet for DetectorRegistry {
         })
     }
 
-    fn compiled_prefilter(&self) -> Option<&'static LiteralMatcher> {
+    fn compiled_prefilter(&self) -> Option<&LiteralMatcher> {
         Self::prefilter(self)
     }
 }
@@ -617,7 +835,8 @@ pub struct BuiltInRegistry {
     detectors: Vec<SharedDetector>,
     profile: Profile,
     activation_identity: String,
-    prefilter: Option<&'static LiteralMatcher>,
+    detection: DetectionSelection,
+    prefilter: Option<Prefilter>,
 }
 
 impl BuiltInRegistry {
@@ -646,6 +865,7 @@ impl BuiltInRegistry {
             detectors,
             profile,
             activation_identity: registry.activation_identity,
+            detection: registry.detection,
             prefilter: registry.prefilter,
         })
     }
@@ -708,6 +928,46 @@ impl BuiltInRegistry {
     #[must_use]
     pub fn activation_identity(&self) -> &str {
         &self.activation_identity
+    }
+
+    /// The detector selection this registry was composed with;
+    /// [`DetectionSelection::all`] unless [`Self::with_detection`] ran.
+    #[must_use]
+    pub const fn detection(&self) -> &DetectionSelection {
+        &self.detection
+    }
+
+    /// Applies a detector-id selection, exactly as
+    /// [`DetectorRegistry::with_detection`] does: before the prefilter and
+    /// overlap, in canonical order, rejecting an unknown, not-included or
+    /// repeated id and an empty result. The shareable value stays immutable
+    /// afterwards.
+    ///
+    /// # Errors
+    ///
+    /// See [`DetectorRegistry::with_detection`].
+    pub fn with_detection(
+        mut self,
+        selection: &DetectionSelection,
+    ) -> Result<Self, DetectionConfigError> {
+        if selection.is_all() {
+            return Ok(self);
+        }
+        let plan: Vec<PlanEntry<'_>> = self
+            .detectors
+            .iter()
+            .map(|registered| PlanEntry {
+                id: registered.id.as_ref(),
+                built_in: matches!(registered.detector, SharedHeld::BuiltIn(_)),
+            })
+            .collect();
+        let keep = plan_selection(selection, &plan)?;
+        drop(plan);
+        self.prefilter = retain_and_recompile(&mut self.detectors, &keep, |registered| {
+            registered.required.as_ref()
+        });
+        self.detection = selection.clone();
+        Ok(self)
     }
 
     /// Registered ids in registration order.
@@ -805,8 +1065,8 @@ impl DetectorSet for BuiltInRegistry {
         })
     }
 
-    fn compiled_prefilter(&self) -> Option<&'static LiteralMatcher> {
-        self.prefilter
+    fn compiled_prefilter(&self) -> Option<&LiteralMatcher> {
+        self.prefilter.as_ref().map(Prefilter::matcher)
     }
 }
 

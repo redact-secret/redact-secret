@@ -1,0 +1,218 @@
+{
+  "schema": "composition-conformance-fixture/v1",
+  "note": "composition/v1 build inputs: the canonical order, the canonical document and its identity (custom: and the SHA-256 of the canonical text), and the inputs that fail closed with a fixed code and a fixed-syntax path, never an echo of an input string. JavaScript (scripts/lib/composition.mjs) and Rust (Composition::new) both derive the same identity. No case carries a secret-shaped value.",
+  "cases": [
+    {
+      "name": "edge-checks",
+      "pii": "none",
+      "include": [
+        "jwt",
+        "github-token",
+        "generic-token"
+      ],
+      "ids": [
+        "github-token",
+        "jwt",
+        "generic-token"
+      ],
+      "canonical": "{\"include\":[\"github-token\",\"jwt\",\"generic-token\"],\"name\":\"edge-checks\",\"pii\":\"none\",\"schema\":\"composition/v1\"}",
+      "id": "custom:3b28ae85ce977665cef9087ee6258e737481eb044f96cc451c054f108cd5669e"
+    },
+    {
+      "name": "edge-checks",
+      "pii": "all",
+      "include": [
+        "jwt",
+        "github-token",
+        "generic-token"
+      ],
+      "ids": [
+        "github-token",
+        "jwt",
+        "generic-token"
+      ],
+      "canonical": "{\"include\":[\"github-token\",\"jwt\",\"generic-token\"],\"name\":\"edge-checks\",\"pii\":\"all\",\"schema\":\"composition/v1\"}",
+      "id": "custom:71cabf841e5f60832a1da0f28bc9bced207a7fe43a40458ee04ffc86bc337c06"
+    },
+    {
+      "name": "edge-renamed",
+      "pii": "none",
+      "include": [
+        "github-token",
+        "jwt",
+        "generic-token"
+      ],
+      "ids": [
+        "github-token",
+        "jwt",
+        "generic-token"
+      ],
+      "canonical": "{\"include\":[\"github-token\",\"jwt\",\"generic-token\"],\"name\":\"edge-renamed\",\"pii\":\"none\",\"schema\":\"composition/v1\"}",
+      "id": "custom:3347e0882bf79396824230d3ee836bb20a3e0ea3dcf1663294942ee30c871d8f"
+    },
+    {
+      "name": "payments-chat",
+      "pii": "none",
+      "include": [
+        "stripe-token",
+        "slack-token",
+        "bearer-token",
+        "connection-string",
+        "generic-token"
+      ],
+      "ids": [
+        "stripe-token",
+        "slack-token",
+        "bearer-token",
+        "connection-string",
+        "generic-token"
+      ],
+      "canonical": "{\"include\":[\"stripe-token\",\"slack-token\",\"bearer-token\",\"connection-string\",\"generic-token\"],\"name\":\"payments-chat\",\"pii\":\"none\",\"schema\":\"composition/v1\"}",
+      "id": "custom:0218dfb3b71e7631ae9ca79a2b7de54c3b1d6deb4dbe37c590d03d4bd2434ce8"
+    },
+    {
+      "name": "single-jwt",
+      "pii": "none",
+      "include": [
+        "jwt"
+      ],
+      "ids": [
+        "jwt"
+      ],
+      "canonical": "{\"include\":[\"jwt\"],\"name\":\"single-jwt\",\"pii\":\"none\",\"schema\":\"composition/v1\"}",
+      "id": "custom:a630607887c0bac34ff36efdeedd50a43877a0a168755498038a53cca5b3f8b4"
+    },
+    {
+      "name": "common-six",
+      "pii": "none",
+      "include": [
+        "generic-token",
+        "otpauth-uri",
+        "connection-string",
+        "bearer-token",
+        "jwt",
+        "private-key"
+      ],
+      "ids": [
+        "private-key",
+        "jwt",
+        "bearer-token",
+        "connection-string",
+        "otpauth-uri",
+        "generic-token"
+      ],
+      "canonical": "{\"include\":[\"private-key\",\"jwt\",\"bearer-token\",\"connection-string\",\"otpauth-uri\",\"generic-token\"],\"name\":\"common-six\",\"pii\":\"none\",\"schema\":\"composition/v1\"}",
+      "id": "custom:4d68890a76fd49a0887235070b5a07ae79898a085d5e1c8f616e3299c1e2058a"
+    }
+  ],
+  "rejected": [
+    {
+      "composition": {
+        "schema": "composition/v1",
+        "name": "x",
+        "include": [],
+        "pii": "none"
+      },
+      "code": "EMPTY_COMPOSITION",
+      "path": "include"
+    },
+    {
+      "composition": {
+        "schema": "composition/v1",
+        "name": "x",
+        "include": [
+          "jwt",
+          "jwt"
+        ],
+        "pii": "none"
+      },
+      "code": "DUPLICATE_DETECTOR_ID",
+      "path": "include[1]"
+    },
+    {
+      "composition": {
+        "schema": "composition/v1",
+        "name": "x",
+        "include": [
+          "jwt",
+          "no-such-detector"
+        ],
+        "pii": "none"
+      },
+      "code": "UNKNOWN_DETECTOR_ID",
+      "path": "include[1]"
+    },
+    {
+      "composition": {
+        "schema": "composition/v1",
+        "name": "x",
+        "include": [
+          "jwt",
+          "Not An Id"
+        ],
+        "pii": "none"
+      },
+      "code": "INVALID_IDENTIFIER",
+      "path": "include[1]"
+    },
+    {
+      "composition": {
+        "schema": "composition/v1",
+        "name": "Bad Name",
+        "include": [
+          "jwt"
+        ],
+        "pii": "none"
+      },
+      "code": "INVALID_IDENTIFIER",
+      "path": "name"
+    },
+    {
+      "composition": {
+        "schema": "composition/v2",
+        "name": "x",
+        "include": [
+          "jwt"
+        ],
+        "pii": "none"
+      },
+      "code": "UNKNOWN_SCHEMA",
+      "path": "schema"
+    },
+    {
+      "composition": {
+        "schema": "composition/v1",
+        "name": "x",
+        "include": [
+          "jwt"
+        ],
+        "pii": "email"
+      },
+      "code": "UNSUPPORTED_PII",
+      "path": "pii"
+    },
+    {
+      "composition": {
+        "schema": "composition/v1",
+        "name": "x",
+        "include": [
+          "jwt"
+        ],
+        "pii": "none",
+        "ruleset": "y"
+      },
+      "code": "UNKNOWN_FIELD",
+      "path": "$"
+    },
+    {
+      "composition": {
+        "schema": "composition/v1",
+        "name": "x",
+        "include": "jwt",
+        "pii": "none"
+      },
+      "code": "WRONG_TYPE",
+      "path": "include"
+    }
+  ]
+}

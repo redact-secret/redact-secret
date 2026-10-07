@@ -50,6 +50,7 @@ usage: redact-secret [--json] [--ruleset <path>] [--action-policy <path>] [--pii
        redact-secret --redact [--ruleset <path>] [--action-policy <path>] [--pii <selector>]... [--] [<path>]
        redact-secret --compare-action-policy <path>... [--action-policy <path>] [--json] [--ruleset <path>] [--pii <selector>]... [--] <path>
        redact-secret --print-pii-activation [--pii <selector>]...
+       redact-secret --print-artifact-manifest
        redact-secret --version | -V
        redact-secret --help | -h";
 
@@ -123,6 +124,16 @@ where
                 stdout,
                 &selection.activation_identity(redact_secret::Profile::Full),
             )?;
+            Ok(Outcome::Clean)
+        }
+        Command::ArtifactManifest => {
+            let manifest = redact_secret::ArtifactManifest::full(
+                redact_secret::ArtifactKind::Cli,
+                true,
+                option_env!("REDACT_SECRET_SOURCE_REVISION"),
+            )
+            .map_err(|error| Failure::Usage(error.message()))?;
+            write_line(stdout, manifest.as_json())?;
             Ok(Outcome::Clean)
         }
         Command::Check {
@@ -358,6 +369,15 @@ redact mode
                   input is not accepted (it is streamed under enforcement), and
                   neither is --redact. Combine with --json for a machine report.
 
+--print-artifact-manifest
+                  Standalone. Prints this binary's artifact-manifest/v1
+                  document (build identity, the built-in detectors in canonical
+                  order with the finding types each can emit, the PII runtime,
+                  capabilities, defaults and bounds, and its digest) as one
+                  line of JSON, and exits without reading any input. It
+                  accepts no other argument. The list of types is declared per
+                  detector, not a closed vocabulary.
+
 exit codes
   0  check: every source was scanned and nothing was found
      redact: the whole sanitized stream was written
@@ -511,6 +531,27 @@ mod tests {
         let stderr = String::from_utf8(stderr).unwrap();
         assert!(stderr.contains("USAGE: unrecognized option"));
         assert!(stderr.contains("redact-secret --redact"));
+    }
+
+    #[test]
+    fn artifact_manifest_prints_one_line_without_reading_input() {
+        let printed = invoke(&["--print-artifact-manifest"], "UNREAD INPUT");
+        assert_eq!(printed.outcome, Ok(Outcome::Clean));
+        assert!(printed.stderr.is_empty());
+        let manifest = redact_secret::ArtifactManifest::full(
+            redact_secret::ArtifactKind::Cli,
+            true,
+            option_env!("REDACT_SECRET_SOURCE_REVISION"),
+        )
+        .unwrap();
+        assert_eq!(printed.stdout, format!("{}\n", manifest.as_json()));
+        assert!(printed.stdout.contains("\"kind\":\"cli\""));
+        assert!(!printed.stdout.contains("UNREAD INPUT"));
+        let rejected = invoke(&["--print-artifact-manifest", "file"], "");
+        assert_eq!(
+            rejected.outcome,
+            Err(Failure::Usage(failure::PRINT_MANIFEST_STANDALONE))
+        );
     }
 
     #[test]

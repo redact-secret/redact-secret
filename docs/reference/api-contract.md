@@ -9,6 +9,7 @@
 | Both together | `scanAndRedact` | `scan_and_redact` | Text and findings |
 | Supported defaults, Rust only | none | `sanitize`, `sanitize_with_profile` | Text and findings, as `scan_and_redact` |
 | Compare action policies, preview only (whole input) | `compareActionPolicies` | `compare_action_policies` (Python and Rust); the CLI's `--compare-action-policy` | Per-finding actions and reasons for 1 to 4 policies over one detection pass, no text |
+| Compare detection configurations, preview only (whole input) | `compareConfigurations` | `compare_configurations` (Rust only) | Per-side findings and the differences against the first side, from independent passes, no text |
 
 Bindings adapt arguments and results; they do not copy detector logic. Rust
 additionally takes a registry, policy, and formatter; `sanitize(input)` and
@@ -104,13 +105,250 @@ for profile membership and the false-negative tradeoff, and the
 without initializing or reconfiguring anything. They take no input, never
 throw or raise, and return only fixed fields: `initialized` (boolean),
 `profile` (`"full"` or `"common"`) and `activation` (the `piiActivation()` /
-`pii_activation()` identity once initialized, otherwise `null` / `None`). Both
-types are named `CoreStatus`. They are additive stable names, not available in
+`pii_activation()` identity once initialized, otherwise `null` / `None`). The
+JavaScript result also carries the additive field `configuration`, the `digest`
+of the snapshot of the configuration the runtime is fixed to (`describeConfig()`),
+`null` before initialization; it is an additive output field, not a breaking
+change, and Python's result does not have it (Python has no configuration
+resolution). Both types are named `CoreStatus`. They are additive stable names, not available in
 releases before the one that adds them, and they are not a detection-readiness
 claim. The Rust crate and the CLI add nothing: Rust has no lifecycle to query
 and the CLI runs one shot. A core-published synthetic readiness probe is
 deliberately not part of the contract
 ([`decision-add-a-side-effect-free-status-query-and-defer-a-published-readiness-probe`](../decisions/2026-10-05-add-a-side-effect-free-status-query-and-defer-a-published-readiness-probe.md)).
+
+## Artifact manifest
+
+`artifact-manifest/v1` says what the exact loaded artifact contains, without a
+scan and without initializing anything: build identity, the built-in detectors
+in canonical order with their pack and the finding types each can emit, whether
+the PII runtime is linked, capabilities, build defaults, bounds and a digest.
+The Rust core generates it from the registration rows the artifact links, so
+every surface forwards one value and keeps no detector table of its own.
+
+| Surface | Name |
+| --- | --- |
+| Rust | `ArtifactManifest::full` / `::common`, `ArtifactKind`, `ArtifactManifestError` |
+| JavaScript (root and `./common`) | `artifactManifest()`, types `ArtifactManifest`, `ArtifactManifestDetector` |
+| Python | `redact_secret.artifact_manifest()` (a `dict`) |
+| CLI | `--print-artifact-manifest` (one JSON line, reads no input, accepts no other argument) |
+
+`detectors[].types` is each built-in's declared list, not a closed vocabulary:
+a ruleset, a custom detector and the PII adapter emit other types, and
+`typeVocabulary.complete` is `false`. The document holds no input, ruleset,
+literal, path, host name or timestamp, and reading it builds no registry and
+reads no PII selection. In JavaScript it reports the artifact `initialize()`
+loaded, and `initialize()` rejects with `INITIALIZATION_FAILED` when the
+manifest is missing from an artifact that should report one, or has another
+schema, version or variant, or a digest that is not its own, echoing none of it.
+`capabilities.detectorSelection` is `true` for the Rust, Node addon and
+WebAssembly artifacts and `false` for the Python wheel and the CLI, so a
+manifest digest differs by artifact kind
+([`decision-define-the-artifact-manifest-and-configuration-data-contracts`](../decisions/2026-10-07-define-the-artifact-manifest-and-configuration-data-contracts.md)).
+
+## Static custom composition
+
+A **custom composition** links only the built-in detectors a build selects. It
+is not a profile (`Profile::Custom` is what a composed registry reports; it has
+no wire name to parse, and `sanitize_with_profile` refuses it with
+`INVALID_OPTIONS`). The core stays free of Cargo features: the mechanism is one
+public constructor per built-in detector plus the types that consume them.
+
+| Surface | Name |
+| --- | --- |
+| Rust | the root module `composition`: `Composition::new(name, pii, selected)`, `SelectedDetector`, and one constructor per built-in detector named after its id with `-` written `_` (`github_token()`, `jwt()`, `generic_token()`); `DetectorRegistry::with_composition`, `::with_composition_and_pii`; `IncrementalSanitizer::with_composition_detection_policy_and_formatter`, `::with_composition_and_pii_detection_policy_and_formatter`; `ArtifactManifest::custom`, `ArtifactManifest::composition_id` |
+| WebAssembly | a generated wrapper from `scripts/build-custom-artifact.mjs` (`npm run wasm:build:custom`) with the function set of `./common` and `PROFILE` `"custom"`; the binding's `custom` Cargo feature |
+| Node addon, Python, CLI | unsupported |
+
+The constructor names are the accepted public naming of the `core-public-api`
+review: `composition` is the one name added to the crate root (73 names), and
+adding a built-in detector adds one constructor, pinned by tests against the
+registration row, the catalog and the prefilter declaration. `Composition::new`
+validates the canonical registration order (a composition never reorders it),
+repeats, the name and a non-empty set, all as `InvalidDetector`, and derives the
+identity `custom:<sha256>` of the canonical `composition/v1` document, shared
+with the JavaScript tooling through `conformance/fixtures/composition-v1.json`.
+A custom detector cannot reuse any built-in id, selected or not. A manifest of
+a custom artifact has `artifact.variant` and `composition.profile` `custom`,
+`composition.kind` `custom` and `composition.id` set; the snapshot's
+`artifact.compositionId` carries the same value. The JavaScript `status()`
+`profile` type widens to include `"custom"` for the generated wrapper only (the
+manifest types already allowed it); the published entry points still report
+`"full"` and `"common"`. The [custom composition guide](../guides/custom-composition.md)
+states what a build removes, what stays, and that no size or speed is
+guaranteed
+([`decision-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support`](../decisions/2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md)).
+
+## Detector selection and effective configuration
+
+A **detector-id selection** chooses which of an artifact's included built-in
+detectors are enabled. It is applied when the registry is composed, before the
+prefilter, candidate collection and overlap resolution, so a disabled detector
+produces no candidate, is no overlap competitor and adds no retention behavior;
+the enabled set is the artifact's canonical order filtered to the enabled ids,
+whatever order they were requested in. `include` is an allowlist (a detector
+added in a later release stays off), `exclude` a denylist (a later detector is
+on), never both; each takes at most 256 lowercase identifiers. An unknown,
+not-included, repeated or non-selectable id is rejected, never ignored and
+never satisfied by loading another artifact. A selection can lose coverage and
+can move a span to a weaker detector's type and action; the standard artifacts
+are unchanged without one, and server-side enforcement should run an unselected
+`full`.
+
+`resolveConfig` resolves explicit input over the artifact's build defaults into a
+`config-snapshot/v1` and every safe diagnostic (`config-resolution/v1`). It is
+pure: it scans nothing, builds no registry, initializes nothing and changes no
+owner, and invalid input is data (`ok: false`, no snapshot), not a throw. The
+shared truth table lives once, in the Rust core:
+
+| Key | Absent | Explicit empty | Explicit value |
+| --- | --- | --- | --- |
+| `detection.include` | every included detector | no built-in detector | exactly the list |
+| `detection.exclude` | none excluded | same as absent | every included detector but the list |
+| `pii` | off | off | the canonical selector set |
+| `ruleset` | none | not expressible | adds the ruleset's detectors |
+| `actionPolicy` | the artifact default | `rules: []` is the base | replaces the whole document |
+| `limits.*` | artifact default | zero is rejected | replaces that field only |
+| callback `policy` | none | n/a | replaces the default; with `actionPolicy` is `INVALID_OPTIONS` |
+
+Arrays and policy documents replace and are never merged across layers, and an
+action, `allow` included, never enables or disables a detector. The snapshot
+reports what is **compiled** (`detection.compiledCount`), **enabled**,
+**disabled** and **unavailable** (the `full` built-ins the artifact does not
+include) separately, where each value came from (`origins`), who fixes each
+setting on this surface (`owners`), and the identity of the artifact, the
+enabled detection (`detectionDigest`), the exact serialized policy document
+(`actionPolicy.digest`) and the snapshot itself (`digest`). A callback is
+labelled a dynamic reference (`source: "callback"`, `explainable: false`). The
+ruleset's detector ids and byte digest are withheld unless the caller asks for
+them. The snapshot holds ids, counts and digests only: no input byte, no ruleset
+body or rule pattern, no value, no path and no sensitivity score. Its `digest` is
+the SHA-256 of its canonical JSON without `digest`, the same rule as the manifest.
+
+A policy that loaded is also checked against the catalog and the resolved
+configuration (issue #1252; [guide](../guides/action-policy.md#diagnose-a-policy-before-use)).
+The revision-1 parser is unchanged, so the checks add only diagnostics: a
+`type` or `detector` no list knows, a detector that is compiled but disabled or
+not included in the artifact, and a rule provably shadowed by one earlier rule
+are warnings (`ACTION_POLICY_UNKNOWN_TYPE`, `ACTION_POLICY_UNKNOWN_DETECTOR`,
+`ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR`,
+`ACTION_POLICY_RULE_ON_NOT_INCLUDED_DETECTOR`, `ACTION_POLICY_SHADOWED_RULE`);
+a callback, or a name a ruleset or PII selection could emit, is `info`
+`ACTION_POLICY_ANALYSIS_UNCERTAIN`. A diagnostic's `id` is a catalog detector id
+or a rule id, and `related` points at the earlier rule of a shadow. Rust alone
+offers the closed vocabulary (`ConfigRequest::closed_types`, `closed_detectors`:
+an unknown name is then an error) and `SampleRuleHits`.
+
+| Surface | Name |
+| --- | --- |
+| Rust | `DetectionSelection`, `DetectorRegistry::with_detection`, `BuiltInRegistry::with_detection`, `IncrementalSanitizer::with_detection_policy_and_formatter` (and the `common`, PII-aware forms), `resolve_config`, `describe_config`, `ConfigRequest`, `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic`, `ConfigSeverity`, `DetectionConfigError`, `SampleRuleHits`, `ConfigRequest::closed_types`, `ConfigRequest::closed_detectors` |
+| JavaScript (root and `./common`) | `initialize({ detection })`, `resolveConfig(config?, options?)`, `describeConfig()`, `status().configuration`, types `DetectionSelection`, `RuntimeConfig`, `ResolveConfigOptions`, `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic` |
+| Node addon | `initializeDetection`, `initializeCommonDetection`, `resolveConfig`, `resolveConfigCommon` |
+| WebAssembly | `initialize(pii, detection?)`, `resolveConfig` |
+| Python, CLI | unsupported: a reduced detection set would only weaken a server or enforcement surface |
+
+Ownership: `detection` and `pii` belong to the initialization owner (`initialize`
+in Node and WebAssembly, the registry value in Rust) and join the one-shot
+contract of `pii`. An equivalent resolved selection is idempotent, a differing
+one, including a plain `initialize()` after a narrowed one, is
+`DETECTION_CONFIG_CONFLICT`, and a rejected or conflicting request changes
+nothing. A selection that leaves no built-in detector, no ruleset and no PII
+family enabled is inert: binding it to an owner or a session is
+`EMPTY_DETECTION_SET`, while `resolveConfig` still describes it (with the warning
+`NO_BUILT_IN_DETECTORS`). There is no `reconfigure`, setter or per-call detection
+argument: a `detection` key on `scan`, `scanAndRedact`, `redact` or a session is
+`INVALID_OPTIONS`. A streaming session captures the owner's configuration once, at
+creation, and neither accepts a ruleset nor changes afterwards. `describeConfig()`
+takes no input, reads no scan input and changes nothing; it returns the
+configuration the runtime is fixed to, and `status().configuration` is its
+`digest` (`null` before initialization). Both need a successful `initialize()` in
+JavaScript, because the resolver is the loaded artifact's own.
+
+New fixed error codes: `INVALID_DETECTION_CONFIG`, `DETECTION_CONFIG_CONFLICT` and
+`EMPTY_DETECTION_SET`. The thrown error carries only the code in JavaScript; the
+Node and WebAssembly message appends the fixed rejection class and, for one id,
+its position in the array, never the id. `resolveConfig` reports the class
+(`UNKNOWN_DETECTOR_ID`, `DETECTOR_NOT_INCLUDED`, `DUPLICATE_DETECTOR_ID`, ...), a
+fixed-syntax path such as `detection.include[3]` (an unknown member is addressed
+by position, `detection.@1`, never its name) and only a canonical catalog id
+([`decision-define-detector-id-selection-and-configuration-replacement-precedence`](../decisions/2026-10-07-define-detector-id-selection-and-configuration-replacement-precedence.md)).
+
+## Configuration comparison
+
+`compareActionPolicies` changes only the action and runs detection once. When a
+change may alter **detection** (the detector selection, the PII selection, a
+ruleset, the limits), use `compareConfigurations` (`configuration-comparison/v1`,
+issue #1254): a whole-input preview that runs one **independent** detection pass
+per side and relates the sides' finalized findings. It is not enforcement and not
+a handle: it returns no text, builds a temporary registry for each side for the
+duration of the call, reads and changes no owner, and holds nothing.
+
+```ts
+compareConfigurations(input, {
+  configs: [{}, { detection: { exclude: ["github-token"] } }], // one to four RuntimeConfig sides
+  actionPolicy, // optional, for every side without its own `actionPolicy`
+  policy, // optional callback for every side; not together with an actionPolicy
+});
+```
+
+Each side is a `RuntimeConfig`; its `detection`, `pii`, `ruleset`, `actionPolicy` and
+`limits` apply to that side only, and the first side is the baseline. Rust takes
+registries the caller built (`ConfigurationSide::new(&registry, policy)`, with
+`with_limits` and `with_snapshot`) because the Rust registry value is the owner;
+`ConfigSnapshot::detection_selection`, `pii_selection` and `whole_input_limits` carry a
+resolved configuration to that construction.
+
+| Result member | Meaning |
+| --- | --- |
+| `schema`, `version`, `rangeUnit` | `configuration-comparison/v1`, the producing package version and the unit of every range |
+| `scope: "input"`, `mode: "preview"`, `enforced: false` | differences on this input only; never enforcement |
+| `configs[i]` | `label` (`baseline`, `candidate-N`), `digest` and `detectionDigest` of the side's snapshot (`null` if it did not resolve), `origins`, the side's own `diagnostics`, and `policy` (`kind`, `documentSha256`) |
+| `results[i]` | `status` (`scanned`, `limited`, `unsupported`, `error`), a fixed `failure` code, action `counts`, and the side's finalized `findings` (type, detector, confidence, obfuscation, `start`, `end`, `action`, `reason`) |
+| `differences[i]` | `null` for the baseline and for any side where it or the baseline did not scan; otherwise `entries` and an `unchanged` count |
+| `callbackSides` | positions of callback sides |
+
+A finding has no per-scan id in a comparison, because ids are not a stable identity
+across scans. Correspondence comes from the findings' ranges in the declared unit:
+findings joined by overlapping ranges form a cluster, and a cluster is
+
+- `added` (only the other side) or `removed` (only the baseline), one entry per finding;
+- `changed`: one finding on each side, `correspondence` `exact` (same range) or
+  `overlap` (different ranges), with `changes` naming any of `range`, `type`,
+  `detector`, `confidence`, `action` and `reason`; a pair equal in all of them is only
+  counted in `unchanged`. Removing a provider detector can expose a contextual one on
+  the same span: that is `changed` with `type` and `detector`, not a removal;
+- `split`, `merged` or `regrouped`: several findings share the overlap. They are listed
+  together as `ambiguous` and are not paired.
+
+`base` and `other` are positions in `results[0].findings` and the other side's
+`findings`. A side that cannot be built (an invalid selection or ruleset, nothing
+enabled, PII the artifact cannot provide) or stops on a limit (each side has its own
+`limits`) is a failed side with a fixed code (`UNKNOWN_DETECTOR_ID`,
+`EMPTY_DETECTION_SET`, `PII_SELECTOR_UNAVAILABLE`, `INPUT_LIMIT_EXCEEDED`, ...) and no
+findings, which is not the same as finding nothing. A different ruleset, detector
+selection or PII selection always has a different `detectionDigest`, whatever the policy
+bytes are. A side or pair without findings or differences says nothing about the
+absence of risk, about other input, or that a detector or rule is ineffective, and the
+comparison covers finalized findings only (never an overlap loser or a candidate a gate
+dropped; a policy cannot recover one).
+
+A malformed call is `INVALID_OPTIONS` before anything runs (no side or more than four,
+an unknown key, a side that is not a plain object, a callback together with an action
+policy); a rejected policy document is `INVALID_ACTION_POLICY` before any side is scanned
+or callback called. A callback may have side effects and has no stable identity: it is
+called once per finalized finding of each scanned side, side by side in the order given,
+and its failure (`POLICY_FAILURE`, `INVALID_POLICY_ACTION`) fails the whole call with no
+partial result.
+
+Supported on Rust, the Node addon and WebAssembly (the same function on both, including
+the custom wrapper); unsupported on Python and the CLI. Independent configurations that
+are scans, not previews, still use the Worker, module-instance or process recipes of the
+[ownership guide](../guides/configuration-ownership.md): wrapping a singleton does not
+isolate PII, and a comparison side that needs PII on an artifact without the PII runtime
+is an `unsupported` side, never a silent fallback. The relation is computed in the
+JavaScript package, outside the WebAssembly artifact, and the Rust function has the same
+rules (`conformance/fixtures/configuration-compare-v1.json` runs on both, on the addon
+and on WebAssembly, `full` and `common`).
 
 ## Errors and extensions
 
@@ -138,7 +376,7 @@ custom detector callbacks are a direct Rust surface only.
 
 | Surface | Covered | Not covered |
 | --- | --- | --- |
-| Rust | The 72 names the `redact_secret` crate root exports, pinned by `core-public-api` in the workspace manifest and by `tests/public_api.rs` | Every private module; `Detector` implementations you write |
+| Rust | The 73 names the `redact_secret` crate root exports, pinned by `core-public-api` in the workspace manifest and by `tests/public_api.rs` | Every private module; `Detector` implementations you write |
 | JavaScript | `@redact-secret/core` and its subpaths `./common`, `./node-stream`, `./web-stream`, `./common/node-stream`, `./common/web-stream`: exported functions, constants, classes and types | `@redact-secret/wasm`, `@redact-secret/node` and the platform packages: installed as dependencies, not for direct use, versioned only in lockstep |
 | Python | Names in `redact_secret.__all__` and the shipped `.pyi` stubs | `redact_secret._native` and anything not re-exported |
 | CLI | Arguments, exit codes `0`/`1`/`2`, the `--json` report fields, standard-stream behavior | The line-per-finding text format (it is for people; parse `--json`), and diagnostic wording beyond the fixed code |
@@ -306,7 +544,7 @@ current contract, stated here so that no consumer has to infer it.
 
 | Fact | Evidence |
 | --- | --- |
-| Every whole-input call is synchronous. A started call runs until it returns a value or an error and cannot be interrupted. No whole-input function, option or callback takes a cancellation token, a deadline or a budget. JavaScript `scan`, `redact` and `scanAndRedact` are plain functions; only `initialize()` is asynchronous, and it loads the artifact. The Node addon and the WebAssembly binding run on the calling thread. Python releases the GIL during detection, so other Python threads keep running, but the native code does not poll for signals and the call cannot be interrupted. | `scan`, `redact`, `scanAndRedact` (`packages/javascript/src/runtime.ts`); `bindings/node/src/lib.rs`; `detect` (`bindings/python/src/lib.rs`). The names and signatures are pinned by `tests/public_api.rs` (the 72 root names), `packages/javascript/test/exact-exports.test.ts`, `packages/javascript/test/type-contracts.ts` and the Python `__all__`; no test asserts the absence of a cancellation parameter by that name. |
+| Every whole-input call is synchronous. A started call runs until it returns a value or an error and cannot be interrupted. No whole-input function, option or callback takes a cancellation token, a deadline or a budget. JavaScript `scan`, `redact` and `scanAndRedact` are plain functions; only `initialize()` is asynchronous, and it loads the artifact. The Node addon and the WebAssembly binding run on the calling thread. Python releases the GIL during detection, so other Python threads keep running, but the native code does not poll for signals and the call cannot be interrupted. | `scan`, `redact`, `scanAndRedact` (`packages/javascript/src/runtime.ts`); `bindings/node/src/lib.rs`; `detect` (`bindings/python/src/lib.rs`). The names and signatures are pinned by `tests/public_api.rs` (the 73 root names), `packages/javascript/test/exact-exports.test.ts`, `packages/javascript/test/type-contracts.ts` and the Python `__all__`; no test asserts the absence of a cancellation parameter by that name. |
 | Policy and formatter callbacks cannot act as a deadline. The policy runs only after detection has finished and the formatter only after the policy, so neither can cut detection short. A Rust custom `Detector` may return `DetectorFailure`, but that is the detector's own choice; the core never preempts it. | `scan_with_limits`, `scan_and_redact_with_limits` (`src/pipeline.rs`). |
 | `abort()` on an incremental session, and `cancel()` or `abort()` on a stream adapter, discard retained plaintext between calls. They cannot interrupt an `append` or `finalize` that is already running. | `IncrementalSanitizer::abort` (`src/incremental.rs`); `WebStreamSanitizer` (`packages/javascript/src/adapters/web-stream-core.ts`). Tests: `abort_rejects_every_later_call` (`tests/incremental.rs`), `packages/javascript/test/adapters/`. |
 | The only bounds are `max_input_bytes`, 64 MiB (67,108,864 bytes), and `max_findings`, 50,000. Both fail closed, as described in the previous section. They bound input size and finding count, not running time: the time a call takes depends on the host, the build, the profile, the PII selection, the ruleset and the content of the input. A CLI file source uses the same 64 MiB bound, and CLI standard input runs under the explicit incremental limits that `--help` lists. | `DEFAULT_MAX_INPUT_BYTES`, `DEFAULT_MAX_FINDINGS` (`src/limits.rs`); `crates/secret-scan-cli/src/limits.rs`. Tests: `default_matches_declared_constants` (`src/limits.rs`), the 50,001-finding and 64 MiB + 1 cases in `tests/sanitize_golden_path_1078.rs`. No test asserts the literal values 67,108,864 and 50,000. |

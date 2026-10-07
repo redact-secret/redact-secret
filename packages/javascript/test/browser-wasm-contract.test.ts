@@ -78,13 +78,14 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
     const wasm = createWasmShapedBinding();
     const runtime = createRedactSecretRuntime(wasm.load, "full");
 
-    expect(runtime.status()).toEqual({ initialized: false, profile: "full", activation: null });
+    expect(runtime.status()).toEqual({ initialized: false, profile: "full", activation: null, configuration: null });
     await runtime.initialize();
 
     expect(runtime.status()).toEqual({
       initialized: true,
       profile: "full",
       activation: runtime.piiActivation(),
+      configuration: null,
     });
   });
 

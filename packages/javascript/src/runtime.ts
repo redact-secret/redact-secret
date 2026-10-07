@@ -9,8 +9,11 @@
  */
 
 import { toActionComparison } from "./compare.js";
+import { parseConfigResolution } from "./config.js";
+import { type SideOutcome, toConfigurationComparison } from "./configuration-compare.js";
 import { SecretScanError, type SecretScanErrorCode, toSecretScanError } from "./errors.js";
 import { defaultPlaceholderFormatter } from "./formatters.js";
+import { assertManifestDigest, parseArtifactManifest } from "./manifest.js";
 import {
   NATIVE_HANDLE,
   type NativeBinding,
@@ -28,7 +31,13 @@ import {
 import type {
   ActionComparison,
   ArtifactKind,
+  ArtifactManifest,
   CompareActionPoliciesOptions,
+  CompareConfigurationsOptions,
+  ComparedPolicyKind,
+  ConfigResolution,
+  ConfigSnapshot,
+  ConfigurationComparison,
   CoreStatus,
   DefaultSecretPolicy,
   DetectedSecretFinding,
@@ -38,6 +47,8 @@ import type {
   InitializeOptions,
   PlaceholderFormatter,
   RedactOptions,
+  ResolveConfigOptions,
+  RuntimeConfig,
   ScanAndRedactOptions,
   ScanOptions,
   ScanResult,
@@ -116,6 +127,18 @@ function requireString(value: unknown): string {
     throw new SecretScanError("UNPAIRED_SURROGATE");
   }
   return value;
+}
+
+/**
+ * Detection is fixed by the initialization owner, never by a call: a
+ * per-call `detection` argument is rejected rather than ignored, because
+ * ignoring it would silently run with a different detector set than the
+ * caller asked for.
+ */
+function rejectPerCallDetection(options: unknown): void {
+  if (typeof options === "object" && options !== null && Object.hasOwn(options, "detection")) {
+    throw new SecretScanError("INVALID_OPTIONS");
+  }
 }
 
 function toPolicyCallback(policy: ScanOptions["policy"]): NativePolicyCallback | undefined {
@@ -288,6 +311,16 @@ function requireExactKeys(value: unknown, allowed: readonly string[]): Readonly<
   return value as Readonly<Record<string, unknown>>;
 }
 
+/** Whether `value` is a plain object: no array, no class instance. */
+function isPlainObject(value: unknown): value is Readonly<Record<string, unknown>> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    (Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null)
+  );
+}
+
 /** The most sides one comparison takes: a baseline and three candidates. */
 const MAX_COMPARED_POLICIES = 4;
 
@@ -371,6 +404,10 @@ function toNativeIncrementalOptions(options: IncrementalSanitizerOptions): Nativ
   if (typeof options !== "object" || options === null) {
     throw new SecretScanError("INVALID_OPTIONS");
   }
+  rejectPerCallDetection(options);
+  // A ruleset is a whole-input option (`rulesets in incremental sessions` are outside contract 1): a session
+  // that ignored one would silently run without the detectors the caller asked for (issue #1255).
+  if (Object.hasOwn(options, "ruleset")) throw new SecretScanError("INVALID_OPTIONS");
   const { limits, policy, placeholderFormatter } = options;
   if (typeof limits !== "object" || limits === null) {
     throw new SecretScanError("INVALID_LIMITS");
@@ -400,10 +437,14 @@ export interface RedactSecretRuntime {
   piiActivation(): string;
   status(): CoreStatus;
   artifact(): ArtifactKind;
+  artifactManifest(): ArtifactManifest;
+  resolveConfig(config?: RuntimeConfig, options?: ResolveConfigOptions): ConfigResolution;
+  describeConfig(): ConfigSnapshot;
   scan(input: string, options?: ScanOptions): readonly SecretFinding[];
   redact(input: string, findings: readonly SecretFinding[], options?: RedactOptions): string;
   scanAndRedact(input: string, options?: ScanAndRedactOptions): ScanResult;
   compareActionPolicies(input: string, options: CompareActionPoliciesOptions): ActionComparison;
+  compareConfigurations(input: string, options: CompareConfigurationsOptions): ConfigurationComparison;
   createIncrementalSanitizer(options: IncrementalSanitizerOptions): IncrementalSanitizer;
   readonly defaultPolicy: DefaultSecretPolicy;
 }
@@ -426,40 +467,99 @@ export interface RedactSecretRuntime {
  */
 export function createRedactSecretRuntime(
   loadNativeBinding: NativeBindingLoader,
-  expectedProfile: "full" | "common",
+  expectedProfile: "full" | "common" | "custom",
 ): RedactSecretRuntime {
   let binding: NativeBinding | undefined;
+  let manifest: ArtifactManifest | undefined;
   let pending: Promise<void> | undefined;
   let pendingKey: string | undefined;
   let activeKey: string | undefined;
+  /**
+   * The configuration this runtime is fixed to, captured once from the first
+   * successful `initialize()`: the `runtime-config/v1` text of its detection
+   * and PII members, and the frozen snapshot the core resolved from it. Later
+   * equivalent calls do not replace it, and no call changes it.
+   */
+  let ownerConfig: string | undefined;
+  let ownerSnapshot: ConfigSnapshot | undefined;
 
-  function selectors(options?: InitializeOptions): readonly string[] {
-    if (options === undefined) return [];
+  /** The parsed, copied options of one `initialize()` call. */
+  interface InitializeRequest {
+    readonly pii: readonly string[];
+    /** The JSON text of the `detection` object, copied at call time; `undefined` when not given. */
+    readonly detection: string | undefined;
+  }
+
+  function parseInitializeOptions(options?: InitializeOptions): InitializeRequest {
+    if (options === undefined) return { pii: [], detection: undefined };
     if (
       typeof options !== "object" ||
       options === null ||
       Array.isArray(options) ||
       (Object.getPrototypeOf(options) !== Object.prototype && Object.getPrototypeOf(options) !== null) ||
-      Object.keys(options).some((key) => key !== "pii")
+      Object.keys(options).some((key) => key !== "pii" && key !== "detection")
     ) {
       throw new SecretScanError("INVALID_OPTIONS");
     }
     const pii = options.pii;
-    if (pii === undefined) return [];
-    if (!Array.isArray(pii)) throw new SecretScanError("INVALID_OPTIONS");
-    for (let index = 0; index < pii.length; index += 1) {
-      if (!Object.hasOwn(pii, index) || typeof pii[index] !== "string") {
-        throw new SecretScanError("INVALID_OPTIONS");
+    let selectors: readonly string[] = [];
+    if (pii !== undefined) {
+      if (!Array.isArray(pii)) throw new SecretScanError("INVALID_OPTIONS");
+      for (let index = 0; index < pii.length; index += 1) {
+        if (!Object.hasOwn(pii, index) || typeof pii[index] !== "string") {
+          throw new SecretScanError("INVALID_OPTIONS");
+        }
       }
+      selectors = [...pii];
     }
-    return [...pii];
+    return { pii: selectors, detection: serializeDetection(options.detection) };
+  }
+
+  /**
+   * Copies a `detection` value to JSON text once, at call time, so a later
+   * mutation of the caller's arrays changes nothing. Only the host shape is
+   * checked here (a plain object); the grammar, the ids and the ceiling are
+   * the core's, reported as `INVALID_DETECTION_CONFIG` (or, in
+   * `resolveConfig`, as diagnostics), so there is one set of rules.
+   */
+  function serializeDetection(detection: unknown): string | undefined {
+    if (detection === undefined) return undefined;
+    if (
+      typeof detection !== "object" ||
+      detection === null ||
+      Array.isArray(detection) ||
+      (Object.getPrototypeOf(detection) !== Object.prototype && Object.getPrototypeOf(detection) !== null)
+    ) {
+      throw new SecretScanError("INVALID_OPTIONS");
+    }
+    let text: unknown;
+    try {
+      text = JSON.stringify(detection);
+    } catch {
+      throw new SecretScanError("INVALID_OPTIONS");
+    }
+    if (typeof text !== "string") throw new SecretScanError("INVALID_OPTIONS");
+    return text;
   }
 
   function selectorKey(pii: readonly string[]): string {
     return [...new Set(pii.map((value) => (value === "pii" ? "pii:global" : value)))].sort().join(",");
   }
 
-  async function load(pii: readonly string[]): Promise<void> {
+  function requestKey(request: InitializeRequest): string {
+    return `${selectorKey(request.pii)}\u0000${request.detection ?? ""}`;
+  }
+
+  /** The `runtime-config/v1` text of an initialization request's data members. */
+  function ownerConfigText(request: InitializeRequest): string {
+    const parts: string[] = [];
+    if (request.detection !== undefined) parts.push(`"detection":${request.detection}`);
+    if (request.pii.length > 0) parts.push(`"pii":${JSON.stringify(request.pii)}`);
+    return `{${parts.join(",")}}`;
+  }
+
+  async function load(request: InitializeRequest): Promise<void> {
+    const { pii, detection } = request;
     let loaded: NativeBinding;
     try {
       // Issue #937: only a PII selection loads the PII-capable artifact, so
@@ -473,26 +573,46 @@ export function createRedactSecretRuntime(
       if (loaded.profile() !== expectedProfile) {
         throw new SecretScanError("INITIALIZATION_FAILED");
       }
-      loaded.initialize(pii);
+      // The artifact's own manifest, when it reports one, must describe this
+      // entry point: another schema, version or variant, or a digest that is
+      // not the document's own, is an unusable artifact. It reads no PII
+      // selection and builds no registry, so it runs before `initialize`.
+      const reported = loaded.artifactManifest?.();
+      if (reported !== undefined) {
+        const parsed = parseArtifactManifest(reported, expectedProfile);
+        await assertManifestDigest(parsed);
+        manifest = parsed;
+      }
+      loaded.initialize(pii, detection);
     } catch (thrown) {
       throw toSecretScanError(thrown, "INITIALIZATION_FAILED");
     }
     binding = loaded;
-    activeKey = selectorKey(pii);
+    activeKey = requestKey(request);
+    // What the owner is fixed to, resolved once by the core. A binding that
+    // reports no configuration leaves it unset: `status().configuration` is
+    // then `null` and `describeConfig()` is `INITIALIZATION_FAILED`.
+    ownerConfig = ownerConfigText(request);
+    try {
+      const resolved = resolveWith(loaded, ownerConfig, undefined, undefined, false, false);
+      ownerSnapshot = resolved.ok && resolved.snapshot !== null ? resolved.snapshot : undefined;
+    } catch {
+      ownerSnapshot = undefined;
+    }
   }
 
   function initialize(options?: InitializeOptions): Promise<void> {
-    let pii: readonly string[];
+    let request: InitializeRequest;
     try {
-      pii = selectors(options);
+      request = parseInitializeOptions(options);
     } catch (thrown) {
       return Promise.reject(toSecretScanError(thrown, "INVALID_OPTIONS"));
     }
-    const key = selectorKey(pii);
+    const key = requestKey(request);
     if (binding !== undefined) {
       if (activeKey === key) return Promise.resolve();
       try {
-        binding.initialize(pii);
+        binding.initialize(request.pii, request.detection);
         activeKey = key;
         return Promise.resolve();
       } catch (thrown) {
@@ -503,7 +623,7 @@ export function createRedactSecretRuntime(
       return pendingKey === key ? pending : pending.then(() => initialize(options));
     }
     pendingKey = key;
-    pending = load(pii).finally(() => {
+    pending = load(request).finally(() => {
       pending = undefined;
       pendingKey = undefined;
     });
@@ -518,6 +638,19 @@ export function createRedactSecretRuntime(
   /** Which artifact `initialize()` loaded. Requires initialization, like every other operation here. */
   function artifact(): ArtifactKind {
     return active().artifact();
+  }
+
+  /**
+   * What the loaded artifact contains and supports (`artifact-manifest/v1`).
+   * Reports the artifact `initialize()` loaded, so it needs a successful
+   * `initialize()` like every other operation here, but it reads no input,
+   * builds no registry and changes no activation. An artifact that reports no
+   * manifest fails with `INITIALIZATION_FAILED`.
+   */
+  function artifactManifest(): ArtifactManifest {
+    active();
+    if (manifest === undefined) throw new SecretScanError("INITIALIZATION_FAILED");
+    return manifest;
   }
 
   function piiActivation(): string {
@@ -536,7 +669,7 @@ export function createRedactSecretRuntime(
   function status(): CoreStatus {
     const native = binding;
     if (native === undefined) {
-      return Object.freeze({ initialized: false, profile: expectedProfile, activation: null });
+      return Object.freeze({ initialized: false, profile: expectedProfile, activation: null, configuration: null });
     }
     let activation: string | null;
     try {
@@ -544,12 +677,115 @@ export function createRedactSecretRuntime(
     } catch {
       activation = null;
     }
-    return Object.freeze({ initialized: true, profile: expectedProfile, activation });
+    return Object.freeze({
+      initialized: true,
+      profile: expectedProfile,
+      activation,
+      configuration: ownerSnapshot?.digest ?? null,
+    });
+  }
+
+  /**
+   * Asks `native` to resolve one request and checks the answer is a
+   * resolution of this artifact's manifest. The core owns the precedence table
+   * and the snapshot; nothing here restates either.
+   */
+  function resolveWith(
+    native: NativeBinding,
+    config: string | undefined,
+    ruleset: Uint8Array | undefined,
+    actionPolicy: Uint8Array | undefined,
+    callback: boolean,
+    disclose: boolean,
+  ): ConfigResolution {
+    if (native.resolveConfig === undefined) throw new SecretScanError("INITIALIZATION_FAILED");
+    let text: string;
+    try {
+      text = native.resolveConfig(config, ruleset, actionPolicy, callback, disclose);
+    } catch (thrown) {
+      throw toSecretScanError(thrown, "INITIALIZATION_FAILED");
+    }
+    return parseConfigResolution(text, manifest?.digest);
+  }
+
+  /**
+   * Resolves `config` over the artifact's defaults into a frozen
+   * `config-resolution/v1` without scanning, building a registry or touching
+   * the runtime: invalid input is data in the result, never a throw. Requires a
+   * successful `initialize()` like every other operation here, because the
+   * resolver is the loaded artifact's own, but changes nothing.
+   *
+   * Host-shape mistakes (not a plain object, a ruleset that is neither text nor
+   * bytes, a value with no JSON form) are `INVALID_OPTIONS`, as they are for a
+   * call. The caller's data is copied and serialized once, here, so mutating it
+   * afterwards changes nothing.
+   */
+  function resolveConfig(config?: RuntimeConfig, options?: ResolveConfigOptions): ConfigResolution {
+    const native = active();
+    if (config !== undefined && !isPlainObject(config)) throw new SecretScanError("INVALID_OPTIONS");
+    if (options !== undefined) {
+      if (!isPlainObject(options)) throw new SecretScanError("INVALID_OPTIONS");
+      if (Object.keys(options).some((key) => key !== "policy" && key !== "discloseRulesetIdentity")) {
+        throw new SecretScanError("INVALID_OPTIONS");
+      }
+      if (options.discloseRulesetIdentity !== undefined && typeof options.discloseRulesetIdentity !== "boolean") {
+        throw new SecretScanError("INVALID_OPTIONS");
+      }
+    }
+    const resolveOptions: ResolveConfigOptions | undefined = options;
+    const hasCallback = resolveOptions?.policy !== undefined;
+    // Validated like a call's callback, and never called.
+    if (hasCallback) toPolicyCallback(resolveOptions?.policy);
+    let ruleset: Uint8Array | undefined;
+    let actionPolicy: Uint8Array | undefined;
+    let text: string | undefined;
+    if (config !== undefined) {
+      const {
+        ruleset: rulesetInput,
+        actionPolicy: policyInput,
+        ...data
+      } = config as RuntimeConfig & {
+        readonly [key: string]: unknown;
+      };
+      ruleset = toNativeRuleset(rulesetInput);
+      // A callback and a policy document together are reported as a data
+      // diagnostic (`INVALID_OPTIONS`), not thrown: the core owns the row.
+      actionPolicy = toNativeActionPolicy(policyInput, false);
+      try {
+        const serialized: unknown = JSON.stringify(data);
+        if (typeof serialized !== "string") throw new SecretScanError("INVALID_OPTIONS");
+        text = serialized;
+      } catch {
+        throw new SecretScanError("INVALID_OPTIONS");
+      }
+    }
+    return resolveWith(
+      native,
+      text,
+      ruleset,
+      actionPolicy,
+      hasCallback,
+      resolveOptions?.discloseRulesetIdentity === true,
+    );
+  }
+
+  /**
+   * The snapshot of the configuration this runtime is fixed to: its detection
+   * selection and PII activation, and the artifact defaults for everything a
+   * call supplies. Input-free: it takes no argument, scans nothing, builds no
+   * registry and changes nothing. Requires a successful `initialize()`, and is
+   * `INITIALIZATION_FAILED` for an artifact that reports no configuration.
+   */
+  function describeConfig(): ConfigSnapshot {
+    active();
+    if (ownerSnapshot === undefined) throw new SecretScanError("INITIALIZATION_FAILED");
+    return ownerSnapshot;
   }
 
   function scan(input: string, options?: ScanOptions): readonly SecretFinding[] {
     const native = active();
     const text = requireString(input);
+    rejectPerCallDetection(options);
     const policy = toPolicyCallback(options?.policy);
     const actionPolicy = toNativeActionPolicy(options?.actionPolicy, policy !== undefined);
     const limits = toNativeWholeInputLimits(options?.limits);
@@ -564,6 +800,7 @@ export function createRedactSecretRuntime(
   function redact(input: string, findings: readonly SecretFinding[], options?: RedactOptions): string {
     const native = active();
     const text = requireString(input);
+    rejectPerCallDetection(options);
     if (!Array.isArray(findings)) {
       throw new SecretScanError("INVALID_FINDINGS");
     }
@@ -579,6 +816,7 @@ export function createRedactSecretRuntime(
   function scanAndRedact(input: string, options?: ScanAndRedactOptions): ScanResult {
     const native = active();
     const text = requireString(input);
+    rejectPerCallDetection(options);
     const policy = toPolicyCallback(options?.policy);
     const actionPolicy = toNativeActionPolicy(options?.actionPolicy, policy !== undefined);
     const formatter = toFormatterCallback(options?.placeholderFormatter);
@@ -611,6 +849,132 @@ export function createRedactSecretRuntime(
     } catch (thrown) {
       throw toSecretScanError(thrown, "DETECTOR_FAILURE");
     }
+  }
+
+  /**
+   * The failure codes of a side that was built but could not be scanned,
+   * recorded in the result instead of thrown. Every other code is a malformed
+   * call or a callback failure and fails the whole comparison.
+   */
+  const SIDE_FAILURES: readonly string[] = [
+    "INPUT_LIMIT_EXCEEDED",
+    "FINDING_LIMIT_EXCEEDED",
+    "DETECTOR_FAILURE",
+    "INVALID_CANDIDATE",
+    "EMPTY_DETECTION_SET",
+    "INVALID_DETECTION_CONFIG",
+    "INVALID_RULESET",
+    "PII_SELECTOR_INVALID",
+    "PII_SELECTOR_UNSUPPORTED",
+    "PII_SELECTOR_UNAVAILABLE",
+  ];
+
+  /**
+   * Compares detection configurations over one input (`configuration-comparison/v1`,
+   * issue #1254): each side is an independent pass over a temporary registry
+   * the artifact builds for that call from the side's own `detection`, `pii`,
+   * `ruleset` and `limits`, then the sides' finalized findings are related by
+   * their declared-unit ranges. A preview, never enforcement; it returns no
+   * text and changes no owner. It reads the loaded artifact's resolver and
+   * registry constructors, so it needs a successful `initialize()`, but it
+   * neither requires nor changes the owner's `detection` or `pii` (a side the
+   * artifact cannot build, such as PII on an artifact without the PII runtime,
+   * is a failed side). It takes one string; there is no session or stream form.
+   *
+   * Every side is validated and resolved before any side is scanned, so a
+   * malformed call or an invalid action policy document detects nothing and
+   * calls no callback. A configuration problem or a limit is data in the
+   * result.
+   */
+  function compareConfigurations(input: string, options: CompareConfigurationsOptions): ConfigurationComparison {
+    const native = active();
+    const text = requireString(input);
+    const record = requireExactKeys(options, ["configs", "actionPolicy", "policy"]);
+    const configs = record.configs;
+    if (!Array.isArray(configs) || configs.length < 1 || configs.length > MAX_COMPARED_POLICIES) {
+      throw new SecretScanError("INVALID_OPTIONS");
+    }
+    for (let index = 0; index < configs.length; index += 1) {
+      if (!Object.hasOwn(configs, index) || !isPlainObject(configs[index])) {
+        throw new SecretScanError("INVALID_OPTIONS");
+      }
+    }
+    const callback = toPolicyCallback(record.policy as CompareConfigurationsOptions["policy"]);
+    const shared = toNativeActionPolicy(
+      record.actionPolicy as CompareConfigurationsOptions["actionPolicy"],
+      callback !== undefined,
+    );
+    const sides = (configs as readonly RuntimeConfig[]).map((config) => {
+      const {
+        ruleset: rulesetInput,
+        actionPolicy: policyInput,
+        ...data
+      } = config as RuntimeConfig & Record<string, unknown>;
+      const ruleset = toNativeRuleset(rulesetInput);
+      const own = toNativeActionPolicy(policyInput, callback !== undefined);
+      let configText: string;
+      try {
+        const serialized: unknown = JSON.stringify(data);
+        if (typeof serialized !== "string") throw new SecretScanError("INVALID_OPTIONS");
+        configText = serialized;
+      } catch {
+        throw new SecretScanError("INVALID_OPTIONS");
+      }
+      const document = own ?? shared;
+      const side: NativeComparedSide =
+        callback !== undefined
+          ? { kind: "callback", callback }
+          : document !== undefined
+            ? { kind: "action-policy", document }
+            : { kind: "default" };
+      return {
+        configText,
+        ruleset,
+        side,
+        resolution: resolveWith(native, configText, ruleset, document, callback !== undefined, false),
+      };
+    });
+    // A rejected policy document is a malformed call, like for
+    // `compareActionPolicies`: it fails before any side is scanned.
+    if (sides.some((side) => side.resolution.diagnostics.items.some((item) => item.code === "INVALID_ACTION_POLICY"))) {
+      throw new SecretScanError("INVALID_ACTION_POLICY");
+    }
+    if (native.scanConfigurationSide === undefined) throw new SecretScanError("INITIALIZATION_FAILED");
+
+    const outcomes: SideOutcome[] = sides.map(({ configText, ruleset, side, resolution }, index) => {
+      const snapshot = resolution.snapshot;
+      const kind: ComparedPolicyKind = side.kind;
+      const digest = snapshot?.actionPolicy.digest ?? null;
+      const summary = Object.freeze({
+        label: index === 0 ? "baseline" : `candidate-${index}`,
+        digest: snapshot?.digest ?? null,
+        detectionDigest: snapshot?.detectionDigest ?? null,
+        origins: snapshot?.origins ?? null,
+        diagnostics: resolution.diagnostics.items,
+        policy: Object.freeze({
+          kind,
+          documentSha256: kind === "action-policy" && digest !== null ? digest.replace(/^sha256:/, "") : null,
+        }),
+      });
+      if (snapshot === null) {
+        const failure =
+          resolution.diagnostics.items.find((item) => item.severity === "error")?.code ?? "INVALID_OPTIONS";
+        return { summary, failure, native: null };
+      }
+      if (snapshot.effects.inert) return { summary, failure: "EMPTY_DETECTION_SET", native: null };
+      try {
+        return {
+          summary,
+          failure: null,
+          native: native.scanConfigurationSide?.(text, configText, ruleset, side) ?? null,
+        };
+      } catch (thrown) {
+        const error = toSecretScanError(thrown, "DETECTOR_FAILURE");
+        if (!SIDE_FAILURES.includes(error.code)) throw error;
+        return { summary, failure: error.code, native: null };
+      }
+    });
+    return toConfigurationComparison(outcomes);
   }
 
   function createIncrementalSanitizer(options: IncrementalSanitizerOptions): IncrementalSanitizer {
@@ -709,10 +1073,14 @@ export function createRedactSecretRuntime(
     piiActivation,
     status,
     artifact,
+    artifactManifest,
+    resolveConfig,
+    describeConfig,
     scan,
     redact,
     scanAndRedact,
     compareActionPolicies,
+    compareConfigurations,
     createIncrementalSanitizer,
     defaultPolicy,
   };

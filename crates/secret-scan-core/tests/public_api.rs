@@ -981,3 +981,144 @@ fn built_in_registry_is_a_shareable_whole_input_entry_point() {
         .unwrap();
     assert_eq!(actual, expected);
 }
+
+#[test]
+fn artifact_manifest_is_public_side_effect_free_and_bounded() {
+    use redact_secret::{ArtifactKind, ArtifactManifest, ArtifactManifestError};
+
+    let manifest: ArtifactManifest =
+        ArtifactManifest::full(ArtifactKind::RustRegistry, true, None).unwrap();
+    assert_eq!(manifest.profile(), Profile::Full);
+    assert!(manifest.digest().starts_with("sha256:"));
+    assert!(
+        manifest
+            .as_json()
+            .starts_with("{\"schema\":\"artifact-manifest/v1\",")
+    );
+    assert_eq!(
+        manifest.detector_ids().count(),
+        registry().ids().count(),
+        "the manifest lists exactly the registered built-ins"
+    );
+    let missing: ArtifactManifestError = manifest.verify_packaged(None).unwrap_err();
+    assert_eq!(missing.code(), "ARTIFACT_MANIFEST_MISSING");
+    assert_eq!(missing.to_string(), missing.message());
+    let common = ArtifactManifest::common(ArtifactKind::Wasm, false, None).unwrap();
+    assert_eq!(common.profile(), Profile::Common);
+    assert_eq!(common.detector_ids().count(), 6);
+}
+
+#[test]
+fn static_custom_composition_is_public_and_is_not_a_selectable_profile() {
+    use redact_secret::composition::{self, Composition, SelectedDetector};
+
+    let selected: Vec<SelectedDetector> = vec![composition::github_token(), composition::jwt()];
+    assert_eq!(selected[0].id(), "github-token");
+    let composition: Composition = Composition::new("public-api", false, selected).unwrap();
+    assert_eq!(composition.name(), "public-api");
+    assert_eq!(
+        composition.ids().collect::<Vec<_>>(),
+        ["github-token", "jwt"]
+    );
+    assert!(composition.id().starts_with("custom:"));
+
+    let registry = DetectorRegistry::with_composition(&composition, []).unwrap();
+    assert_eq!(registry.profile(), Some(Profile::Custom));
+    assert_eq!(Profile::Custom.as_str(), "custom");
+    assert_eq!(
+        Profile::from_name("custom"),
+        None,
+        "a composition is not selectable by name"
+    );
+    assert_eq!(
+        redact_secret::sanitize_with_profile(FIXTURE, Profile::Custom)
+            .unwrap_err()
+            .code(),
+        SecretScanErrorCode::InvalidOptions
+    );
+    assert_eq!(scan(FIXTURE, &registry, &DefaultPolicy).unwrap().len(), 1);
+
+    let manifest = redact_secret::ArtifactManifest::custom(
+        redact_secret::ArtifactKind::Wasm,
+        &composition,
+        None,
+    )
+    .unwrap();
+    assert_eq!(manifest.composition_id(), Some(composition.id()));
+}
+
+#[test]
+fn detector_selection_and_configuration_resolution_are_public() {
+    use redact_secret::{
+        ArtifactKind, ArtifactManifest, ConfigDiagnostic, ConfigRequest, ConfigResolution,
+        ConfigSeverity, ConfigSnapshot, DetectionConfigError, DetectionSelection, SampleRuleHits,
+        describe_config, resolve_config,
+    };
+
+    // A selection is applied when a registry is composed.
+    let selection: DetectionSelection = DetectionSelection::include(["jwt", "private-key"]);
+    assert_eq!(selection.mode(), "include");
+    assert_eq!(selection.ids().collect::<Vec<_>>(), ["jwt", "private-key"]);
+    assert!(DetectionSelection::all().is_all());
+    assert!(DetectionSelection::exclude(Vec::<String>::new()).is_all());
+    let narrowed = registry().with_detection(&selection).unwrap();
+    assert_eq!(narrowed.ids().collect::<Vec<_>>(), ["private-key", "jwt"]);
+    assert_eq!(narrowed.detection(), &selection);
+    let rejected: DetectionConfigError = registry()
+        .with_detection(&DetectionSelection::include(["nope"]))
+        .unwrap_err();
+    assert_eq!(rejected.class_name(), "UNKNOWN_DETECTOR_ID");
+    assert_eq!(rejected.index(), Some(0));
+    assert_eq!(rejected.code(), SecretScanErrorCode::InvalidDetectionConfig);
+    assert_eq!(SecretScanError::from(rejected).code(), rejected.code());
+    assert!(DetectionSelection::from_json(r#"{"include":["jwt"]}"#).is_ok());
+
+    // Resolution is data over a manifest.
+    let manifest = ArtifactManifest::full(ArtifactKind::RustRegistry, true, None).unwrap();
+    assert!(manifest.detector_selection());
+    let resolution: ConfigResolution = resolve_config(
+        &manifest,
+        &ConfigRequest::new().runtime_config(r#"{"detection":{"include":["jwt"]}}"#),
+    );
+    assert!(resolution.is_ok());
+    let snapshot: &ConfigSnapshot = resolution.snapshot().unwrap();
+    assert_eq!(snapshot.enabled_ids().collect::<Vec<_>>(), ["jwt"]);
+    assert!(snapshot.digest().starts_with("sha256:"));
+    assert!(snapshot.detection_digest().starts_with("sha256:"));
+    assert!(!snapshot.is_inert());
+    let diagnostic: &ConfigDiagnostic = &resolution.diagnostics()[0];
+    assert_eq!(diagnostic.severity(), ConfigSeverity::Info);
+    assert_eq!(diagnostic.code(), "OVERLAP_OUTCOMES_MAY_CHANGE");
+    assert_eq!(diagnostic.path(), "detection");
+    assert_eq!(diagnostic.id(), None);
+    assert_eq!(diagnostic.related(), None);
+    // Describing a registry composed with the same selection gives the same
+    // detection identity as resolving it.
+    let jwt_only = registry()
+        .with_detection(&DetectionSelection::include(["jwt"]))
+        .unwrap();
+    assert_eq!(
+        describe_config(&manifest, &jwt_only).detection_digest(),
+        snapshot.detection_digest()
+    );
+
+    // The action policy diagnostic layer: a closed vocabulary makes an
+    // unknown name an error, and sample hits are counted apart from it.
+    let policy = br#"{"actionPolicyRevision":1,"base":"default","rules":[
+        {"id":"typo","match":{"type":["jwt_tokne"]},"action":"block"}]}"#;
+    let open = resolve_config(&manifest, &ConfigRequest::new().action_policy(policy));
+    assert!(open.is_ok());
+    assert_eq!(open.diagnostics()[0].code(), "ACTION_POLICY_UNKNOWN_TYPE");
+    let strict = resolve_config(
+        &manifest,
+        &ConfigRequest::new()
+            .action_policy(policy)
+            .closed_types(&["jwt"])
+            .closed_detectors(&[]),
+    );
+    assert!(!strict.is_ok());
+    let loaded = redact_secret::load_action_policy(policy).unwrap();
+    let hits: SampleRuleHits = SampleRuleHits::for_policy(&loaded);
+    assert_eq!(hits.rule_hits(), &[0]);
+    assert_eq!(hits.no_rule_matched(), 0);
+}

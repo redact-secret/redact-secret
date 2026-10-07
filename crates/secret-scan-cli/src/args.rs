@@ -10,8 +10,8 @@ use std::path::PathBuf;
 use crate::failure::{
     ACTION_POLICY_MISSING_PATH, ACTION_POLICY_REPEATED, COMPARE_MISSING_PATH, COMPARE_ONE_PATH,
     COMPARE_REQUIRES_FILE, COMPARE_TOO_MANY, COMPARE_WITH_REDACT, Failure, JSON_WITH_REDACT,
-    PII_MISSING_SELECTOR, PRINT_PII_STANDALONE, REDACT_ONE_PATH, RULESET_MISSING_PATH,
-    RULESET_REPEATED, RULESET_REQUIRES_FILE, SOLE_OPTION, UNKNOWN_OPTION,
+    PII_MISSING_SELECTOR, PRINT_MANIFEST_STANDALONE, PRINT_PII_STANDALONE, REDACT_ONE_PATH,
+    RULESET_MISSING_PATH, RULESET_REPEATED, RULESET_REQUIRES_FILE, SOLE_OPTION, UNKNOWN_OPTION,
 };
 
 /// The most candidates one comparison takes: with the baseline, the core's
@@ -80,6 +80,8 @@ pub enum Command {
     Version,
     /// Print canonical activation and exit without reading input.
     PiiActivation { selectors: Vec<String> },
+    /// Print this binary's artifact manifest and exit without reading input.
+    ArtifactManifest,
     /// Scan every source and report safe finding metadata.
     Check {
         /// The sources to scan, in the order they were given.
@@ -148,6 +150,7 @@ where
             Some("--redact") => parsed.redact = true,
             Some("--json") => parsed.json = true,
             Some("--print-pii-activation") => parsed.print_pii_activation = true,
+            Some("--print-artifact-manifest") => parsed.print_artifact_manifest = true,
             Some("--pii") => {
                 let selector = args.next().ok_or(Failure::Usage(PII_MISSING_SELECTOR))?;
                 parsed.selectors.push(selector.into_string().map_err(|_| {
@@ -186,10 +189,15 @@ where
 
 /// Everything the option loop collected, before it is judged as one command.
 #[derive(Default)]
+#[allow(
+    clippy::struct_excessive_bools,
+    reason = "one independent presence flag per command-line option, judged together in `into_command`"
+)]
 struct Parsed {
     redact: bool,
     json: bool,
     print_pii_activation: bool,
+    print_artifact_manifest: bool,
     ruleset: Option<PathBuf>,
     action_policy: Option<PathBuf>,
     candidates: Vec<PathBuf>,
@@ -204,12 +212,30 @@ impl Parsed {
             redact,
             json,
             print_pii_activation,
+            print_artifact_manifest,
             ruleset,
             action_policy,
             candidates,
             selectors,
             paths,
         } = self;
+
+        if print_artifact_manifest {
+            let other_inputs = [
+                redact,
+                json,
+                print_pii_activation,
+                ruleset.is_some(),
+                action_policy.is_some(),
+                !candidates.is_empty(),
+                !selectors.is_empty(),
+                !paths.is_empty(),
+            ];
+            if other_inputs.contains(&true) {
+                return Err(Failure::Usage(PRINT_MANIFEST_STANDALONE));
+            }
+            return Ok(Command::ArtifactManifest);
+        }
 
         if print_pii_activation {
             let other_inputs = [
@@ -657,5 +683,34 @@ mod tests {
             parse_args(&["--print-pii-activation", "file"]),
             Err(Failure::Usage(PRINT_PII_STANDALONE))
         );
+    }
+
+    #[test]
+    fn print_artifact_manifest_is_standalone() {
+        assert_eq!(
+            parse_args(&["--print-artifact-manifest"]),
+            Ok(Command::ArtifactManifest)
+        );
+        for extra in [
+            &["--print-artifact-manifest", "file"][..],
+            &["--print-artifact-manifest", "--redact"],
+            &["--print-artifact-manifest", "--json"],
+            &["--print-artifact-manifest", "--pii", "pii"],
+            &["--print-artifact-manifest", "--ruleset", "r"],
+            &["--print-artifact-manifest", "--action-policy", "a"],
+            &["--print-artifact-manifest", "--print-pii-activation"],
+            &[
+                "--print-artifact-manifest",
+                "--compare-action-policy",
+                "c",
+                "f",
+            ],
+        ] {
+            assert_eq!(
+                parse_args(extra),
+                Err(Failure::Usage(PRINT_MANIFEST_STANDALONE)),
+                "{extra:?}"
+            );
+        }
     }
 }

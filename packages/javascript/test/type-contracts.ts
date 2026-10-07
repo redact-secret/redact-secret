@@ -23,14 +23,21 @@ import type {
   ActionPolicyRuleAction,
   ArtifactKind,
   CompareActionPoliciesOptions,
+  CompareConfigurationsOptions,
   ComparedFinding,
   ComparedPolicy,
   ComparedPolicyKind,
   ComparedPolicySummary,
+  ConfigDiagnostic,
+  ConfigResolution,
+  ConfigSnapshot,
+  ConfigurationComparison,
+  ConfigurationDifference,
   CoreStatus,
   DecisionBasis,
   DefaultSecretPolicy,
   DetectedSecretFinding,
+  DetectionSelection,
   IncrementalSanitizer,
   IncrementalSanitizerOptions,
   IncrementalSanitizerResult,
@@ -39,6 +46,8 @@ import type {
   PlaceholderFormatter,
   PolicyContext,
   RangeUnit,
+  ResolveConfigOptions,
+  RuntimeConfig,
   ScanAndRedactOptions,
   ScanOptions,
   ScanResult,
@@ -53,13 +62,16 @@ import type {
 import {
   artifact,
   compareActionPolicies,
+  compareConfigurations,
   createIncrementalSanitizer,
   defaultPlaceholderFormatter,
   defaultPolicy,
+  type describeConfig,
   initialize,
   type PROFILE,
   RANGE_UNIT,
   redact,
+  type resolveConfig,
   SecretScanError,
   scan,
   scanAndRedact,
@@ -105,7 +117,46 @@ type ScanAndRedactIsSync = Expect<Equal<ReturnType<typeof scanAndRedact>, ScanRe
 type StatusIsSync = Expect<Equal<ReturnType<typeof status>, CoreStatus>>;
 type StatusTakesNoInput = Expect<Equal<Parameters<typeof status>, []>>;
 type StatusIsImmutable = Expect<Equal<CoreStatus, Readonly<CoreStatus>>>;
-type StatusFieldsAreFixed = Expect<Equal<keyof CoreStatus, "initialized" | "profile" | "activation">>;
+type StatusFieldsAreFixed = Expect<Equal<keyof CoreStatus, "initialized" | "profile" | "activation" | "configuration">>;
+/** The configuration digest is a string once initialized and null before. */
+type StatusConfigurationIsADigestOrNull = Expect<Equal<CoreStatus["configuration"], string | null>>;
+
+/**
+ * Configuration resolution is synchronous data. `resolveConfig` takes data and
+ * an options bag, `describeConfig` takes nothing at all (it is input-free), and
+ * both return frozen, readonly snapshots that carry no value.
+ */
+type ResolveConfigIsSync = Expect<Equal<ReturnType<typeof resolveConfig>, ConfigResolution>>;
+type ResolveConfigTakesDataAndOptions = Expect<
+  Parameters<typeof resolveConfig> extends [
+    config?: RuntimeConfig | undefined,
+    options?: ResolveConfigOptions | undefined,
+  ]
+    ? true
+    : false
+>;
+type DescribeConfigIsSync = Expect<Equal<ReturnType<typeof describeConfig>, ConfigSnapshot>>;
+type DescribeConfigTakesNoInput = Expect<Equal<Parameters<typeof describeConfig>, []>>;
+type SnapshotIsImmutable = Expect<Equal<ConfigSnapshot, Readonly<ConfigSnapshot>>>;
+type ResolutionIsImmutable = Expect<Equal<ConfigResolution, Readonly<ConfigResolution>>>;
+type DiagnosticIsImmutable = Expect<Equal<ConfigDiagnostic, Readonly<ConfigDiagnostic>>>;
+type SnapshotCarriesNoScalarSensitivity = Expect<
+  "sensitivity" | "score" | "probability" | "percentage" extends never
+    ? true
+    : Extract<keyof ConfigSnapshot, "sensitivity" | "score" | "probability" | "percentage"> extends never
+      ? true
+      : false
+>;
+type SnapshotHoldsNoInputOrRulesetBody = Expect<
+  Extract<keyof ConfigSnapshot, "input" | "text" | "value" | "body" | "pattern"> extends never ? true : false
+>;
+/** Detection is an `initialize` setting and a configuration key, never a call option. */
+type NoPerCallDetection = Expect<
+  "detection" extends keyof ScanOptions | keyof ScanAndRedactOptions | keyof IncrementalSanitizerOptions ? false : true
+>;
+type DetectionIsOneOfTwoLists = Expect<Equal<keyof DetectionSelection, "include" | "exclude">>;
+/** A callback is not configuration data. */
+type RuntimeConfigHasNoCallback = Expect<"policy" extends keyof RuntimeConfig ? false : true>;
 
 const policy: SecretPolicy = {
   evaluate(finding: DetectedSecretFinding, context: PolicyContext): SecretAction {
@@ -282,6 +333,55 @@ function rejectedComparisonUsage(): void {
 }
 
 void rejectedComparisonUsage;
+
+/**
+ * The configuration comparison (#1254): whole-input only, one to four
+ * `RuntimeConfig` sides, and a result of plain readonly, non-enforcing data
+ * scoped to the input.
+ */
+function documentedConfigurationComparisonUsage(): void {
+  const options: CompareConfigurationsOptions = {
+    configs: [{}, { detection: { exclude: ["github-token"] }, limits: { maxInputBytes: 1_024 } }, { pii: [] }],
+    actionPolicy: { actionPolicyRevision: 1, base: "default", rules: [] },
+  };
+  const withCallback: CompareConfigurationsOptions = { configs: [{}], policy: defaultPolicy };
+  const comparison: ConfigurationComparison = compareConfigurations("input", options);
+  const schema: "configuration-comparison/v1" = comparison.schema;
+  const scope: "input" = comparison.scope;
+  const mode: "preview" = comparison.mode;
+  const enforced: false = comparison.enforced;
+  const difference: ConfigurationDifference | undefined = comparison.differences[1]?.entries[0];
+  const status: "scanned" | "limited" | "unsupported" | "error" | undefined = comparison.results[0]?.status;
+  const callbacks: readonly number[] = comparison.callbackSides;
+
+  // @ts-expect-error a comparison is frozen data: no field is assignable.
+  comparison.results = [];
+  // @ts-expect-error `scope` is the literal "input": no claim beyond this input.
+  const wider: "corpus" = comparison.scope;
+
+  void [withCallback, schema, scope, mode, enforced, difference, status, callbacks, wider];
+}
+
+void documentedConfigurationComparisonUsage;
+
+function rejectedConfigurationComparisonUsage(): void {
+  // @ts-expect-error a comparison takes a string, never a chunk or a stream.
+  compareConfigurations(["a", "b"], { configs: [{}] });
+  // @ts-expect-error the options are required: there is nothing to compare without configurations.
+  compareConfigurations("input");
+  // @ts-expect-error a per-call detection argument is not an option of any other call, and not here.
+  const perCall: CompareConfigurationsOptions = { configs: [{}], detection: { include: ["jwt"] } };
+  void perCall;
+}
+
+void rejectedConfigurationComparisonUsage;
+
+type SessionHasNoConfigurationComparison = Expect<
+  "compareConfigurations" extends keyof IncrementalSanitizer ? false : true
+>;
+type StreamHasNoConfigurationComparison = Expect<
+  "compareConfigurations" extends keyof NodeStreamSanitizer ? false : true
+>;
 
 type ComparedKindsAreClosed = Expect<Equal<ComparedPolicy["kind"], ComparedPolicyKind>>;
 type BasisNamesAreTheCores = Expect<

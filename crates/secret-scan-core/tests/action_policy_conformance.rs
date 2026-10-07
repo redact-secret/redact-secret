@@ -237,11 +237,17 @@ fn the_fixture_vocabulary_limits_and_error_match_the_core() {
 }
 
 #[test]
-fn the_core_error_code_set_grows_to_twenty_three() {
-    assert_eq!(SecretScanErrorCode::ALL.len(), 23);
+fn the_core_error_code_set_grows_to_twenty_six() {
+    // `InvalidActionPolicy` closed the set at 23; the detector-selection
+    // codes of issue #1251 are appended after it, so no earlier code moves.
+    assert_eq!(SecretScanErrorCode::ALL.len(), 26);
+    assert_eq!(
+        SecretScanErrorCode::ALL[22],
+        SecretScanErrorCode::InvalidActionPolicy
+    );
     assert_eq!(
         SecretScanErrorCode::ALL.last().copied(),
-        Some(SecretScanErrorCode::InvalidActionPolicy)
+        Some(SecretScanErrorCode::EmptyDetectionSet)
     );
 }
 

@@ -5,8 +5,173 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Added
+
+- Artifact manifest, `artifact-manifest/v1` (#1250, epic #1246,
+  `decision-define-the-artifact-manifest-and-configuration-data-contracts`):
+  a consumer can read what the exact loaded artifact contains without scanning
+  an input and without initializing anything. The Rust core generates the
+  document from the registration rows the artifact links (ids, canonical
+  order, pack, the finding types each built-in can emit, whether the PII
+  runtime is linked, capabilities, build defaults, bounds, and a SHA-256
+  digest of its canonical JSON), so no binding keeps its own detector table.
+  `types` is each detector's declared list and the document says it is not a
+  closed vocabulary (`typeVocabulary.complete` is `false`). New names: Rust
+  `ArtifactManifest`, `ArtifactKind`, `ArtifactManifestError`; JavaScript
+  `artifactManifest()` and the `ArtifactManifest` and
+  `ArtifactManifestDetector` types, both entry points; Python
+  `artifact_manifest()`; the CLI flag `--print-artifact-manifest`; the Node
+  addon exports `artifactManifest` and `artifactManifestCommon`; the
+  WebAssembly module exports `artifactManifest`. A manifest that is missing, of
+  another schema, version or variant, or whose digest is not its own fails
+  `initialize()` with `INITIALIZATION_FAILED` and echoes none of it. Detection,
+  findings, defaults and every existing contract are unchanged;
+  `capabilities.detectorSelection` says whether the artifact supports runtime
+  selection (#1251: true for Rust, the Node addon and WebAssembly, false for the
+  Python wheel and the CLI, so a manifest digest differs by artifact kind).
+
+- Detector-id selection and effective-configuration resolution (#1251, epic
+  #1246, `decision-define-detector-id-selection-and-configuration-replacement-precedence`
+  and `decision-define-the-artifact-manifest-and-configuration-data-contracts`),
+  implemented once in the Rust core and forwarded by every binding. A consumer
+  can enable a subset of an artifact's built-in detectors by id and see, before
+  committing, exactly what a request resolves to.
+  - Selection: `initialize({ detection: { include } })` or `{ exclude }`
+    (JavaScript, Node and WebAssembly) and `DetectorRegistry::with_detection`
+    (Rust), also `BuiltInRegistry::with_detection` and the
+    `IncrementalSanitizer::with_*detection_policy_and_formatter` constructors.
+    It is applied when the registry is composed, before the prefilter and
+    overlap resolution, so a disabled detector produces no candidate and no
+    overlap competitor, and the enabled set is the artifact's canonical order
+    whatever order was requested. An unknown, not-included, repeated or
+    non-selectable id is rejected (`INVALID_DETECTION_CONFIG`; the `common`
+    entry never loads `full`), an empty total set is `EMPTY_DETECTION_SET`, and
+    a differing second request, including a plain `initialize()` after a narrowed
+    one, is `DETECTION_CONFIG_CONFLICT`; a rejected or conflicting request changes
+    nothing. There is no setter and no per-call detection argument (a
+    `detection` key on `scan`, `scanAndRedact`, `redact` or a session is
+    `INVALID_OPTIONS`), and a streaming session captures the owner's selection at
+    creation. Python and the CLI do not support it. Without a selection every
+    finding, order, range, output and error is unchanged.
+  - Resolution: `resolveConfig(config?, options?)`, `describeConfig()` and the
+    additive output field `status().configuration` (JavaScript, both entry
+    points), Rust `resolve_config`, `describe_config`, `ConfigRequest`,
+    `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic`, `ConfigSeverity`,
+    `DetectionSelection` and `DetectionConfigError`, the Node addon exports
+    `initializeDetection`, `initializeCommonDetection`, `resolveConfig` and
+    `resolveConfigCommon`, and the WebAssembly exports `resolveConfig` and a
+    second `initialize` argument. It produces the immutable `config-snapshot/v1`
+    from the artifact defaults plus explicit input through one truth table
+    (absent inherits, explicit empty disables, arrays and policy documents
+    replace and are never concatenated, a callback with `actionPolicy` is
+    `INVALID_OPTIONS`), reports compiled, enabled, disabled and unavailable
+    detectors separately (an `allow` action is not detector disabling), the
+    origin of each value, and the artifact, detection and exact policy-document
+    identities. Invalid input is data (`ok: false`), observation is input-free and
+    changes nothing, a callback is a labelled dynamic reference, and a ruleset's
+    detector ids and digest are withheld unless asked for. The snapshot holds no
+    input, ruleset body, value, path or sensitivity score.
+  - New fixed error codes `INVALID_DETECTION_CONFIG`, `DETECTION_CONFIG_CONFLICT`
+    and `EMPTY_DETECTION_SET`. `status()` gains `configuration` (additive, not a
+    breaking change).
+  - Cost: the standard WebAssembly artifacts carry the selection, the resolver
+    and a small JSON reader; the measured delta is in the pull request.
+
+- Action policy diagnostics (#1252, epic #1246,
+  `decision-define-the-artifact-manifest-and-configuration-data-contracts`):
+  `resolveConfig` and `resolve_config` now check a revision-1 action policy
+  against the artifact catalog and the resolved configuration and report what
+  the open-vocabulary parser leaves silent, as `config-diagnostics/v1` items
+  (the policy still loads exactly as before, so a typo surfaces only here and
+  an existing configuration stays `ok`). Warnings tell apart a rule `type` no
+  included detector declares (`ACTION_POLICY_UNKNOWN_TYPE`), a rule `detector`
+  the catalog and the supplied ruleset do not know
+  (`ACTION_POLICY_UNKNOWN_DETECTOR`), a built-in that is compiled but disabled
+  (`ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR`), a `full` built-in this artifact
+  does not include (`ACTION_POLICY_RULE_ON_NOT_INCLUDED_DETECTOR`), and a rule
+  provably shadowed by one earlier rule (`ACTION_POLICY_SHADOWED_RULE`, with the
+  shadowed rule's id and a `related` pointer to the earlier rule). A shadow is
+  reported only when the earlier rule matches everything the later one does
+  under AND-across-keys, OR-within-sets and first-rule-wins, where a `default`
+  action also stops evaluation; partial overlap, disjoint rules and a broad rule
+  placed after a narrow one are never reported. A callback policy, and a type no
+  list can vouch for while a ruleset or PII selection could emit it, are
+  reported as `info` `ACTION_POLICY_ANALYSIS_UNCERTAIN`. Output is bounded (at
+  most 256 items, errors first, `truncated` says when it was cut) and carries
+  rule ids and positions only, never an input name, snippet or document byte.
+  New names: the optional `related` member of a diagnostic (JavaScript
+  `ConfigDiagnostic.related`, Rust `ConfigDiagnostic::related`), and Rust-only
+  `SampleRuleHits` (sample rule hits, kept apart from static reachability: no
+  hit never proves a rule dead) and `ConfigRequest::closed_types` /
+  `closed_detectors` (strict validation, an error instead of a warning, only
+  for a vocabulary the caller declares closed; not offered in JavaScript, whose
+  `runtime-config/v1` has no such member). The `ConfigDiagnostic` id may now be
+  a rule id as well as a catalog detector id.
+
+- Static custom composition (#1253, epic #1246,
+  `decision-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support`):
+  `npm run wasm:build:custom -- --config <composition.json>`
+  (`scripts/build-custom-artifact.mjs`, usable from a webpack or Vite build hook)
+  resolves a declarative `composition/v1` input against the detector catalog and
+  builds, in an isolated workspace, a WebAssembly artifact that links only the
+  selected built-in detectors. It emits the wrapper (the function set of
+  `./common`, `PROFILE` `"custom"`), the glue and `.wasm`, the packaged
+  `artifact-manifest.custom.json` (compared with the generated manifest at
+  `initialize()`), a capability report, the verified default configuration and a
+  build report with the engine revision, toolchain and identities; an
+  unsupported id, combination or target fails before anything is emitted. New
+  Rust names: the root module `composition` (one constructor per built-in
+  detector, `Composition::new`, `SelectedDetector`),
+  `DetectorRegistry::with_composition`, `::with_composition_and_pii`,
+  `IncrementalSanitizer::with_composition_*`, `ArtifactManifest::custom`,
+  `Profile::Custom`. The standard `full` and `common` artifacts are unchanged.
+  Removal is of detector code only; no size or speed is guaranteed. A custom
+  Node addon, Python wheel or CLI is unsupported.
+
+- Configuration comparison, `configuration-comparison/v1` (#1254, epic #1246,
+  `decision-define-the-artifact-manifest-and-configuration-data-contracts`):
+  `compareConfigurations(input, { configs, actionPolicy?, policy? })`
+  (JavaScript, both entry points and the custom wrapper; Node addon and
+  WebAssembly) and `compare_configurations` (Rust) tell a consumer whether a
+  change to the detector selection, PII selection, ruleset, action policy or
+  limits altered detection or only the action, on one input. Each of one to four
+  sides is an independent pass over a temporary registry built for that call (it
+  reads and changes no owner and is not a handle); the sides' finalized findings
+  are related by their ranges in the declared unit into `added`, `removed`,
+  `changed` (with `type`, `detector`, `confidence`, `action`, `reason` and
+  `range` named, so removing a provider that exposes a contextual detection on
+  the same span is a type and detector change, not a removal) and the ambiguous
+  `split`, `merged` and `regrouped`. A side that cannot be built or scanned is
+  reported as `limited`, `unsupported` or `error` with a fixed code and gets no
+  difference, so a failure is never read as equivalence; each side carries its
+  snapshot and detection digests, origins and policy identity, which differ for
+  a different ruleset or selection even when the policy bytes match. The result
+  is a non-enforcing preview scoped to the input (`scope: "input"`): it returns
+  no text, snippet, per-scan id or hash of input, covers finalized findings
+  only, and a side with no finding claims nothing about absence of risk. A
+  callback policy is disclosed (`callbackSides`), may have side effects and has
+  no identity; it runs once per finding of each scanned side, side by side, and
+  its failure fails the call. `compareActionPolicies` is unchanged (one
+  detection pass, policy-only). Python and the CLI are unsupported. New
+  names: JavaScript `compareConfigurations`, `CompareConfigurationsOptions`,
+  `ConfigurationComparison` and its member types; Rust
+  `compare_configurations`, `ConfigurationSide`, `ConfigurationComparison`,
+  `ConfigurationResult`, `ConfigurationDifference(s)`, `DifferenceKind`,
+  `Correspondence`, `SideStatus`, `CHANGE_NAMES`, and the
+  `ConfigSnapshot` accessors `detection_selection`, `pii_selection` and
+  `whole_input_limits`; the Node addon exports `scanConfigurationSide` and
+  `scanConfigurationSideCommon` and the WebAssembly module `scanConfigurationSide`.
+  The comparison is related in the JavaScript package, not in the artifact: on
+  the standard `full` WebAssembly artifact the change is +1,044 bytes brotli
+  (204,726 to 205,770), 13.13% above the pre-epic 181,882 in total.
+
 ### Fixed
 
+- An incremental session no longer ignores a `ruleset` option (#1255, epic #1246):
+  `createIncrementalSanitizer` now rejects the key with `INVALID_OPTIONS`, as it already did `detection`, instead
+  of running the session without the detectors the caller asked for. Rulesets in
+  incremental sessions were never part of contract 1; callers that pass one
+  silently got no ruleset detection, and the adapters never pass one.
 - JavaScript `typedPlaceholderFormatter` upper-cases only ASCII letters in a
   finding type, matching the Rust core's `to_ascii_uppercase` (#1276). Every
   built-in type name is ASCII, so built-in output is unchanged; a custom
@@ -16,6 +181,16 @@ evidence is linked from each published version.
 
 ### Documentation
 
+- Configuration qualification and quickstart (#1255, epic #1246): an executable
+  [configuration quickstart](docs/guides/configuration-quickstart.md) (manifest,
+  `resolveConfig` and `describeConfig`, diagnose a typo and a shadowed rule,
+  `compareConfigurations` on synthetic samples, `scanAndRedact`), and a
+  `configuration` job that runs the configuration journeys on the exact installed
+  Node addon and WebAssembly artifacts and on a generated custom composition,
+  asserts that Python, the CLI and a custom addon or wheel are unsupported, and
+  bundles the standard and the custom artifact with esbuild. Measured WebAssembly
+  sizes and the benchmarks handoff are recorded in the data-contracts record. No
+  speed or size claim follows.
 - The deferred quality backlog is retired from the tree (epic #1259). Fourteen of
   its 25 findings were already closed, one is stale, and the ten still valid are
   tracked by #1273 to #1276; the file stays readable through a pinned permalink,

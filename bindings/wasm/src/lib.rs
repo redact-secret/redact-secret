@@ -34,6 +34,8 @@
 
 mod callbacks;
 mod compare;
+#[cfg(feature = "custom")]
+pub mod custom;
 mod error;
 mod finding;
 mod incremental;
@@ -77,21 +79,87 @@ pub fn profile() -> String {
     lifecycle::PROFILE.as_str().to_owned()
 }
 
+/// Returns this artifact's `artifact-manifest/v1` document as JSON text
+/// (issue #1250): the build identity, the built-in detectors it links in
+/// canonical order, the finding types each can emit, whether the PII runtime
+/// is linked, and the supported capabilities, defaults and bounds.
+///
+/// Generated from the registration rows this artifact links. Readable before
+/// [`initialize`], builds no registry and reads no PII selection, so it
+/// cannot initialize or lock anything.
+///
+/// # Errors
+///
+/// Returns the fixed `ARTIFACT_MANIFEST_INVALID_SOURCE_REVISION` class if the
+/// compile-time source revision is malformed.
+#[wasm_bindgen(js_name = artifactManifest)]
+pub fn artifact_manifest() -> Result<String, JsValue> {
+    lifecycle::artifact_manifest().map_err(to_js_error)
+}
+
 /// Idempotently initializes the module: builds and caches the built-in
 /// detector registry. Every later call, whether or not the first one
 /// succeeded, returns the same cached result without rebuilding it.
 ///
+/// `detection`, when given, is the JSON text of the `detection` object of
+/// `runtime-config/v1` (`{"include":[ids]}` or `{"exclude":[ids]}`): the
+/// detector-id selection the owner is fixed to (issue #1251). An equivalent
+/// selection is idempotent, a differing one is `DETECTION_CONFIG_CONFLICT`,
+/// and a rejected or conflicting request changes nothing.
+///
 /// # Errors
 ///
 /// Returns a fixed, input-free `INITIALIZATION_FAILED` error when the
-/// registry cannot be built.
+/// registry cannot be built, or the selection's own fixed error.
 #[wasm_bindgen]
 #[allow(
     clippy::needless_pass_by_value,
-    reason = "wasm-bindgen owns vector arguments"
+    reason = "wasm-bindgen owns vector and option arguments"
 )]
-pub fn initialize(pii: Vec<String>) -> Result<(), JsValue> {
-    lifecycle::initialize(&pii).map_err(to_js_error)
+pub fn initialize(pii: Vec<String>, detection: Option<String>) -> Result<(), JsValue> {
+    let selection = match detection.as_deref() {
+        None => redact_secret::DetectionSelection::all(),
+        Some(text) => redact_secret::DetectionSelection::from_json(text)
+            .map_err(|error| to_js_error(error.into()))?,
+    };
+    lifecycle::initialize_with(&pii, &selection).map_err(to_js_error)
+}
+
+/// Resolves explicit runtime input over this artifact's build defaults into
+/// the `config-resolution/v1` document (issue #1251), as JSON text.
+///
+/// `config` is the `runtime-config/v1` text for `schema`, `detection`, `pii`
+/// and `limits`; `ruleset` and `action_policy` are the exact bytes a call
+/// would load; `callback` records a callback policy as a dynamic reference;
+/// `disclose` includes the ruleset's detector ids and byte digest, withheld
+/// by default. Pure: it builds no registry, reads no owner state and
+/// initializes nothing, so it is safe before [`initialize`]. Invalid input
+/// is data in the document, never an error.
+///
+/// # Errors
+///
+/// Returns the fixed `ARTIFACT_MANIFEST_INVALID_SOURCE_REVISION` class if the
+/// compile-time source revision is malformed.
+#[wasm_bindgen(js_name = resolveConfig)]
+#[allow(
+    clippy::needless_pass_by_value,
+    reason = "wasm-bindgen owns option arguments"
+)]
+pub fn resolve_config(
+    config: Option<String>,
+    ruleset: Option<Vec<u8>>,
+    action_policy: Option<Vec<u8>>,
+    callback: bool,
+    disclose: bool,
+) -> Result<String, JsValue> {
+    lifecycle::resolve_config(
+        config.as_deref(),
+        ruleset.as_deref(),
+        action_policy.as_deref(),
+        callback,
+        disclose,
+    )
+    .map_err(to_js_error)
 }
 
 /// Returns the canonical credentials/PII activation identity.
@@ -352,6 +420,47 @@ pub fn compare_action_policies(
     Ok(compare::comparison_to_array(input, &comparison).into())
 }
 
+/// Scans one input under one explicit configuration and evaluates one policy
+/// over the finalized findings, without enforcing anything (issue #1254): one
+/// side of `compareConfigurations`. The package's own wrapper calls it once
+/// per side and relates the sides.
+///
+/// The registry is **temporary**: built from `config` (the `runtime-config/v1`
+/// text) and `ruleset` for this call and dropped with it. It reads no owner
+/// state, so it needs no successful [`initialize`] and never changes one. The
+/// side's policy arrives as `compareActionPolicies` sides do, with exactly one
+/// kind. The result is the flat array of `compareActionPolicies` for one side.
+/// The whole-input limits are the configuration's own.
+///
+/// # Errors
+///
+/// `INVALID_OPTIONS` when `kinds` does not hold exactly one side or the
+/// configuration does not resolve, `EMPTY_DETECTION_SET`, the limit errors
+/// exactly as [`scan`], `INVALID_ACTION_POLICY`, and `POLICY_FAILURE` or
+/// `INVALID_POLICY_ACTION` when the callback fails.
+#[allow(clippy::needless_pass_by_value)]
+#[wasm_bindgen(js_name = "scanConfigurationSide")]
+pub fn scan_configuration_side(
+    input: &str,
+    config: Option<String>,
+    ruleset: Option<Vec<u8>>,
+    kinds: Vec<String>,
+    documents: Vec<js_sys::Uint8Array>,
+    callbacks: Vec<Function>,
+) -> Result<JsValue, JsValue> {
+    let documents: Vec<Vec<u8>> = documents.iter().map(js_sys::Uint8Array::to_vec).collect();
+    let plans = compare::plan_sides(&kinds, &documents, callbacks.len()).map_err(to_js_error)?;
+    if plans.len() != 1 {
+        return Err(to_js_error(SecretScanErrorCode::InvalidOptions.into()));
+    }
+    let (registry, limits) =
+        lifecycle::build_temporary_registry(config.as_deref(), ruleset.as_deref())
+            .map_err(to_js_error)?;
+    let comparison = compare::run_compare(input, &registry, &plans, &callbacks, &limits)
+        .map_err(|error| to_js_error(error.into()))?;
+    Ok(compare::comparison_to_array(input, &comparison).into())
+}
+
 /// Evaluates the core's default policy for one finding's safe metadata and
 /// returns its action name, so a JavaScript policy that wants "mine, else the
 /// default" never copies the default table
@@ -472,7 +581,7 @@ pub(crate) mod synthetic {
     }
 
     /// `full`: a bare AWS-shaped access key id, a `provider` detector.
-    #[cfg(feature = "full")]
+    #[cfg(all(feature = "full", not(feature = "custom")))]
     pub(crate) fn secret() -> Secret {
         let key = format!("AKIA{}", "SYNTHETICEXAMPLE");
         Secret {
@@ -483,7 +592,7 @@ pub(crate) mod synthetic {
     }
 
     /// `common`: a connection-URI password, a `common` detector.
-    #[cfg(not(feature = "full"))]
+    #[cfg(not(all(feature = "full", not(feature = "custom"))))]
     pub(crate) fn secret() -> Secret {
         let password = format!("SYNTHETIC_REVOKED_{}", "PASSWORD");
         Secret {
@@ -541,7 +650,7 @@ mod tests {
 
     #[test]
     fn run_scan_rejects_input_over_an_explicit_byte_limit() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let limits = WholeInputLimits::new(5, 50).unwrap();
         let error =
             lifecycle::with_registry(|registry| run_scan("abcdef", registry, None, &limits))
@@ -578,10 +687,10 @@ mod tests {
     /// there is no finding count to bound.
     #[test]
     fn run_scan_rejects_a_finding_count_over_an_explicit_bound() {
-        if !cfg!(feature = "full") {
+        if !cfg!(all(feature = "full", not(feature = "custom"))) {
             return;
         }
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let input = format!(
             "prefix AKIA{} middle AKIA{} suffix",
             "SYNTHETICEXAMPLE", "SYNTHETICEXAMPL2"
@@ -625,7 +734,7 @@ mod tests {
     /// `scanAndRedact` call.
     #[test]
     fn scan_and_redact_agree_on_a_canonical_synthetic_finding() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let input = synthetic_input();
 
         let findings = scan(&input, None, None, None, None, None).unwrap();
@@ -652,10 +761,10 @@ mod tests {
     /// artifact detects the same input.
     #[test]
     fn a_bare_provider_token_is_detected_only_by_the_full_profile() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
         let findings = scan(&input, None, None, None, None, None).unwrap();
-        if cfg!(feature = "full") {
+        if cfg!(all(feature = "full", not(feature = "custom"))) {
             assert_eq!(findings.len(), 1);
             assert_eq!(findings[0].detector(), "aws-access-key");
         } else {
@@ -665,12 +774,38 @@ mod tests {
 
     #[test]
     fn profile_reports_the_compiled_profile() {
-        let expected = if cfg!(feature = "full") {
+        let expected = if cfg!(feature = "custom") {
+            "custom"
+        } else if cfg!(feature = "full") {
             "full"
         } else {
             "common"
         };
         assert_eq!(profile(), expected);
+    }
+
+    #[test]
+    fn artifact_manifest_describes_the_compiled_composition_without_initializing() {
+        // Generated before any `initialize()`: no registry is built, so the
+        // module stays uninitialized afterwards.
+        let manifest = lifecycle::artifact_manifest().expect("manifest");
+        assert!(manifest.starts_with("{\"schema\":\"artifact-manifest/v1\","));
+        assert!(manifest.contains("\"kind\":\"wasm\""));
+        let variant = if cfg!(feature = "custom") {
+            "custom"
+        } else if cfg!(feature = "full") {
+            "full"
+        } else {
+            "common"
+        };
+        assert!(manifest.contains(&format!("\"variant\":\"{variant}\"")));
+        assert!(manifest.contains(&format!("\"available\":{}", cfg!(feature = "pii"))));
+        // A common artifact names no provider detector as included.
+        assert_eq!(
+            manifest.contains("\"id\":\"github-token\""),
+            cfg!(all(feature = "full", not(feature = "custom")))
+        );
+        assert_eq!(manifest, lifecycle::artifact_manifest().expect("manifest"));
     }
 
     /// A minimal, valid declarative ruleset (issue #495).
@@ -684,7 +819,7 @@ validator: none\n";
 
     #[test]
     fn scan_accepts_a_ruleset_and_registers_it_after_the_compiled_profiles_built_ins() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let value = "a".repeat(20);
         let input = format!("ACME_{value}");
 
@@ -710,7 +845,7 @@ validator: none\n";
 
     #[test]
     fn scan_and_redact_thread_the_ruleset_through_to_the_scan_step() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let value = "a".repeat(20);
         let input = format!("ACME_{value}");
 
@@ -744,7 +879,7 @@ validator: none\n";
 
     #[test]
     fn scan_applies_an_action_policy_and_the_default_stays_the_base() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let input = synthetic_input();
 
         let default = scan(&input, None, None, None, None, None).unwrap();
@@ -803,7 +938,7 @@ validator: none\n";
     /// either construction order: nothing is held between calls.
     #[test]
     fn no_process_global_action_policy_slot_exists() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let input = synthetic_input();
         let run = |document: &[u8]| {
             scan(&input, None, None, None, None, Some(document.to_vec())).unwrap()[0].action()
@@ -829,7 +964,7 @@ validator: none\n";
 
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn a_rejected_action_policy_reaches_javascript_with_its_code_class_and_rule_index() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let rejected = br#"{"actionPolicyRevision":1,"base":"default","rules":[{"id":"r","match":{"type":["jwt"]},"action":"mask"}]}"#;
         let error = scan(
             "irrelevant",
@@ -856,7 +991,7 @@ validator: none\n";
 
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn a_callback_and_an_action_policy_together_are_invalid_options_before_the_document_is_read() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let callback = Function::new_no_args("return 'redact';");
         // A document that would be rejected still reports the misuse code.
         let error = scan(
@@ -873,7 +1008,7 @@ validator: none\n";
 
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn a_callback_returning_an_unknown_action_name_is_invalid_policy_action() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let input = synthetic_input();
         let callback = Function::new_no_args("return 'mask';");
         let error = scan(&input, Some(callback), None, None, None, None).unwrap_err();
@@ -890,7 +1025,7 @@ validator: none\n";
 
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn default_policy_rejects_malformed_metadata_as_invalid_findings() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let error = default_policy("finding-1", "Not An Identifier", "d", "high", "none", 0, 1)
             .unwrap_err();
         assert_eq!(js_error_parts(error).0, "INVALID_FINDINGS");
@@ -902,7 +1037,7 @@ validator: none\n";
 
     #[test]
     fn default_policy_delegates_to_the_core_default_evaluation() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let evaluate = |type_name: &str, confidence: &str| {
             default_policy(
                 "finding-1",
@@ -927,7 +1062,7 @@ validator: none\n";
     /// delegates to does not.
     #[test]
     fn registry_with_ruleset_builds_a_registry_over_the_compiled_profile() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let registry = lifecycle::registry_with_ruleset(RULESET_FIXTURE).unwrap();
         assert!(registry.contains("acme-internal-token"));
         assert_eq!(registry.profile(), Some(lifecycle::PROFILE));
@@ -947,7 +1082,7 @@ validator: none\n";
     /// the match.
     #[test]
     fn finding_range_uses_utf16_offsets_end_to_end() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let input = synthetic_input();
         let findings = scan(&input, None, None, None, None, None).unwrap();
         let range = findings[0].range();
@@ -1081,7 +1216,7 @@ validator: none\n";
     /// builds a real JavaScript function.
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn scan_and_redact_accept_custom_policy_and_formatter_callbacks() {
-        initialize(Vec::new()).unwrap();
+        initialize(Vec::new(), None).unwrap();
         let input = synthetic_input();
 
         let policy = Function::new_with_args("finding, context", "return 'block';");

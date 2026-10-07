@@ -113,6 +113,7 @@ pull request does not trigger it.
 | `package-consumer-wasm-runtimes` | Qualifies the Node WebAssembly fallback and the Cloudflare Workers path against the `browser` job's builds, for both detector profiles |
 | `clean-install` | Runs the [five-minute quickstart](quickstart.md) for Node, Python, and a Vite browser bundle from an empty directory against this run's addon, wasm builds, and wheel; see [clean-install qualification](#clean-install-qualification) |
 | `golden-path` | Runs the MCP AI-context golden path (`examples/mcp-redact`, `buildSafeContext`) on the installed Node and Python candidates and requires a sanitized model-facing context; see [golden-path qualification](#golden-path-qualification) |
+| `configuration` | Runs the configuration journeys (runtime detector selection against build defaults, effective-configuration resolution and comparison, sessions, bundlers, the configuration quickstart) on the installed candidate and a generated custom artifact, and asserts the unsupported surfaces; see [configuration qualification](#configuration-qualification) |
 | `inventory` | Requires the whole declared matrix and records what was built |
 
 Because `rust` and `python` are called workflows rather than copies, their
@@ -526,6 +527,23 @@ fails `npm run ci`. Their commands were executed from the page against the
 published crates as the evidence for the page's last revision
 ([#1070](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1070/README.md)); after each publication, run them
 again from the page's text.
+
+## Configuration qualification
+
+Issue #1255 (epic #1246). The `configuration` job runs `scripts/qualify-configuration.mjs`
+against the exact installed bytes, not a separate source build: the `node-addon`, `wasm-web` and
+`wasm-web-common` artifacts packed by `scripts/pack-npm-candidate.mjs` and installed into an empty
+project outside the checkout from a local registry, plus a custom WebAssembly artifact the job builds from the same revision
+(`scripts/build-custom-artifact.mjs`). Each row's manifest is read from the loaded artifact and its digest is
+recomputed outside it; the loaded binary's SHA-256 is recorded beside it. The custom row also compares the packaged
+manifest file, the build report's file digests and the recorded default snapshot. Python (the wheel) and the CLI
+are used only to assert `detectorSelection: false` and the absence of a configuration surface, and a custom Node
+addon or Python wheel is asserted refused by the build tooling. The journeys, their rows and what they emit are listed in the
+[configuration quickstart](guides/configuration-quickstart.md#what-is-qualified); the job runs the
+quickstart file itself. It uploads a `configuration-journeys` report and is not part of `inventory`'s lane
+list. To reproduce locally, build the candidate as in [clean-install qualification](#clean-install-qualification) and run
+`node scripts/qualify-configuration.mjs --candidate-dir <dir> --build-custom [--cli-binary <path>] [--python <path>] --report <path>`
+(`--require-unsupported` makes a missing CLI or wheel a failure, as in CI).
 
 ## Golden-path qualification
 

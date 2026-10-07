@@ -1,0 +1,1171 @@
+{
+  "schema": "runtime-config-conformance/v1",
+  "note": "The shared truth table for resolveConfig (issue #1251). Each case gives the runtime-config/v1 members that are data as `config` (an object, serialized compactly) or `configText` (raw, for malformed input), the exact `ruleset` and `actionPolicy` text a binding receives as bytes, whether a callback policy is present, and the expected resolution on the artifacts named in `profiles`. A case marked `rawOnly` is text no JavaScript object can produce (malformed JSON, a repeated member), so only the binding-level run, which passes the text through, executes it. `codes` and `paths` list every diagnostic in order (errors first). The Rust core and every JavaScript runtime that loads a binding run these cases against the artifact manifest they report; no surface keeps its own copy of the table. No case carries a scan input or a secret-shaped value.",
+  "cases": [
+    {
+      "name": "absent-inherits-every-default",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "expect": {
+        "ok": true,
+        "codes": [],
+        "mode": "all-included",
+        "disabledCount": 0,
+        "inert": false,
+        "policySource": "default",
+        "limits": {
+          "maxInputBytes": 67108864,
+          "maxFindings": 50000
+        },
+        "origins": {
+          "detection": "artifact-default",
+          "pii": "artifact-default",
+          "ruleset": "artifact-default",
+          "actionPolicy": "artifact-default",
+          "maxInputBytes": "artifact-default",
+          "maxFindings": "artifact-default"
+        }
+      }
+    },
+    {
+      "name": "empty-document-inherits",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {},
+      "expect": {
+        "ok": true,
+        "codes": [],
+        "mode": "all-included",
+        "disabledCount": 0
+      }
+    },
+    {
+      "name": "explicit-empty-detection-object-is-the-default",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {}
+      },
+      "expect": {
+        "ok": true,
+        "codes": [],
+        "mode": "all-included",
+        "disabledCount": 0,
+        "origins": {
+          "detection": "runtime"
+        }
+      }
+    },
+    {
+      "name": "include-replaces-and-the-order-is-canonical",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "include": [
+            "bearer-token",
+            "private-key",
+            "jwt"
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "codes": [
+          "OVERLAP_OUTCOMES_MAY_CHANGE"
+        ],
+        "paths": [
+          "detection"
+        ],
+        "mode": "include",
+        "enabledIds": [
+          "private-key",
+          "jwt",
+          "bearer-token"
+        ],
+        "inert": false
+      }
+    },
+    {
+      "name": "exclude-keeps-every-other-included-detector",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "exclude": [
+            "jwt"
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "codes": [
+          "OVERLAP_OUTCOMES_MAY_CHANGE"
+        ],
+        "mode": "exclude",
+        "disabledIds": [
+          "jwt"
+        ]
+      }
+    },
+    {
+      "name": "exclude-empty-enables-everything-like-absent",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "exclude": []
+        }
+      },
+      "expect": {
+        "ok": true,
+        "codes": [],
+        "mode": "exclude",
+        "disabledCount": 0
+      }
+    },
+    {
+      "name": "include-empty-enables-no-builtin-and-is-inert",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "include": []
+        }
+      },
+      "expect": {
+        "ok": true,
+        "codes": [
+          "NO_BUILT_IN_DETECTORS",
+          "OVERLAP_OUTCOMES_MAY_CHANGE"
+        ],
+        "mode": "include",
+        "enabledCount": 0,
+        "inert": true
+      }
+    },
+    {
+      "name": "include-and-exclude-together-conflict",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "include": [
+            "jwt"
+          ],
+          "exclude": [
+            "private-key"
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "DETECTION_SELECTOR_CONFLICT"
+        ],
+        "paths": [
+          "detection"
+        ]
+      }
+    },
+    {
+      "name": "unknown-id-is-rejected-without-echo",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "include": [
+            "jwt",
+            "no-such-detector"
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "UNKNOWN_DETECTOR_ID"
+        ],
+        "paths": [
+          "detection.include[1]"
+        ]
+      }
+    },
+    {
+      "name": "repeated-id-is-rejected",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "exclude": [
+            "jwt",
+            "jwt"
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "DUPLICATE_DETECTOR_ID"
+        ],
+        "paths": [
+          "detection.exclude[1]"
+        ]
+      }
+    },
+    {
+      "name": "not-an-identifier-is-rejected-before-any-lookup",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "include": [
+            "Github-Token"
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "INVALID_IDENTIFIER"
+        ],
+        "paths": [
+          "detection.include[0]"
+        ]
+      }
+    },
+    {
+      "name": "a-pii-family-is-not-a-detector-id",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "include": [
+            "pii:global:email"
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "INVALID_IDENTIFIER"
+        ],
+        "paths": [
+          "detection.include[0]"
+        ]
+      }
+    },
+    {
+      "name": "the-pii-adapter-is-not-selectable",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "include": [
+            "pii-domain"
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "DETECTOR_NOT_SELECTABLE"
+        ],
+        "paths": [
+          "detection.include[0]"
+        ]
+      }
+    },
+    {
+      "name": "a-full-detector-is-accepted-in-full",
+      "profiles": [
+        "full"
+      ],
+      "config": {
+        "detection": {
+          "include": [
+            "github-token"
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "codes": [
+          "OVERLAP_OUTCOMES_MAY_CHANGE"
+        ],
+        "enabledIds": [
+          "github-token"
+        ]
+      }
+    },
+    {
+      "name": "a-full-detector-is-not-included-in-common-and-is-never-fetched",
+      "profiles": [
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "include": [
+            "github-token"
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "DETECTOR_NOT_INCLUDED"
+        ],
+        "paths": [
+          "detection.include[0]"
+        ]
+      }
+    },
+    {
+      "name": "too-many-ids",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "include": [
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt",
+            "jwt"
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "TOO_MANY_DETECTOR_IDS"
+        ],
+        "paths": [
+          "detection.include"
+        ]
+      }
+    },
+    {
+      "name": "unknown-member-is-addressed-by-position",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "allow": []
+        },
+        "secretlike": 1
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "UNKNOWN_FIELD",
+          "UNKNOWN_FIELD"
+        ],
+        "paths": [
+          "@1",
+          "detection.@0"
+        ]
+      }
+    },
+    {
+      "name": "null-is-not-absent",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "configText": "{\"detection\":null}",
+      "expect": {
+        "ok": false,
+        "codes": [
+          "WRONG_TYPE"
+        ],
+        "paths": [
+          "detection"
+        ]
+      }
+    },
+    {
+      "name": "unknown-schema",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "schema": "runtime-config/v2"
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "UNKNOWN_SCHEMA"
+        ],
+        "paths": [
+          "schema"
+        ]
+      }
+    },
+    {
+      "name": "the-schema-member-is-accepted",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "schema": "runtime-config/v1"
+      },
+      "expect": {
+        "ok": true,
+        "codes": []
+      }
+    },
+    {
+      "name": "malformed-document",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "configText": "{\"detection\":",
+      "rawOnly": true,
+      "expect": {
+        "ok": false,
+        "codes": [
+          "WRONG_TYPE"
+        ],
+        "paths": [
+          "$"
+        ]
+      }
+    },
+    {
+      "name": "duplicate-member-is-malformed",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "configText": "{\"limits\":{},\"limits\":{}}",
+      "rawOnly": true,
+      "expect": {
+        "ok": false,
+        "codes": [
+          "WRONG_TYPE"
+        ],
+        "paths": [
+          "$"
+        ]
+      }
+    },
+    {
+      "name": "pii-explicit-empty-is-off",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "pii": []
+      },
+      "expect": {
+        "ok": true,
+        "codes": [],
+        "piiSelectors": [],
+        "origins": {
+          "pii": "runtime"
+        }
+      }
+    },
+    {
+      "name": "pii-selector-grammar-is-judged-by-the-core",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "pii": [
+          "PII"
+        ]
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "PII_SELECTOR_INVALID"
+        ],
+        "paths": [
+          "pii"
+        ]
+      }
+    },
+    {
+      "name": "limits-replace-field-by-field",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "limits": {
+          "maxInputBytes": 1000
+        }
+      },
+      "expect": {
+        "ok": true,
+        "codes": [],
+        "limits": {
+          "maxInputBytes": 1000,
+          "maxFindings": 50000
+        },
+        "origins": {
+          "maxInputBytes": "runtime",
+          "maxFindings": "artifact-default"
+        }
+      }
+    },
+    {
+      "name": "zero-limit-is-rejected",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "limits": {
+          "maxFindings": 0
+        }
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "INVALID_LIMITS"
+        ],
+        "paths": [
+          "limits.maxFindings"
+        ]
+      }
+    },
+    {
+      "name": "fractional-limit-is-rejected",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "configText": "{\"limits\":{\"maxInputBytes\":1.5}}",
+      "expect": {
+        "ok": false,
+        "codes": [
+          "INVALID_LIMITS"
+        ],
+        "paths": [
+          "limits.maxInputBytes"
+        ]
+      }
+    },
+    {
+      "name": "string-limit-is-wrong-type",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "limits": {
+          "maxInputBytes": "10"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "WRONG_TYPE"
+        ],
+        "paths": [
+          "limits.maxInputBytes"
+        ]
+      }
+    },
+    {
+      "name": "a-policy-document-replaces-the-default-and-allow-does-not-disable-a-detector",
+      "profiles": [
+        "full"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"allow-github\",\"match\":{\"type\":[\"github_token\"]},\"action\":\"allow\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [],
+        "policySource": "document",
+        "policyDigest": "sha256:639a0e632fdec8204559779bab20cbc975d782cb4e22b17273e3b2c0d53566a9",
+        "policyRuleCount": 1,
+        "disabledCount": 0,
+        "mode": "all-included",
+        "origins": {
+          "actionPolicy": "runtime"
+        }
+      }
+    },
+    {
+      "name": "a-provider-type-rule-on-the-common-artifact-is-undeclared-not-rejected",
+      "profiles": [
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"allow-github\",\"match\":{\"type\":[\"github_token\"]},\"action\":\"allow\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_UNKNOWN_TYPE"
+        ],
+        "policySource": "document",
+        "policyDigest": "sha256:639a0e632fdec8204559779bab20cbc975d782cb4e22b17273e3b2c0d53566a9",
+        "policyRuleCount": 1,
+        "disabledCount": 0,
+        "mode": "all-included",
+        "origins": {
+          "actionPolicy": "runtime"
+        },
+        "paths": [
+          "actionPolicy.rules[0].match.type[0]"
+        ]
+      }
+    },
+    {
+      "name": "an-invalid-policy-names-its-rule-and-no-content",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"r\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"mask\"}]}",
+      "expect": {
+        "ok": false,
+        "codes": [
+          "INVALID_ACTION_POLICY"
+        ],
+        "paths": [
+          "actionPolicy.rules[0]"
+        ]
+      }
+    },
+    {
+      "name": "a-callback-is-a-dynamic-reference",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "callback": true,
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_ANALYSIS_UNCERTAIN"
+        ],
+        "policySource": "callback",
+        "policyExplainable": false,
+        "policyDigest": null,
+        "paths": [
+          "actionPolicy"
+        ]
+      }
+    },
+    {
+      "name": "a-callback-with-a-policy-document-conflicts",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "callback": true,
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"allow-github\",\"match\":{\"type\":[\"github_token\"]},\"action\":\"allow\"}]}",
+      "expect": {
+        "ok": false,
+        "codes": [
+          "INVALID_OPTIONS"
+        ],
+        "paths": [
+          "actionPolicy"
+        ]
+      }
+    },
+    {
+      "name": "a-ruleset-adds-detectors-and-withholds-its-identity-by-default",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "ruleset": "ruleset-revision: 1\ndetector: acme-internal-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n",
+      "expect": {
+        "ok": true,
+        "codes": [],
+        "rulesetPresent": true,
+        "rulesetDisclosed": false,
+        "rulesetDetectorCount": 1
+      }
+    },
+    {
+      "name": "a-ruleset-identity-is-disclosed-only-on-request",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "ruleset": "ruleset-revision: 1\ndetector: acme-internal-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n",
+      "discloseRulesetIdentity": true,
+      "expect": {
+        "ok": true,
+        "codes": [],
+        "rulesetPresent": true,
+        "rulesetDisclosed": true,
+        "rulesetDetectorIds": [
+          "acme-internal-token"
+        ],
+        "rulesetDigest": "sha256:322906facc64b1dfec52b525853e7cd8ee2594e76afa22d2c53456b466947129"
+      }
+    },
+    {
+      "name": "an-invalid-ruleset-is-rejected",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "ruleset": "ruleset-revision: 2\n",
+      "expect": {
+        "ok": false,
+        "codes": [
+          "INVALID_RULESET"
+        ],
+        "paths": [
+          "ruleset"
+        ]
+      }
+    },
+    {
+      "name": "a-ruleset-id-may-not-reuse-a-built-in-id",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "ruleset": "ruleset-revision: 1\ndetector: jwt\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n",
+      "expect": {
+        "ok": false,
+        "codes": [
+          "INVALID_RULESET"
+        ],
+        "paths": [
+          "ruleset"
+        ]
+      }
+    },
+    {
+      "name": "every-problem-is-reported-errors-first",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "include": [
+            "no-such-detector"
+          ]
+        },
+        "limits": {
+          "maxInputBytes": 0
+        }
+      },
+      "ruleset": "x",
+      "expect": {
+        "ok": false,
+        "codes": [
+          "UNKNOWN_DETECTOR_ID",
+          "INVALID_LIMITS",
+          "INVALID_RULESET"
+        ],
+        "paths": [
+          "detection.include[0]",
+          "limits.maxInputBytes",
+          "ruleset"
+        ]
+      }
+    },
+    {
+      "name": "a-typo-in-a-tightening-rule-loads-and-warns-without-echo",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"tighten\",\"match\":{\"type\":[\"jwt_tokne\"]},\"action\":\"block\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_UNKNOWN_TYPE"
+        ],
+        "paths": [
+          "actionPolicy.rules[0].match.type[0]"
+        ],
+        "policySource": "document",
+        "policyRuleCount": 1
+      }
+    },
+    {
+      "name": "an-unknown-detector-id-in-a-rule-warns",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"tighten\",\"match\":{\"detector\":[\"jwt-tokne\"]},\"action\":\"block\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_UNKNOWN_DETECTOR"
+        ],
+        "paths": [
+          "actionPolicy.rules[0].match.detector[0]"
+        ]
+      }
+    },
+    {
+      "name": "a-rule-on-a-detector-this-artifact-does-not-include-is-not-a-typo",
+      "profiles": [
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"tighten\",\"match\":{\"detector\":[\"github-token\"]},\"action\":\"block\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_RULE_ON_NOT_INCLUDED_DETECTOR"
+        ],
+        "paths": [
+          "actionPolicy.rules[0].match.detector[0]"
+        ]
+      }
+    },
+    {
+      "name": "a-rule-on-a-disabled-detector-is-reported-with-its-detection-note",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "exclude": [
+            "jwt"
+          ]
+        }
+      },
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"tighten\",\"match\":{\"detector\":[\"jwt\"],\"type\":[\"jwt\"]},\"action\":\"block\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR",
+          "ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR",
+          "OVERLAP_OUTCOMES_MAY_CHANGE"
+        ],
+        "paths": [
+          "actionPolicy.rules[0].match.type[0]",
+          "actionPolicy.rules[0].match.detector[0]",
+          "detection"
+        ]
+      }
+    },
+    {
+      "name": "a-broad-early-rule-shadows-a-narrow-later-rule-and-a-default-action-stops-evaluation",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"broad\",\"match\":{\"type\":[\"jwt\",\"private_key\"]},\"action\":\"default\"},{\"id\":\"narrow\",\"match\":{\"type\":[\"jwt\"],\"confidence\":[\"high\"]},\"action\":\"block\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_SHADOWED_RULE"
+        ],
+        "paths": [
+          "actionPolicy.rules[1]"
+        ]
+      }
+    },
+    {
+      "name": "partial-overlap-disjoint-and-a-broad-later-rule-are-not-shadowed",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"narrow-first\",\"match\":{\"type\":[\"jwt\"],\"confidence\":[\"high\"]},\"action\":\"block\"},{\"id\":\"disjoint\",\"match\":{\"type\":[\"jwt\"],\"confidence\":[\"low\"]},\"action\":\"warn\"},{\"id\":\"partial\",\"match\":{\"type\":[\"jwt\",\"bearer_token\"],\"confidence\":[\"high\",\"low\"]},\"action\":\"allow\"},{\"id\":\"broad-last\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"warn\"},{\"id\":\"contained\",\"match\":{\"type\":[\"jwt\"],\"confidence\":[\"high\"],\"obfuscation\":[\"none\"]},\"action\":\"warn\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_SHADOWED_RULE"
+        ],
+        "paths": [
+          "actionPolicy.rules[4]"
+        ]
+      }
+    }
+  ]
+}

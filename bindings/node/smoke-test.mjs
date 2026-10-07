@@ -6,18 +6,30 @@
 // through `require`/`import`, not Rust unit tests.
 
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import {
+  artifactManifest,
+  artifactManifestCommon,
   compareActionPolicies,
   createIncrementalSanitizer,
   defaultPolicy,
   initialize,
+  initializeDetection,
   initializePii,
   piiActivation,
   redact,
+  resolveConfig,
+  resolveConfigCommon,
   scan,
   scanAndRedact,
   version,
 } from "./index.js";
+import {
+  bindingArguments,
+  casesFor,
+  checkCase,
+  loadRuntimeConfigFixture,
+} from "../../conformance/runtime-config.mjs";
 
 const SYNTHETIC_TOKEN =
   "Authorization: Bearer sk-syntheticRevokedExampleToken00000000000000000000";
@@ -48,6 +60,71 @@ function check(name, fn) {
     process.exitCode = 1;
   }
 }
+
+function canonicalJson(value) {
+  const sort = (item) =>
+    Array.isArray(item)
+      ? item.map(sort)
+      : item !== null && typeof item === "object"
+        ? Object.fromEntries(Object.keys(item).sort().map((key) => [key, sort(item[key])]))
+        : item;
+  return JSON.stringify(sort(value));
+}
+
+// The artifact manifest is read before anything is initialized: it must
+// describe the addon and must not build a registry or lock the PII
+// selection, so every later check (which may select PII) still applies.
+check("artifact manifest describes the addon and touches no activation", () => {
+  for (const [text, variant] of [
+    [artifactManifest(), "full"],
+    [artifactManifestCommon(), "common"],
+  ]) {
+    const manifest = JSON.parse(text);
+    assert.equal(Object.keys(manifest)[0], "schema");
+    assert.equal(manifest.schema, "artifact-manifest/v1");
+    assert.equal(manifest.version, version());
+    assert.deepEqual(manifest.artifact, { kind: "node-addon", pii: true, variant });
+    const { digest, ...rest } = manifest;
+    assert.equal(digest, `sha256:${createHash("sha256").update(canonicalJson(rest)).digest("hex")}`);
+    assert.equal(manifest.typeVocabulary.complete, false);
+  }
+  // `common` is a subset of `full`: what it lacks is exactly what it lists as not included.
+  const full = JSON.parse(artifactManifest());
+  const common = JSON.parse(artifactManifestCommon());
+  assert.deepEqual(full.notIncluded, []);
+  assert.equal(common.detectors.length + common.notIncluded.length, full.detectors.length);
+  assert.ok(common.detectors.length > 0 && common.detectors.length < full.detectors.length);
+});
+
+// The shared truth table for `resolveConfig` runs against the addon's own
+// resolver for both profiles. Resolution is pure: it builds no registry and
+// fixes no owner, so it runs here, before anything is initialized, and the
+// checks after it still see an untouched activation.
+check("resolveConfig runs the shared truth table and touches no activation", () => {
+  const fixture = loadRuntimeConfigFixture();
+  for (const [profile, resolve, manifestText] of [
+    ["full", resolveConfig, artifactManifest()],
+    ["common", resolveConfigCommon, artifactManifestCommon()],
+  ]) {
+    const manifest = JSON.parse(manifestText);
+    const cases = casesFor(fixture, profile);
+    assert.ok(cases.length >= 35, `${profile} ran ${cases.length} cases`);
+    for (const fixtureCase of cases) {
+      const { config, ruleset, actionPolicy, callback, disclose } = bindingArguments(fixtureCase);
+      const resolution = JSON.parse(resolve(config, ruleset, actionPolicy, callback, disclose));
+      checkCase(fixtureCase, profile, resolution, manifest, (actual, expected, message) =>
+        assert.deepEqual(actual, expected, message),
+      );
+      if (resolution.snapshot !== null) {
+        // The digest re-derived independently: sha256 over the canonical
+        // JSON of the snapshot without `digest`.
+        const { digest, ...rest } = resolution.snapshot;
+        assert.equal(digest, `sha256:${createHash("sha256").update(canonicalJson(rest)).digest("hex")}`);
+        assert.equal(Object.keys(resolution.snapshot)[0], "schema");
+      }
+    }
+  }
+});
 
 // Repeated initialization: idempotent, callable any number of times.
 check("repeated initialization is idempotent", () => {
@@ -487,6 +564,40 @@ check("compareActionPolicies fails closed on a bad side count, a bad return and 
     () => compareActionPolicies("irrelevant", ["action-policy"], [Buffer.from("{}")], []),
     (error) => error.code === "INVALID_ACTION_POLICY",
   );
+});
+
+// Detector selection joins the one-shot ownership of the PII selection. The
+// owner is already fixed by the checks above, so this proves the refusals: an
+// equivalent request is idempotent, a differing one conflicts without any
+// change, and a rejected one is a fixed code that never echoes the id.
+check("detector selection is rejected or conflicts without changing the owner", () => {
+  const before = JSON.stringify(scan(SYNTHETIC_TOKEN));
+  // The owner's PII selection is part of the request: a differing one would
+  // be a PII conflict, reported first.
+  const pii = PII_SELECTOR === undefined ? [] : [PII_SELECTOR];
+  assert.throws(
+    () => initializeDetection(pii, '{"exclude":["jwt"]}'),
+    (error) => error.code === "DETECTION_CONFIG_CONFLICT",
+  );
+  const secretLike = "SYNTHETICUNKNOWNDETECTORID000000";
+  assert.throws(
+    () => initializeDetection(pii, JSON.stringify({ include: [secretLike.toLowerCase()] })),
+    (error) =>
+      error.code === "INVALID_DETECTION_CONFIG" &&
+      error.message.includes("UNKNOWN_DETECTOR_ID") &&
+      !error.message.toLowerCase().includes(secretLike.toLowerCase()),
+  );
+  // An empty include with no PII selected enables nothing. With a PII selector
+  // the same request is a valid PII-only set, which differs from the owner's.
+  assert.throws(
+    () => initializeDetection(pii, '{"include":[]}'),
+    (error) => error.code === (PII_SELECTOR === undefined ? "EMPTY_DETECTION_SET" : "DETECTION_CONFIG_CONFLICT"),
+  );
+  assert.throws(
+    () => initializeDetection(pii, '{"include":["jwt"],"exclude":["jwt"]}'),
+    (error) => error.code === "INVALID_DETECTION_CONFIG" && error.message.includes("DETECTION_SELECTOR_CONFLICT"),
+  );
+  assert.equal(JSON.stringify(scan(SYNTHETIC_TOKEN)), before);
 });
 
 if (process.exitCode) {

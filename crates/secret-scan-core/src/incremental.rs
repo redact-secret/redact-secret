@@ -66,6 +66,7 @@
 
 use std::borrow::Cow;
 
+use crate::composition::Composition;
 use crate::detectors::{
     LookbackTail, MAX_LOOKBACK_LINES, PrivateKeyRetentionTracker, carries_aws_access_key_id,
     continues_previous_line, has_open_aws_secret_candidate_line_in, has_open_bearer_authorization,
@@ -91,6 +92,7 @@ use crate::pipeline::detect_units;
 use crate::policy::DefaultPolicy;
 use crate::redact::{default_placeholder_formatter, redact_shifted_into};
 use crate::registry::{DetectorRegistry, Profile};
+use crate::selection::DetectionSelection;
 use crate::types::{
     Action, ByteRange, DetectedFinding, Finding, PlaceholderFormatter, Policy, PolicyContext,
     ScanResult,
@@ -725,6 +727,124 @@ impl IncrementalSanitizer {
         formatter: Box<dyn PlaceholderFormatter>,
     ) -> Result<Self, SecretScanError> {
         let registry = DetectorRegistry::with_common_built_in_and_pii(selection)?;
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    /// Creates a `full` session over the built-in detectors `detection`
+    /// leaves enabled (issue #1251), with PII off.
+    ///
+    /// The session captures that configuration here, once, for its whole
+    /// life: no later call, selection or registry can change what it
+    /// detects, and it takes no custom detector and no ruleset, so there is
+    /// no new claim that incremental accepts either. With
+    /// [`DetectionSelection::all`] it is exactly
+    /// [`Self::with_policy_and_formatter`].
+    ///
+    /// # Errors
+    ///
+    /// [`SecretScanErrorCode::InvalidDetectionConfig`] when `detection`
+    /// names an unknown, not-included or repeated id, and
+    /// [`SecretScanErrorCode::EmptyDetectionSet`] when it leaves nothing
+    /// enabled.
+    pub fn with_detection_policy_and_formatter(
+        limits: IncrementalLimits,
+        detection: &DetectionSelection,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Result<Self, SecretScanError> {
+        let registry = DetectorRegistry::with_built_in([])?.with_detection(detection)?;
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    /// The `common` analogue of [`Self::with_detection_policy_and_formatter`].
+    /// A `common` session never makes the `full` constructor reachable.
+    ///
+    /// # Errors
+    ///
+    /// As [`Self::with_detection_policy_and_formatter`].
+    pub fn with_common_built_in_detection_policy_and_formatter(
+        limits: IncrementalLimits,
+        detection: &DetectionSelection,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Result<Self, SecretScanError> {
+        let registry = DetectorRegistry::with_common_built_in([])?.with_detection(detection)?;
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    /// The `full` PII-aware analogue of
+    /// [`Self::with_detection_policy_and_formatter`]: the session captures
+    /// `selection` and `detection` together at construction.
+    ///
+    /// # Errors
+    ///
+    /// As [`Self::with_detection_policy_and_formatter`].
+    pub fn with_built_in_and_pii_detection_policy_and_formatter(
+        limits: IncrementalLimits,
+        selection: &PiiSelection,
+        detection: &DetectionSelection,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Result<Self, SecretScanError> {
+        let registry =
+            DetectorRegistry::with_built_in_and_pii(selection)?.with_detection(detection)?;
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    /// The `common` PII-aware analogue of
+    /// [`Self::with_built_in_and_pii_detection_policy_and_formatter`].
+    ///
+    /// # Errors
+    ///
+    /// As [`Self::with_detection_policy_and_formatter`].
+    pub fn with_common_built_in_and_pii_detection_policy_and_formatter(
+        limits: IncrementalLimits,
+        selection: &PiiSelection,
+        detection: &DetectionSelection,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Result<Self, SecretScanError> {
+        let registry =
+            DetectorRegistry::with_common_built_in_and_pii(selection)?.with_detection(detection)?;
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    /// The analogue of [`Self::with_detection_policy_and_formatter`] over a
+    /// static custom [`Composition`] (issue #1253): the session runs exactly
+    /// the composition's detectors, narrowed by `detection`, and never makes
+    /// another built-in detector reachable.
+    ///
+    /// # Errors
+    ///
+    /// As [`Self::with_detection_policy_and_formatter`].
+    pub fn with_composition_detection_policy_and_formatter(
+        limits: IncrementalLimits,
+        composition: &Composition,
+        detection: &DetectionSelection,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Result<Self, SecretScanError> {
+        let registry =
+            DetectorRegistry::with_composition(composition, [])?.with_detection(detection)?;
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    /// The PII-aware analogue of
+    /// [`Self::with_composition_detection_policy_and_formatter`].
+    ///
+    /// # Errors
+    ///
+    /// As [`Self::with_detection_policy_and_formatter`].
+    pub fn with_composition_and_pii_detection_policy_and_formatter(
+        limits: IncrementalLimits,
+        composition: &Composition,
+        selection: &PiiSelection,
+        detection: &DetectionSelection,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Result<Self, SecretScanError> {
+        let registry = DetectorRegistry::with_composition_and_pii(composition, selection, [])?
+            .with_detection(detection)?;
         Ok(Self::from_registry(registry, limits, policy, formatter))
     }
 
