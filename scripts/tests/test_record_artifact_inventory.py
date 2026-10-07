@@ -333,6 +333,12 @@ class InventoryTests(unittest.TestCase):
 
         self.assertEqual(self.errors(configure), ["unrecognized artifact(s): something-else"])
 
+    def test_the_configuration_journeys_report_is_not_an_unrecognized_artifact(self) -> None:
+        def configure(artifacts: Artifacts) -> None:
+            artifacts.files["configuration-journeys"] = ["configuration-journeys.json"]
+
+        self.assertEqual(self.errors(configure), [])
+
     def test_shadow_determinism_records_are_not_unrecognized_artifacts(self) -> None:
         def configure(artifacts: Artifacts) -> None:
             for host in ("ubuntu-latest", "macos-latest", "windows-latest", "wasm32-wasip1"):
