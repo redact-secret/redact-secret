@@ -475,8 +475,16 @@ npm run ci
 ```
 
 [Developer onboarding](docs/onboarding.md) lists the Rust, Python, and
-artifact qualification commands and the repository layout; the
-[contribution guide](CONTRIBUTION.md) covers pull requests and review.
+artifact qualification commands and the repository layout.
+
+## Contributing
+
+Start with [Which contribution path should I use?](CONTRIBUTION.md#which-contribution-path-should-i-use)
+in the [contribution guide](CONTRIBUTION.md). A reporter files an issue form
+(`intake`) and needs no other reading. A researcher, fixture contributor, or
+implementer of an `implementation-ready` issue follows the role section there.
+Filing an issue or opening a pull request never makes support `stable`; support
+status is decided by independent evaluation. Use synthetic data only.
 
 ## Project governance
 

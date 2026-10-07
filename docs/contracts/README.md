@@ -92,6 +92,19 @@ core remains the only authoritative implementation
   No package ships it. The contract and its compatibility policy are in
   [`docs/specs/distribution.md`](../specs/distribution.md) and
   [`decision-publish-a-commit-bound-public-site-feed`](../decisions/2026-09-28-publish-a-commit-bound-public-site-feed.md).
+- [`contribution/implementation-ready-handoff.md`](contribution/implementation-ready-handoff.md)
+  and its schema
+  [`contribution/implementation-ready-handoff-v1.schema.json`](contribution/implementation-ready-handoff-v1.schema.json)
+  (`redact-secret.implementation-handoff/v1`, issue
+  [#1049](https://github.com/redact-secret/redact-secret/issues/1049)) -- the
+  `implementation-ready` handoff contract: state vocabulary, ownership, required
+  fields, the contributor-first issue layout and the `<slug>.handoff.json`
+  form, with a
+  [worked example](contribution/worked-example-1110.md) and
+  [`examples/ory-siblings.handoff.json`](contribution/examples/ory-siblings.handoff.json).
+  Meant to be read by the detector scaffold (#1050) and the CI summary (#1051);
+  no check reads it yet. Nothing loads it at scan time. The rule is in
+  [`docs/specs/evidence-and-gates.md`](../specs/evidence-and-gates.md).
 - [`pii/pii-context-v1.json`](pii/pii-context-v1.json) and its schema
   [`pii/pii-context-v1.schema.json`](pii/pii-context-v1.schema.json) — the
   `pii-context/v1` vocabulary defined for issue

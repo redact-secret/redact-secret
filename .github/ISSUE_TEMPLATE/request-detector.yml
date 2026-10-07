@@ -1,6 +1,6 @@
-name: Request a detector / 탐지기 요청
-description: Suggest a provider credential format or a future PII entity.
-title: "[detector request] "
+name: Request sensitive-data support / 탐지 지원 요청
+description: Ask for a credential type or a kind of personal data to be detected.
+title: "[support request] "
 labels:
   - area:detectors
   - enhancement
@@ -8,69 +8,58 @@ body:
   - type: markdown
     attributes:
       value: |
-        Request a provider credential format or PII entity for future support.
-        새로운 프로바이더 형식 또는 PII 엔티티 지원을 제안할 수 있습니다.
+        Tell us what you would like Redact Secret to detect. A provider or
+        data-type name is enough. 탐지하고 싶은 자격 증명이나 개인정보 종류의 이름만 알려주셔도 됩니다.
 
-        Link to public format documentation when possible. Do not paste any real,
-        revoked-but-real, or real-derived credentials, personal data, customer logs,
-        screenshots, or prompt exports. A format description is enough to start.
-        If this is a suspected exploitable bypass, report it privately through
-        [Security advisories](https://github.com/redact-secret/redact-secret/security/advisories/new).
-        A request does not imply a commitment or stable classification.
+        **Never paste real data.** No live, revoked-but-real, or real-derived
+        credentials, personal data, customer logs, screenshots, or prompt or
+        tool exports. Describe the format in words or link to public
+        documentation instead.
 
-        Provider and credential-family research is tracked in
-        [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks),
-        not in this repository. Maintainers open or link the research issue
-        there, using its
-        [research-family form](https://github.com/redact-secret/redact-secret-benchmarks/issues/new?template=research-family.yml),
-        and a detector request here is answered by linking that issue. You are
-        welcome to open that form yourself for a provider you know well.
-        프로바이더 연구는 이 저장소가 아니라 benchmarks 저장소의 위 양식에서 추적합니다.
-
-  - type: dropdown
-    id: category
-    attributes:
-      label: What would you like detected?
-      options:
-        - Provider-issued credential
-        - Contextual or generic credential
-        - PII entity (beta.10 or later)
-        - Other / unsure
-    validations:
-      required: true
+        This opens an intake issue. A request does not promise support, and you
+        do not need to know how detectors are researched or classified. A
+        maintainer decides whether it is research-needed or implementation-ready
+        and routes it internally. For a suspected security vulnerability use
+        [private reporting](https://github.com/redact-secret/redact-secret/security/advisories/new),
+        not this form.
 
   - type: input
     id: provider-or-entity
     attributes:
-      label: Provider or entity name
+      label: Provider or data type
       description: A public name is enough; do not include an actual value.
-      placeholder: "Example Provider API token"
+      placeholder: "Example Provider API token, or national ID number"
     validations:
       required: true
 
-  - type: textarea
-    id: use-case
+  - type: dropdown
+    id: category
     attributes:
-      label: Where does it appear?
-      description: Describe the use case, such as a prompt, tool result, log, trace, or user input. No production data.
-      placeholder: "Users paste configuration into an assistant, and tokens may enter model context."
-    validations:
-      required: true
-
-  - type: input
-    id: public-docs
-    attributes:
-      label: Public format or specification link (if available)
-      description: Prefer official documentation. Leave blank if you cannot find a public source.
-      placeholder: "https://provider.example/docs/tokens"
+      label: What kind is it? (optional)
+      description: Pick the closest, or leave it blank if unsure.
+      options:
+        - Credential issued by a provider
+        - Generic or contextual credential
+        - Personal data
+        - Not sure
     validations:
       required: false
 
   - type: textarea
-    id: relevant-details
+    id: use-case
     attributes:
-      label: Relevant format or context (optional)
-      description: Describe only publicly documented structure, distinguishing context, or benign lookalikes. No actual values or bypass recipe.
+      label: Where does it appear? (optional)
+      description: For example a prompt, tool result, log, or trace. No production data.
+      placeholder: "Users paste configuration into an assistant, and tokens may enter model context."
+    validations:
+      required: false
+
+  - type: input
+    id: public-docs
+    attributes:
+      label: Public documentation link (optional)
+      description: Prefer official documentation. Leave blank if you cannot find one.
+      placeholder: "https://provider.example/docs/tokens"
     validations:
       required: false
 

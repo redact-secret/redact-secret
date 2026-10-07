@@ -759,3 +759,55 @@ jobs:
       # digests valid (issue #1264). It makes no network call.
       - name: Every historical permalink must resolve at an ancestor of main
         run: npm run historical-permalinks:check
+
+  # Issue #1051: a summary of the gates above in contribution terms (what is
+  # present, what needs action, the command to run). It is a reader, never a
+  # gate:
+  #
+  #   - `needs` + `if: always()` run it after the gates whether they pass or
+  #     fail, and it only reads their `result`; it re-runs nothing.
+  #   - `continue-on-error: true` and a script that always exits 0 mean this
+  #     job cannot fail the workflow or a PR. The gates above stay the only
+  #     thing that can, so a failing gate is never masked and this job is
+  #     never the thing that turns a PR red or green. Do not add it to a
+  #     required-checks list.
+  #   - `contents: read` only, no secrets, no write token. The summary prints
+  #     file names and commands, never fixture values.
+  contribution-readiness:
+    name: Contribution readiness (summary only, never a gate)
+    if: always() && github.event_name == 'pull_request'
+    needs: [test, lint, changelog-coverage, scoring-artifact-identity]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+    permissions:
+      contents: read
+
+    steps:
+      # The diff and CHANGELOG.md at the merge base need full history.
+      - name: Check out repository with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      # Expressions are read through the environment, never interpolated into
+      # the shell snippet (see the changelog-coverage job above).
+      - name: Summarize contribution readiness
+        run: |
+          python3 -B scripts/contribution-readiness.py --step-summary \
+            --base "${PR_BASE_SHA}" \
+            --head "${PR_HEAD_SHA}" \
+            --labels "${PR_LABELS}" \
+            --gate "test=${GATE_TEST}" \
+            --gate "lint=${GATE_LINT}" \
+            --gate "changelog-coverage=${GATE_CHANGELOG}" \
+            --gate "scoring-artifact-identity=${GATE_SCORING}"
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          GATE_TEST: ${{ needs.test.result }}
+          GATE_LINT: ${{ needs.lint.result }}
+          GATE_CHANGELOG: ${{ needs.changelog-coverage.result }}
+          GATE_SCORING: ${{ needs.scoring-artifact-identity.result }}

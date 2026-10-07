@@ -5,7 +5,10 @@ contact_links:
     about: Report a suspected vulnerability privately. Do not use a public issue.
   - name: Questions and ideas
     url: https://github.com/redact-secret/redact-secret/discussions
-    about: Ask a usage question or float an early idea. Convert a concrete request to the detector request form.
-  - name: Reporting guide
+    about: Ask a usage question or float an early idea.
+  - name: Propose a provider for credential research (researchers)
+    url: https://github.com/redact-secret/redact-secret-benchmarks/issues/new?template=suggest-research.yml
+    about: Optional, for researchers who already know a provider's credential format. If you only want something detected, use "Request sensitive-data support" here instead.
+  - name: Reporting guide (optional)
     url: https://github.com/redact-secret/redact-secret/blob/main/docs/guides/reporting-detection-issues.md
-    about: Choose a safe form for detector requests, detection results, or integration feedback.
+    about: Optional help for writing a safe synthetic example. You do not need to read it to file a report.

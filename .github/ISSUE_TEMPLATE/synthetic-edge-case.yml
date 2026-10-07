@@ -1,0 +1,68 @@
+name: Submit a synthetic edge case / 합성 엣지 케이스 제출
+description: Share a safe, made-up input that you think the scanner should handle differently or test for.
+title: "[edge case] "
+labels:
+  - area:conformance
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a tricky input that is useful for testing, such as an unusual
+        separator, encoding, or surrounding text? Share a synthetic version here.
+        You do not need to know whether it is a false positive or a missed
+        detection. 어느 쪽인지 몰라도 괜찮습니다.
+
+        **Synthetic only.** The value must be made up by you, with no live,
+        revoked-but-real, or real-derived credentials, no personal data, and no
+        customer logs or unsanitized prompt or tool exports. Do not edit a real
+        value to make it look fake. The
+        [reporting guide](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/reporting-detection-issues.md)
+        is optional help; you do not need to read it first.
+
+        Filing this opens an intake issue. A maintainer decides whether it is
+        research-needed or implementation-ready; filing it does not by itself
+        change any fixture, confirm a defect, or make anything supported.
+        For a suspected
+        security vulnerability use
+        [private reporting](https://github.com/redact-secret/redact-secret/security/advisories/new).
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Synthetic example
+      description: The made-up input, or a description of its shape with placeholders.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: expectation
+    attributes:
+      label: What do you expect, and what happened? (optional)
+      description: For example "I expected it to be redacted, but nothing was found."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Where did you run it? (optional)
+      options:
+        - JavaScript (Node.js)
+        - JavaScript (browser)
+        - Python
+        - Command line
+        - Rust
+        - Other / not sure
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: safety-ack
+    attributes:
+      label: Safety acknowledgement
+      options:
+        - label: >-
+            The example is entirely synthetic. It contains no live,
+            revoked-but-real, or real-derived credential and no personal data.
+          required: true

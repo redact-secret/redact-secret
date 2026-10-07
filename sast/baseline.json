@@ -580,6 +580,34 @@
       "path": "scripts/check-rust-workspace.py",
       "rationale": "The URL is built from a fixed, hardcoded registry host (pypi.org, crates.io, or registry.npmjs.org) with only a package/crate name path-appended; the host is never attacker-influenced, so this cannot be redirected to an untrusted origin.",
       "rule_id": "sast.rules.python.lang.security.audit.dynamic-urllib-use-detected"
+    },
+    "4646ac9f1c5791b2": {
+      "classification": "false_positive",
+      "line": 126,
+      "path": "scripts/contrib-new-detector.mjs",
+      "rationale": "The pattern comes from the checked-in handoff JSON Schema (`docs/contracts/contribution/implementation-ready-handoff-v1.schema.json`), which is reviewed repository content, not request data. The script is a local contributor tool that reads a local file and sends nothing over a network, so there is no attacker-controlled pattern or input to cause ReDoS.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-non-literal-regexp"
+    },
+    "d27291320a54fbdd": {
+      "classification": "false_positive",
+      "line": 479,
+      "path": "scripts/contrib-new-detector.mjs",
+      "rationale": "The interpolated detector id is validated by `ID_PATTERN` (`^[a-z0-9][a-z0-9-]*$`) before any edit runs, so it holds no regular-expression metacharacters (a `-` outside a character class is literal). The script is a local contributor tool, not a service.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-non-literal-regexp"
+    },
+    "f8d19894a7ed57b5": {
+      "classification": "false_positive",
+      "line": 486,
+      "path": "scripts/contrib-new-detector.mjs",
+      "rationale": "The interpolated group is checked against the fixed `GROUPS` list (`ai`, `cloud`, `devtools`, `pkg-registry`, `saas`) before use, so it holds no regular-expression metacharacters. The script is a local contributor tool, not a service.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-non-literal-regexp"
+    },
+    "5ee1ef66780ff9ec": {
+      "classification": "false_positive",
+      "line": 706,
+      "path": "scripts/contrib-new-detector.mjs",
+      "rationale": "The template string is the CLI `--help` usage text, containing `<detector-id>`-style placeholders for the terminal. It is printed to stdout, never assigned to `innerHTML`, rendered into a DOM, or interpreted as markup.",
+      "rule_id": "sast.rules.javascript.lang.security.html-in-template-string"
     }
   },
   "known_errors": {

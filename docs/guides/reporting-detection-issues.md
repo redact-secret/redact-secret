@@ -2,16 +2,22 @@
 
 [Documentation home](../README.md) · [Troubleshooting](../troubleshooting.md)
 
-Choose the form that best matches your feedback. English or Korean is welcome.
+This guide is optional help; you do not need to read it before filing. Choose
+the form that best matches your feedback. English or Korean is welcome.
 제보는 영어와 한국어 모두 가능합니다. If you are unsure of a detector family,
 leave it blank. For a suspected security vulnerability, use the private process
 in [SECURITY.md](../../SECURITY.md) — never a public issue.
+
+Want to do more than report, such as research a provider or implement an
+`implementation-ready` issue? See
+[Which contribution path should I use?](../../CONTRIBUTION.md#which-contribution-path-should-i-use)
 
 | What you noticed | Form |
 | --- | --- |
 | A harmless value was flagged or redacted | [False positive report](https://github.com/redact-secret/redact-secret/issues/new?template=false-positive.yml) |
 | A supported credential was missed or given the wrong action | [Missed detection report](https://github.com/redact-secret/redact-secret/issues/new?template=missed-detection.yml) |
-| A provider credential or PII entity should be supported | [Request a detector](https://github.com/redact-secret/redact-secret/issues/new?template=request-detector.yml) |
+| A provider credential or PII entity should be supported | [Request sensitive-data support](https://github.com/redact-secret/redact-secret/issues/new?template=request-detector.yml) |
+| A safe made-up input you think is worth testing, and you are not sure which kind | [Submit a synthetic edge case](https://github.com/redact-secret/redact-secret/issues/new?template=synthetic-edge-case.yml) |
 | Installation, adapter behavior, or a guide was confusing | [Integration or docs feedback](https://github.com/redact-secret/redact-secret/issues/new?template=integration-docs.yml) |
 | A crash, thrown error, binding mismatch, or other code defect | [Bug report](https://github.com/redact-secret/redact-secret/issues/new?template=bug-report.yml) |
 | A broken link, wrong content, translation, or playground problem on the website | [Website feedback](https://github.com/redact-secret/redact-secret/issues/new?template=website-feedback.yml) |
@@ -97,18 +103,23 @@ console.log(JSON.stringify({
 }, null, 2));
 ```
 
-Paste the resulting JSON into the "Safe reproduction shape" field. It carries
+Paste the resulting JSON into the "Synthetic example" field. It carries
 only detector ids, confidence, action, and offsets — no text from your file.
 
-## Required fields
+## Which fields matter
 
-| Field | Why it's required |
+Only the synthetic example is required on the false positive and missed
+detection forms, plus the safety acknowledgement; without them a report cannot
+be reproduced or triaged safely. Everything else is optional and helps triage
+when you know it:
+
+| Field | Why it helps |
 | --- | --- |
+| Synthetic example | Required. States the exact shape that reproduces the behavior. |
+| What should have happened | States the disagreement precisely, such as `allow` expected but a finding returned. |
+| Provider or detector family | Narrows triage; leave blank if you don't know it. |
+| Where you ran it | Rust, Node, browser WebAssembly, Python, and the CLI can differ in offset units or supported detectors. |
 | Package version | Behavior is versioned; a fix or its absence is specific to a release. |
-| Runtime | Rust, Node, browser WebAssembly, Python, and the CLI can differ in offset units, artifact selection, or supported detectors. |
-| Detector family (if known) | Narrows triage; leave blank if you don't know which detector is involved. |
-| Expected action | States the disagreement precisely — `allow` expected but got a finding, or a finding expected but got `allow`, etc. |
-| Safe reproduction shape | Without it, a report cannot be reproduced or triaged at all. |
 
 ## Form field ids
 
@@ -124,10 +135,22 @@ prefill.
 
 ## What happens after you file
 
+Every report starts as `intake`. A maintainer then decides whether it needs
+`research-needed` (provider facts are not yet recorded), is
+`implementation-ready` (research is complete and the behavior is frozen), is
+`verification-needed` (a candidate exists and independent evaluation has not
+measured it), or is `complete` (that measurement was recorded). The
+[contribution guide](../../CONTRIBUTION.md#what-happens-to-what-you-submit)
+explains the five states, and the
+[handoff contract](../contracts/contribution/implementation-ready-handoff.md#vocabulary)
+defines them. You never move an issue between states or file a second issue in
+another repository.
+
 Filing a false positive or missed detection report does **not** by itself
 change any conformance fixture or expected result, and does not by itself open
 a confirmed product defect. A detector request also does not imply that a
-family will be implemented or qualified.
+family will be implemented or qualified, and no state makes a family supported
+or stable.
 Benchmark-originated and reporter-originated findings share one governed
 lifecycle, owned by
 [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)

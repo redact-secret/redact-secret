@@ -69,8 +69,13 @@ jobs:
       - name: Install the candidate Python wheel without an index or source fallback
         run: |
           python -m venv .venv
-          .venv/bin/python -m pip install --no-index --no-deps --only-binary :all: \
-            --disable-pip-version-check dist/redact_secret-*.whl
+          wheels=(dist/redact_secret-*.whl)
+          test "${#wheels[@]}" -eq 1
+          wheel_hash="$(sha256sum "${wheels[0]}" | cut -d' ' -f1)"
+          printf '%s/%s --hash=sha256:%s\n' "$PWD" "${wheels[0]}" "$wheel_hash" > "$RUNNER_TEMP/candidate-wheel.txt"
+          .venv/bin/python -m pip install --require-hashes --no-index --no-deps \
+            --only-binary :all: --disable-pip-version-check \
+            -r "$RUNNER_TEMP/candidate-wheel.txt"
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
