@@ -80,7 +80,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { DETECTOR_PROFILES, profileBuilds } from "./build-browser-artifact.mjs";
-import { brotliSize, gzipSize } from "./measure-detector-cost.mjs";
+import { brotliSize, gzipSize } from "./lib/artifact-size.mjs";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 /** Inside the gitignored Cargo target directory, so recorded paths stay repo-relative. */

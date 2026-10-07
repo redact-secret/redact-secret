@@ -75,6 +75,7 @@ jobs:
   lifecycle:
     name: Audit lifecycle
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       # Read-only: the closed-issue snapshot for `after-issue:#N` units.
@@ -135,6 +136,7 @@ jobs:
     name: Publish npm dependency ${{ matrix.platform }}
     needs: [ci, artifact-qualification]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
       name: release
     permissions:
@@ -259,6 +261,7 @@ jobs:
           name: registry-state-native-${{ matrix.platform }}
           path: registry-state.json
           if-no-files-found: error
+          retention-days: 90
 
       # Issue #528: `comparable` is false here because npm re-packs this
       # qualified file into a new versioned tarball before publishing --
@@ -302,6 +305,7 @@ jobs:
           name: artifact-digest-native-${{ matrix.platform }}
           path: artifact-digest.json
           if-no-files-found: error
+          retention-days: 90
 
   # Publishes `@redact-secret/wasm` from the `wasm-web` and `wasm-web-common`
   # artifacts `artifact-qualification` already qualified for this commit --
@@ -314,6 +318,7 @@ jobs:
     name: Publish npm dependency (wasm)
     needs: [ci, artifact-qualification]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
       name: release
     permissions:
@@ -539,6 +544,7 @@ jobs:
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     # `ci` covers the four ci.yml Rust jobs and the wasm32 job (rust-policy,
     # rust-native, rust-msrv, rust-wasm) plus the Node test matrix.
     # `artifact-qualification` is the Node addon, browser artifact, and CLI
@@ -743,6 +749,7 @@ jobs:
     name: Publish crates.io
     needs: [ci, artifact-qualification]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
       name: release
     permissions:
@@ -944,6 +951,7 @@ jobs:
     name: Publish PyPI
     needs: [ci, artifact-qualification]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
       name: release
     permissions:
@@ -1082,6 +1090,7 @@ jobs:
     name: Verify registry install ${{ matrix.target }}
     needs: [publish, publish-native-dependencies, publish-wasm-dependency]
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
     permissions:
       contents: read
     strategy:
@@ -1146,6 +1155,7 @@ jobs:
     name: Verify registry install (browser)
     needs: [publish, publish-native-dependencies, publish-wasm-dependency]
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
 
@@ -1179,6 +1189,7 @@ jobs:
       - verify-registry-install
       - verify-registry-install-browser
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment:
       name: release
     permissions:
@@ -1231,6 +1242,7 @@ jobs:
       - publish-pypi
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
 
@@ -1425,3 +1437,4 @@ jobs:
           name: release-manifest-${{ steps.manifest.outputs.version }}
           path: manifest.json
           if-no-files-found: error
+          retention-days: 90

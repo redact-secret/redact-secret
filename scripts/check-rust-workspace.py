@@ -57,6 +57,14 @@ Checks, in order:
    WebAssembly, computes identical scores and bands (#772). Test modules,
    which compare the fixed-point values with ``f64`` references, are exempt.
 
+12. Supply-chain coverage (R/F-13, R/F-14; #1274): every triple in
+   ``python-wheel-targets`` plus ``wasm32-unknown-unknown`` appears in
+   ``deny.toml`` ``[graph] targets``, so ``cargo deny`` checks the graph of
+   every artifact the release builds; and the ``wasm-bindgen-cli`` version
+   literals in ``ci.yml``, ``artifact-qualification.yml`` and
+   ``complete-assessment.yml`` equal the ``wasm-bindgen`` version
+   ``Cargo.toml`` pins, so a drift fails here and not when a build runs.
+
 Run ``--recheck-crate-name`` to also query crates.io for the preferred crate
 name; that is the only check that uses the network and it is off by default.
 """
@@ -149,6 +157,20 @@ UNSAFE_KEYWORD = re.compile(r"\bunsafe\b")
 # name {` (an inline test module).
 TEST_MODULE_FILE = re.compile(r"#\[cfg\(test\)\]\s+mod\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*;")
 INLINE_TEST_MODULE = re.compile(r"#\[cfg\(test\)\]\s+mod\s+[A-Za-z_][A-Za-z0-9_]*\s*\{")
+DENY_CONFIG = Path("deny.toml")
+WASM_TARGET = "wasm32-unknown-unknown"
+# The `wasm-bindgen-cli` version each workflow installs, as written: an inline
+# `--version <literal>` or a `WASM_BINDGEN_VERSION: "<literal>"` env entry.
+WASM_BINDGEN_WORKFLOWS = (
+    Path(".github") / "workflows" / "ci.yml",
+    Path(".github") / "workflows" / "artifact-qualification.yml",
+    Path(".github") / "workflows" / "complete-assessment.yml",
+)
+WASM_BINDGEN_LITERAL = re.compile(
+    r"wasm-bindgen-cli\s+--version\s+[\"']?(?P<inline>\d[\w.+-]*)[\"']?(?=\s)"
+    r"|^\s*WASM_BINDGEN_VERSION:\s*[\"']?(?P<env>\d[\w.+-]*)[\"']?\s*$",
+    re.M,
+)
 USER_AGENT = "redact-secret workspace check (https://github.com/redact-secret/redact-secret)"
 
 
@@ -382,6 +404,64 @@ def check_msrv(root: Path, metadata: dict, root_manifest: dict) -> list[str]:
         found = CI_MSRV.findall(workflow.read_text(encoding="utf-8"))
         if found != [declared]:
             errors.append(f"{CI_WORKFLOW}: expected exactly one MSRV: {declared}, found {found or 'none'}")
+    return errors
+
+
+def check_deny_targets(root: Path, policy: dict) -> list[str]:
+    """`deny.toml` `[graph] targets` covers every `python-wheel-targets`
+    triple and `wasm32-unknown-unknown`; a target missing there is a build
+    whose dependency graph `cargo deny` never checked (#1274, R/F-13)."""
+    wheel_targets = policy.get("python-wheel-targets")
+    if not wheel_targets:
+        return ["Cargo.toml: [workspace.metadata.redact-secret] must declare python-wheel-targets"]
+    path = root / DENY_CONFIG
+    if not path.is_file():
+        return [f"{DENY_CONFIG}: missing cargo-deny configuration"]
+    with path.open("rb") as handle:
+        declared = tomllib.load(handle).get("graph", {}).get("targets", [])
+    triples = {entry.get("triple") if isinstance(entry, dict) else entry for entry in declared}
+    errors = [
+        f"{DENY_CONFIG}: [graph] targets lacks {triple}, a python-wheel-targets entry"
+        for triple in sorted(wheel_targets)
+        if triple not in triples
+    ]
+    if WASM_TARGET not in triples:
+        errors.append(f"{DENY_CONFIG}: [graph] targets lacks {WASM_TARGET}, the WebAssembly artifact target")
+    return errors
+
+
+def pinned_wasm_bindgen(root_manifest: dict) -> str | None:
+    entry = root_manifest.get("workspace", {}).get("dependencies", {}).get("wasm-bindgen")
+    if isinstance(entry, dict):
+        entry = entry.get("version")
+    return entry.lstrip("=^~") if isinstance(entry, str) else None
+
+
+def check_wasm_bindgen_pins(root: Path, root_manifest: dict) -> list[str]:
+    """Every `wasm-bindgen-cli` version literal in a workflow equals the
+    `wasm-bindgen` version `Cargo.toml` pins: glue built by a different CLI
+    cannot instantiate the module (#1274, R/F-14)."""
+    pinned = pinned_wasm_bindgen(root_manifest)
+    if pinned is None:
+        return ["Cargo.toml: [workspace.dependencies] must pin wasm-bindgen"]
+    errors: list[str] = []
+    for relative in WASM_BINDGEN_WORKFLOWS:
+        path = root / relative
+        if not path.is_file():
+            errors.append(f"{relative.as_posix()}: missing workflow")
+            continue
+        found = [
+            match.group("inline") or match.group("env")
+            for match in WASM_BINDGEN_LITERAL.finditer(path.read_text(encoding="utf-8"))
+        ]
+        if not found:
+            errors.append(f"{relative.as_posix()}: no wasm-bindgen-cli version literal found")
+        for version in found:
+            if version != pinned:
+                errors.append(
+                    f"{relative.as_posix()}: wasm-bindgen-cli version {version} must equal "
+                    f"the wasm-bindgen {pinned} Cargo.toml pins"
+                )
     return errors
 
 
@@ -653,6 +733,8 @@ def validate(root: Path, metadata: dict, package_lister=None) -> list[str]:
     errors.extend(check_no_public_score_surface(root, metadata, policy))
     errors.extend(check_integer_only_scorer(root, metadata, policy))
     errors.extend(check_core_manifest(root, metadata, policy))
+    errors.extend(check_deny_targets(root, policy))
+    errors.extend(check_wasm_bindgen_pins(root, root_manifest))
     if package_lister is not None:
         errors.extend(check_core_package_contents(policy, package_lister(policy["core-package"])))
     return errors

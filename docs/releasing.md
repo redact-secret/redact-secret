@@ -94,6 +94,61 @@ flowchart TD
   files, unreadable registry state, or expired original artifacts block
   recovery. A dry run prints the missing PyPI filenames without publishing.
 
+## Workflow timeouts, artifact retention and Actions settings
+
+Issue #1273. Every job in `ci.yml`, `release.yml`, `reconcile-release.yml`,
+`notify-benchmarks.yml`, `scorecard.yml` and `wiki-links.yml` sets
+`timeout-minutes` (a reusable-workflow caller job cannot). Values are several
+times the longest successful duration in recent runs (release runs 2026-10-03
+and 2026-10-07, plus recent PR runs): 30 for the Rust native, coverage and wasm
+jobs (measured at most 10), 10 to 15 for the lightweight jobs, and 20 to 30 for
+publish, registry-install, reconcile and tag jobs (measured at most 4.2). A job
+that hits its limit fails; raise the value rather than rerunning blindly.
+
+Every `actions/upload-artifact` step sets `retention-days`:
+
+| Workflow | Retention | Why |
+|---|---|---|
+| `release.yml` (registry state, artifact digest, release manifest) | 90 days | release evidence; the platform maximum |
+| `artifact-qualification.yml`, `python-wheels.yml` | 14 days on `pull_request`, otherwise 90 | non-PR runs feed `release.yml` and `Reconcile Release`, which downloads the original qualified artifacts of the source run and blocks if they expired |
+| `package-release-rehearsal.yml` | 30 days | rehearsal evidence is not a release record |
+
+The repository settings are a maintainer action, not a workflow change. Read
+the current state:
+
+```bash
+gh api repos/redact-secret/redact-secret/actions/permissions
+gh api repos/redact-secret/redact-secret/actions/permissions/selected-actions
+```
+
+Target: `sha_pinning_required: true` and `allowed_actions: selected` with the
+allowlist below (every external action in `.github/workflows` and
+`.github/actions`; local actions and same-repository workflows need no entry).
+Apply it in this order:
+
+```bash
+gh api -X PUT repos/redact-secret/redact-secret/actions/permissions \
+  -F enabled=true -f allowed_actions=selected -F sha_pinning_required=true
+gh api -X PUT repos/redact-secret/redact-secret/actions/permissions/selected-actions \
+  -F github_owned_allowed=true -F verified_allowed=false \
+  -f 'patterns_allowed[]=advanced-security/dismiss-alerts@*' \
+  -f 'patterns_allowed[]=dtolnay/rust-toolchain@*' \
+  -f 'patterns_allowed[]=EmbarkStudios/cargo-deny-action@*' \
+  -f 'patterns_allowed[]=ossf/scorecard-action@*' \
+  -f 'patterns_allowed[]=PyO3/maturin-action@*' \
+  -f 'patterns_allowed[]=pypa/gh-action-pypi-publish@*' \
+  -f 'patterns_allowed[]=sigstore/cosign-installer@*' \
+  -f 'patterns_allowed[]=Swatinem/rust-cache@*' \
+  -f 'patterns_allowed[]=taiki-e/install-action@*'
+```
+
+`github_owned_allowed` covers `actions/*` (checkout, setup-node, setup-python,
+upload-artifact, download-artifact, create-github-app-token) and
+`github/codeql-action`. The selected-actions endpoint returns 409 while
+`allowed_actions` is `all`, so the two commands run in this order; apply them
+while no release is running, then rerun a workflow to confirm. Re-derive the list with
+`grep -rhoE 'uses: [^ ]+' .github | sort -u` when an action is added.
+
 ## Product and artifact identity
 
 All product packages share one SemVer version and source revision. Python uses
@@ -459,6 +514,44 @@ workflow's OIDC identity), is a possible future step. It would change the
 release workflow, so it needs maintainer approval of that change and a fresh
 rehearsal before it is adopted. Until then, treat the manifest and the
 registry attestations, not the tag signature, as the source-identity evidence.
+
+### npm publish authentication (trusted publishing deferred)
+
+The npm publish steps in `release.yml` (the native and Wasm dependency jobs
+and the facade job) and in `reconcile-release.yml` still authenticate with the
+`NPM_TOKEN` secret, passed as `NODE_AUTH_TOKEN`. npm trusted publishing (OIDC)
+does not replace it. This is a recorded deferral, not a finding that the token
+is preferable. Issue #1275 changed no workflow.
+
+- **Where the token lives.** `NPM_TOKEN` and `CARGO_REGISTRY_TOKEN` are secrets
+  of the `release` environment (the repository has no repository-level
+  secrets), so only jobs that run in that environment can read them. The npm
+  secret was last updated 2026-09-11. The publish jobs also hold
+  `id-token: write`, which signs the provenance attestation; the registry login
+  still uses the stored token.
+- **Token scope: unknown here.** The token type (granular or classic), its
+  package allow-list, its permission, and its expiry are visible only in the npm
+  account that issued it. A maintainer must record them when the token is next
+  rotated.
+- **Who rotates it: not recorded.** No document names an owner, cadence, or
+  rotation procedure. npm publisher rights are maintainer-held (see
+  [Review and approval](#review-and-approval)), so a maintainer with those
+  rights rotates it. Naming that person and a cadence is open.
+- **What blocks trusted publishing: not verified.** Preconditions known from
+  npm's feature, not checked against this repository's npm settings: a trusted
+  publisher must be configured on npmjs for each published package (the facade,
+  every native platform package, and the Wasm package), naming this repository,
+  the workflow file, and the `release` environment; `release.yml` and
+  `reconcile-release.yml` both publish, and each needs to be covered; and the
+  runner needs an npm CLI that supports OIDC login, while the workflows pin only
+  `node-version: 22` and do not pin npm. Whether the npm bundled with that Node
+  release suffices, and whether the packages' settings already allow it, were
+  not checked.
+- **Adopting it** changes publish authentication in both workflows, so it needs
+  explicit maintainer approval, a rehearsal (see
+  [Rehearsing at a throwaway unpublished version](#rehearsing-at-a-throwaway-unpublished-version)),
+  and removal of the `NPM_TOKEN` secret afterwards. Until then, rotate the token
+  after any suspected exposure.
 
 ### npm dist-tag policy
 

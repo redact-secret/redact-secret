@@ -470,7 +470,7 @@ byte spans before common scoring.
 ## Development
 
 ```bash
-npm ci
+npm ci --ignore-scripts
 npm run ci
 ```
 

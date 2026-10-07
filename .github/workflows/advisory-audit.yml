@@ -1,0 +1,40 @@
+# SECURITY.md prescribes a dependency review at least monthly. Advisories
+# arrive between pushes, and `ci.yml` only runs `cargo deny` on push and pull
+# request, so this scheduled job re-checks the Cargo and npm lockfiles weekly
+# (#1274). It reads the lockfiles only: no install, no secrets, no publish.
+name: Advisory audit
+
+on:
+  schedule:
+    - cron: "43 4 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  advisories:
+    name: Cargo and npm advisories
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check Cargo advisories and yanked crates
+        uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1
+        with:
+          command: check advisories
+          arguments: --locked
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Audit the npm lockfile
+        run: npm audit --package-lock-only

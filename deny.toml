@@ -1,13 +1,16 @@
 # cargo-deny policy for the whole workspace. Run `cargo deny check`.
 # The per-crate dependency boundary for the core lives in Cargo.toml under
 # [workspace.metadata.redact-secret] and is enforced by
-# scripts/check-rust-workspace.py.
+# scripts/check-rust-workspace.py, which also requires `targets` below to
+# cover every `python-wheel-targets` triple plus wasm32-unknown-unknown.
 
 [graph]
 all-features = false
 targets = [
   "x86_64-unknown-linux-gnu",
+  "x86_64-unknown-linux-musl",
   "aarch64-unknown-linux-gnu",
+  "aarch64-unknown-linux-musl",
   "x86_64-apple-darwin",
   "aarch64-apple-darwin",
   "x86_64-pc-windows-msvc",

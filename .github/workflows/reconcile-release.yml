@@ -74,6 +74,7 @@ concurrency:
 jobs:
   reconcile:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment:
       name: release
     permissions:
@@ -534,6 +535,7 @@ jobs:
     needs: reconcile
     if: inputs.dry_run == false
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
     permissions:
       contents: read
     strategy:
@@ -609,6 +611,7 @@ jobs:
     needs: reconcile
     if: inputs.dry_run == false
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
 
@@ -648,6 +651,7 @@ jobs:
     needs: [reconcile, verify-registry-install, verify-registry-install-browser]
     if: inputs.dry_run == false
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment:
       name: release
     permissions:
