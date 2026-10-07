@@ -32,7 +32,7 @@ only layer that changes what can be found at all.
 | `full` profile | supported (`with_built_in*`) | supported (root export) | supported (default artifact) | supported (the only profile) | supported (the only profile) |
 | `common` profile | supported (`with_common_built_in*`) | supported (`@redact-secret/core/common`; the addon links both and exposes `*Common` functions) | supported (separate `common` artifact, chosen at build time by the `full` Cargo feature) | **extension** (`profile()` is the constant `full`; adding `*_common` functions follows the Node pattern) | **extension** (no profile flag; `Profile::Full` only) |
 | Both profiles in one process | supported | supported (independent registries and PII cells per profile) | supported (two module instances) | unsupported | unsupported (one profile per invocation) |
-| Disable or select one detector by id at run time | unsupported | unsupported | unsupported | unsupported | unsupported |
+| Disable or select one detector by id at run time | **proposed** (accepted by the [#1249 records](#6-configuration-epic-1246-surface-matrix), not built) | **proposed** (`initialize`) | **proposed** (`initialize`) | unsupported | unsupported |
 | Register a custom Rust `Detector` | supported (`DetectorRegistry::register`, `!Send`) | unsupported | unsupported | unsupported | unsupported |
 | Declarative ruleset (adds detectors) | supported (`load_ruleset` into `DetectorRegistry`; not `BuiltInRegistry`) | supported (argument of `scan`, `scanAndRedact`; not incremental) | supported (same, per module instance) | supported (`ruleset=` of `scan`, `scan_and_redact`; not incremental) | supported (`--ruleset <path>`; refused with standard input) |
 | PII selector | per registry or session (`PiiSelection`) | one-shot per thread and profile (`initialize({ pii })`) | one-shot per module instance; only the `pii` artifact variant accepts a selection | one-shot per process (`initialize(pii=...)`) | per invocation (`--pii`, repeatable) |
@@ -159,9 +159,33 @@ Effects:
   Node and Python ship native code, so a profile or PII choice does not change
   their download size.
 
-## 6. What this does not authorize
+## 6. Configuration epic #1246 surface matrix
 
-- No per-detector selection, no numeric sensitivity or confidence threshold,
+Decided by the [#1249 records](../decisions/2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md) ([data contracts](../decisions/2026-10-07-define-the-artifact-manifest-and-configuration-data-contracts.md), [selection and precedence](../decisions/2026-10-07-define-detector-id-selection-and-configuration-replacement-precedence.md)).
+**existing** is shipped; **proposed** is accepted but not built, so do not
+promise it before its issue lands; **unsupported** is excluded until a consumer
+requirement with evidence reopens it. The rows above are unchanged unless named.
+
+| Capability (issue) | Rust | Node | WASM, browser | Python | CLI |
+| --- | --- | --- | --- | --- | --- |
+| `full`, `common` profiles | existing | existing | existing | existing (`full`) | existing (`full`) |
+| Artifact manifest, generated from the real composition (#1250) | proposed | proposed | proposed | proposed | proposed |
+| `resolveConfig`, `describeConfig`, `status().configuration` (#1251) | proposed | proposed | proposed | unsupported | unsupported |
+| Safe diagnostics (#1252) | proposed | proposed | proposed | unsupported | unsupported |
+| Runtime detector-id selection, owned by `initialize` or the registry (#1251) | proposed | proposed | proposed | unsupported | unsupported |
+| Static custom composition (#1253) | proposed (leaf crate) | unsupported | proposed, first | unsupported | unsupported |
+| `compareConfigurations`, per call, preview only (#1254) | proposed | proposed | proposed | unsupported | unsupported |
+| Action policy and `compareActionPolicies` | existing | existing | existing | policy only | existing |
+| Configuration-bound handle for Node, WASM, Python | n/a | unsupported (#1222) | unsupported (#1222) | unsupported (#1222) | n/a |
+| NER, sensitivity percentage, identity-gate control | unsupported | unsupported | unsupported | unsupported | unsupported |
+
+Included, enabled, emitted and action are four levels, and a later level never
+exceeds the earlier one; an unsupported request is rejected, never ignored or
+fetched.
+
+## 7. What this does not authorize
+
+- No per-detector selection beyond the proposed rows of section 6, no numeric sensitivity or confidence threshold,
   and no change to the identity and sensitivity gate is offered.
 - No second, reconfigurable global; a handle, when one is added, is built
   once with a fixed selection and never mutated.

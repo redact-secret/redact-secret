@@ -183,7 +183,7 @@ A later session starts from #1221's recommendation, narrowed as follows:
   callback may call another handle, or the same handle, because the registry is
   only read, and holds no borrow across a callback.
 - **Rejected for that design**: any mutation after construction (selection,
-  profile or ruleset); per-detector selection by id; a numeric sensitivity or
+  profile or ruleset); per-detector selection by id (amended by [`decision-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support`](2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md): one validated `detection` value is allowed in the immutable shape); a numeric sensitivity or
   confidence slider; sharing a handle across Workers or processes; a
   `Sanitizer` builder that bundles policy and formatter (deferred by #1097);
   accepting a shared registry in `IncrementalSanitizer` (decided against in
