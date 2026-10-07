@@ -405,6 +405,9 @@ function toNativeIncrementalOptions(options: IncrementalSanitizerOptions): Nativ
     throw new SecretScanError("INVALID_OPTIONS");
   }
   rejectPerCallDetection(options);
+  // A ruleset is a whole-input option (`rulesets in incremental sessions` are outside contract 1): a session
+  // that ignored one would silently run without the detectors the caller asked for (issue #1255).
+  if (Object.hasOwn(options, "ruleset")) throw new SecretScanError("INVALID_OPTIONS");
   const { limits, policy, placeholderFormatter } = options;
   if (typeof limits !== "object" || limits === null) {
     throw new SecretScanError("INVALID_LIMITS");

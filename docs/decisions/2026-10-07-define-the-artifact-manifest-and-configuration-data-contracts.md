@@ -259,6 +259,32 @@ tests are authoritative; the decision of each section is unchanged.
   failed baseline leaves every difference `null`; a rejected policy document or
   a failing callback fails the whole call. Python and the CLI stay unsupported.
   See [the API contract](../reference/api-contract.md#configuration-comparison).
+- **#1249.** The three 2026-10-07 records (this, [selection](2026-10-07-define-detector-id-selection-and-configuration-replacement-precedence.md),
+  [capability ceiling](2026-10-07-define-the-configuration-capability-ceiling-runtime-ownership-and-surface-support.md))
+  and the handoff contract. Reopen only with a consumer requirement and evidence; #1222 stays closed.
+- **#1255.** Qualified on the exact installed artifacts, not a source build
+  (`scripts/qualify-configuration.mjs`, job `configuration`; [rows and journeys](../guides/configuration-quickstart.md#what-is-qualified)):
+  Node addon and WebAssembly, `full` and `common`, and a generated custom composition, with each
+  loaded manifest recomputed outside the artifact and the binary's digest recorded; Python, the CLI
+  and a custom addon or wheel are asserted unsupported. Fixed on the way: an incremental session
+  ignored a `ruleset` key silently; it is `INVALID_OPTIONS`, like `detection`. The closed adapters
+  #217, #213 and #215 name only `initialize`, `scan`, `redact`, `scanAndRedact`,
+  `createIncrementalSanitizer`, `status` and the per-call and per-session `actionPolicy`; the epic
+  changed none of them.
+- **Footprint** (brotli, release builds, darwin-arm64, rustc 1.98.1, wasm-bindgen 0.2.128): `full`
+  205,770 B, +23,888 B or +13.13% over the 181,882 B pre-epic baseline (3,394 B under the 15% bound);
+  `common` 157,591; `full`+`pii` 303,112; `common`+`pii` 255,106; a 3-detector custom composition
+  150,360 (73% of `full`). Only `full` has a recorded baseline, so no cumulative figure is claimed
+  for the others; none of this is a speed or memory claim. Handed to `redact-secret-benchmarks`
+  (final evidence lives there): transfer size of every build against pre-epic baselines (take `common`
+  and `pii` from the commit before #1250); `initialize`/instantiate time and resident memory per row,
+  with and without a selection; `scan` throughput narrowed against a custom artifact of the same
+  set; `resolveConfig` and two- and four-side `compareConfigurations` cost against input size;
+  session creation and `append` with a narrowed set.
+- **Unsupported, reopen with a consumer requirement and evidence:** detector selection, resolution
+  and comparison on Python and the CLI; a custom addon, wheel or CLI; webpack or Vite for a custom
+  artifact (esbuild on Node is qualified, its browser bundle built but not run in a browser);
+  rulesets in sessions and stream adapters; handles and per-call detection (#1222).
 
 ## Rejected
 

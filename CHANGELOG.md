@@ -167,6 +167,11 @@ evidence is linked from each published version.
 
 ### Fixed
 
+- An incremental session no longer ignores a `ruleset` option (#1255, epic #1246):
+  `createIncrementalSanitizer` now rejects the key with `INVALID_OPTIONS`, as it already did `detection`, instead
+  of running the session without the detectors the caller asked for. Rulesets in
+  incremental sessions were never part of contract 1; callers that pass one
+  silently got no ruleset detection, and the adapters never pass one.
 - JavaScript `typedPlaceholderFormatter` upper-cases only ASCII letters in a
   finding type, matching the Rust core's `to_ascii_uppercase` (#1276). Every
   built-in type name is ASCII, so built-in output is unchanged; a custom
@@ -176,6 +181,16 @@ evidence is linked from each published version.
 
 ### Documentation
 
+- Configuration qualification and quickstart (#1255, epic #1246): an executable
+  [configuration quickstart](docs/guides/configuration-quickstart.md) (manifest,
+  `resolveConfig` and `describeConfig`, diagnose a typo and a shadowed rule,
+  `compareConfigurations` on synthetic samples, `scanAndRedact`), and a
+  `configuration` job that runs the configuration journeys on the exact installed
+  Node addon and WebAssembly artifacts and on a generated custom composition,
+  asserts that Python, the CLI and a custom addon or wheel are unsupported, and
+  bundles the standard and the custom artifact with esbuild. Measured WebAssembly
+  sizes and the benchmarks handoff are recorded in the data-contracts record. No
+  speed or size claim follows.
 - The deferred quality backlog is retired from the tree (epic #1259). Fourteen of
   its 25 findings were already closed, one is stale, and the ten still valid are
   tracked by #1273 to #1276; the file stays readable through a pinned permalink,

@@ -207,3 +207,18 @@ mistake.
 #1251 implements the grammar, validation order and precedence table over the
 manifest of #1250, #1252 the diagnostics named here. The engine spec gains one
 row; the profile record is amended by the ownership record.
+
+## Implementation status
+
+- **#1251, #1252.** The grammar, validation order, truth table and diagnostics are implemented once in
+  the Rust core and forwarded by the Node addon and WebAssembly; the code and its tests are
+  authoritative (see the [API contract](../reference/api-contract.md#detector-selection-and-effective-configuration)).
+- **#1255.** Verified on the installed artifacts, build defaults against runtime overrides: `include` of
+  every id (also reversed) and `exclude: []` give the build defaults' enabled set, detection
+  identity and scans; selection runs before the prefilter and overlap resolution (excluding
+  `github-token` hands the span to `generic-token` with its own type and action); a reserved
+  built-in id in a ruleset is `INVALID_RULESET`; a ruleset id is not selectable
+  (`UNKNOWN_DETECTOR_ID`); a secret pasted where an id belongs is rejected without being echoed.
+  A session captures the configuration once and takes no `detection` or `ruleset` key
+  (`INVALID_OPTIONS`; a `ruleset` key used to be ignored silently). The reopen conditions above
+  are unchanged.

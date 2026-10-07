@@ -195,3 +195,13 @@ evidence for a handle.
   constructors only, and the binding's third Cargo feature `custom` installs it. The generated
   wrapper has the function set of `./common`. See the
   [guide](../guides/custom-composition.md) and the engine spec row.
+- **#1255.** The surface rows are qualified on the exact installed artifacts: Node addon and
+  WebAssembly (`full`, `common`) and a generated custom composition run the same journeys; Python,
+  the CLI and a custom Node addon or wheel are asserted unsupported
+  ([qualification](../guides/configuration-quickstart.md#what-is-qualified)). A custom artifact
+  can only narrow within what it compiled (`DETECTOR_NOT_INCLUDED`, `PII_SELECTOR_UNAVAILABLE`,
+  `DETECTION_CONFIG_CONFLICT`), is checked against `full` narrowed to the same ids, and its
+  packaged manifest, build report and recorded snapshot are compared with the loaded one. Reopen
+  a row (custom addon, wheel or CLI; a Webpack or Vite recipe for a custom artifact) only with a
+  consumer requirement and evidence. Footprint and the benchmarks handoff are in the
+  [data contracts record](2026-10-07-define-the-artifact-manifest-and-configuration-data-contracts.md#implementation-status).

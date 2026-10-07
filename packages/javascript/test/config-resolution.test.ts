@@ -515,6 +515,19 @@ describe("detection is never a per-call argument", () => {
     expect(double.binding.calls).toEqual(before);
   });
 
+  it("rejects a ruleset on an incremental session instead of ignoring it", async () => {
+    const double = recorded();
+    const runtime = await initialized(double);
+    const before = [...double.binding.calls];
+    const limits = { maxInputBytes: 1024, maxBufferedBytes: 384, maxTokenBytes: 128, maxMultilineBytes: 256 };
+    for (const ruleset of ["ruleset-revision: 1\n", undefined, new Uint8Array(0)]) {
+      expect(() => runtime.createIncrementalSanitizer({ limits, ruleset } as never)).toThrowError(
+        expect.objectContaining({ code: "INVALID_OPTIONS" }),
+      );
+    }
+    expect(double.binding.calls).toEqual(before);
+  });
+
   it("leaves a call without the key exactly as before", async () => {
     const double = recorded();
     const runtime = await initialized(double);

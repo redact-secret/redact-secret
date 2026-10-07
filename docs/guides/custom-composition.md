@@ -148,6 +148,57 @@ ruleset are per call and need no rebuild; a policy never adds or removes a
 finding. In Node the wrapper reads the `.wasm` bytes itself; in a browser or
 bundler the glue resolves it relative to its own URL.
 
+### Bundling with esbuild
+
+The glue loads its binary with `new URL("redact_secret_wasm_custom_bg.wasm", import.meta.url)`, which no
+bundler rewrites for you: the `.wasm` has to sit next to the emitted bundle. The qualified path is
+**esbuild** (already a development dependency of this repository, so it needs nothing new and is
+deterministic to install); this plugin, a thin build-time helper and not a UI, copies the binary:
+
+```js
+// A thin esbuild plugin for a generated custom artifact: esbuild bundles the glue but not the `.wasm` it
+// loads relative to its own URL, so the plugin copies the artifact's binary next to the bundle.
+import { copyFileSync, mkdirSync, readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+
+export function copyRedactWasm({ artifactDir }) {
+  return {
+    name: "redact-secret-wasm",
+    setup(build) {
+      build.onEnd((result) => {
+        if (result.errors.length > 0) return;
+        const outfile = build.initialOptions.outfile ?? join(build.initialOptions.outdir, "index.js");
+        mkdirSync(dirname(outfile), { recursive: true });
+        for (const name of readdirSync(artifactDir).filter((file) => file.endsWith("_bg.wasm"))) {
+          copyFileSync(join(artifactDir, name), join(dirname(outfile), name));
+        }
+      });
+    },
+  };
+}
+```
+
+```js
+import { build } from "esbuild";
+import { copyRedactWasm } from "./esbuild-redact-wasm.mjs";
+
+await build({
+  entryPoints: ["src/app.mjs"], // imports ./vendor/redact/index.js
+  bundle: true,
+  format: "esm",
+  platform: "node", // or "browser"; the binary lands next to outfile either way
+  outfile: "dist/app.mjs",
+  plugins: [copyRedactWasm({ artifactDir: "src/vendor/redact" })],
+});
+```
+
+`npm run configuration:qualify` bundles the installed standard package and a generated custom artifact
+this way, runs both bundles and requires the same manifest digest as the unbundled artifact; the `browser`
+build is checked for the binary reference and the copied bytes, and is not executed in a browser by that
+step. The clean-install browser lane already bundles the *standard* package with Vite; webpack is not a
+dependency of this repository and neither is qualified for a *custom* artifact here, so no recipe for them is
+claimed; the same constraint (the binary beside the emitted glue) applies.
+
 ## How it works: the generation seam
 
 The official detector tables are crate-private, so a consumer cannot name a
@@ -216,7 +267,9 @@ standard `full` and `common` artifacts keep the #1250 self-report check only
 `npm run custom-composition:qualify` (builds two different compositions and the
 `full` baseline, then runs everything below; it prints one JSON report and fails
 on the first broken check). It is evidence for a reviewer, not a published
-claim; record results in the issue or in `redact-secret-benchmarks`, not here.
+claim; record results in the issue or in `redact-secret-benchmarks`, not here. The installed-artifact
+journeys (runtime overrides, sessions, comparison, bundlers) are in the
+[configuration quickstart](configuration-quickstart.md#what-is-qualified).
 
 - Agreement oracle: findings equal the `full` runtime artifact initialized with
   the same `include` over the canonical synchronous corpus; positive synthetic
