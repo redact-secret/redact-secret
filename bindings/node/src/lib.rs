@@ -1699,7 +1699,7 @@ fn scan_configuration_side_for(
 }
 
 /// One side of `compareConfigurations` against the `full` profile (see
-/// [`scan_configuration_side_for`]).
+/// `scan_configuration_side_for`).
 ///
 /// # Errors
 ///

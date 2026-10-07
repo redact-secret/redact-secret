@@ -399,7 +399,7 @@ impl ConfigurationComparison {
 }
 
 /// Runs one independent detection pass per side over `input` and relates every
-/// side to the first. See the [module documentation](self).
+/// side to the first. See the module documentation (`configuration_compare`).
 ///
 /// # Examples
 ///

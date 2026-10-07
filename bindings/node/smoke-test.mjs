@@ -587,9 +587,11 @@ check("detector selection is rejected or conflicts without changing the owner", 
       error.message.includes("UNKNOWN_DETECTOR_ID") &&
       !error.message.toLowerCase().includes(secretLike.toLowerCase()),
   );
+  // An empty include with no PII selected enables nothing. With a PII selector
+  // the same request is a valid PII-only set, which differs from the owner's.
   assert.throws(
     () => initializeDetection(pii, '{"include":[]}'),
-    (error) => error.code === "EMPTY_DETECTION_SET",
+    (error) => error.code === (PII_SELECTOR === undefined ? "EMPTY_DETECTION_SET" : "DETECTION_CONFIG_CONFLICT"),
   );
   assert.throws(
     () => initializeDetection(pii, '{"include":["jwt"],"exclude":["jwt"]}'),

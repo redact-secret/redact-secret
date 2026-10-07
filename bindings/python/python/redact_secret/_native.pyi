@@ -396,6 +396,7 @@ def artifact_manifest() -> dict[str, Any]:
     vocabulary (see ``typeVocabulary``); ``digest`` is ``sha256:`` over the
     canonical JSON of the document without ``digest``.
     """
+
 def byte_offset_to_char_offset(text: str, byte_offset: int) -> int: ...
 def scan(
     text: str,

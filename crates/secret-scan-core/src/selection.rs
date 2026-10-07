@@ -45,7 +45,7 @@ pub(crate) enum Mode {
 /// enabled set is the artifact's canonical order filtered to the enabled ids.
 /// Nothing is validated until the selection is applied
 /// ([`DetectorRegistry::with_detection`](crate::DetectorRegistry::with_detection))
-/// or resolved ([`resolve_config`]), when an unknown, not-included or repeated
+/// or resolved ([`resolve_config`](crate::resolve_config)), when an unknown, not-included or repeated
 /// id is rejected rather than ignored.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct DetectionSelection {

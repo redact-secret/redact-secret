@@ -16,6 +16,7 @@ from typing import Any
 
 import pytest
 import redact_secret
+
 from .conftest import REPO_ROOT, load_corpus
 
 
