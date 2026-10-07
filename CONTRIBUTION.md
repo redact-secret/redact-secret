@@ -248,15 +248,17 @@ entry there; an entry that is no longer a gap also fails, so the allowlist only
 shrinks as the pinned matrix is refreshed.
 
 **This checklist is necessary, never sufficient, for `stable`.** Clearing
-it means the evidence *exists*; reaching `stable` in
-[`docs/support-matrix.md`](docs/support-matrix.md) also requires the
-pass-rate floors `redact-secret-benchmarks`' `benchmarks/support/status-criteria.json`
-checks over that evidence (issue #503) -- five twin pairs, five benign
-cases, zero unresolved critical mutation or metamorphic findings, zero
-unresolved differential contract disagreements, and a T1 positive contract.
-A family can clear this checklist and still classify `provisional`; it
-cannot classify anything but `provisional` (at best) without clearing this
-checklist first.
+it means the evidence *exists*. Whether a family is `stable` is decided by
+`redact-secret-benchmarks` and reaches this repository only as the pinned
+support matrix; this document does not restate that rule. The rule has one
+home here: the support-matrix row of
+[evidence and gates](docs/specs/evidence-and-gates.md) and its user-facing form,
+[what each status means](docs/support-matrix.md#what-each-status-means). Stable
+is reached through one of three qualification profiles (documented, empirical,
+policy-qualified), each with its own evidence floors, so a T1 provider contract
+is required for the documented profile only. A family can clear this checklist
+and still classify `provisional`; it cannot classify anything but
+`provisional` (at best) without clearing this checklist first.
 
 ### Benchmark-originated bug checklist
 
