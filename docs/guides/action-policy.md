@@ -12,7 +12,8 @@ A policy is an argument of each call and owns no detection configuration; see
 [configuration ownership](configuration-ownership.md) for what each surface owns
 and how to keep several policies, or several PII selections, in one deployment.
 
-Support today (`current`): the Rust core (`load_action_policy`), the command
+Every surface below was introduced in `0.1.0-beta.14`; `0.1.0-beta.13` has none of
+them. Support today (`current`): the Rust core (`load_action_policy`), the command
 line (`--action-policy <path>`), Python (`action_policy=`) and the JavaScript package
 `@redact-secret/core` (`actionPolicy`) on both runtimes, the Node addon and the
 WebAssembly artifact.

@@ -42,8 +42,11 @@ per line (or a JSON array), for example the output of
 A unit whose N is in the snapshot is stale and fails. Without a snapshot the
 check cannot know, so it does not pretend to: release mode prints every
 unverified `after-issue` exception as a NOTICE for the maintainer to confirm,
-and still fails every other rule. The snapshot is never committed (it would be
-a second archive that goes stale) and never fetched here.
+and still fails every other rule. The release workflows never run without one:
+`scripts/snapshot-closed-issues.py` generates it from the workflow's read-only
+token and fails the job when it cannot, finds none or reaches its limit. The
+snapshot is never committed (it would be a second archive that goes stale) and
+never fetched by this script.
 
 Migration list. Units written before the policy carry no block. They are not
 "new unclassified audits": `scripts/audit-lifecycle-legacy-units.txt` names

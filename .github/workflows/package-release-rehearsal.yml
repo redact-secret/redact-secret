@@ -89,6 +89,7 @@ jobs:
     uses: ./.github/workflows/artifact-qualification.yml
     permissions:
       contents: read
+      issues: read
     with:
       rehearsal-version: ${{ needs.version.outputs.version }}
 

@@ -49,6 +49,11 @@ on packages that already published successfully, since most registries reject
 publishing over an existing version. Details on why to prefer each workflow,
 and what evidence each requires, are in the sections below.
 
+There is no local publish command. `npm run release` only prints this pointer
+and exits non-zero (`scripts/refuse-direct-publish.mjs`, held by `npm run
+release-entry:test`); registry publication and the version tag come from
+`Release` and `Reconcile Release` alone.
+
 ## Branching model
 
 `main` is both the integration branch and the only release source. Normal
@@ -150,7 +155,9 @@ and must use the qualified binaries and recorded digests.
    in prose and no check reads them: the Quick start in the root
    [`README.md`](../README.md) and the install commands in
    [`docs/getting-started.md`](getting-started.md#install-a-published-release).
-   Change them in the same commit, and at `0.1.0` drop the `@beta` and
+   Change them in the same commit, and mark them with the version status
+   block (latest published versus release candidate) that the three pages
+   carry. At `0.1.0` drop the `@beta` and
    `--version` qualifiers the quickstart explains.
 4. Retire historical review bodies before qualification, in the same reviewed
    pull request or an earlier one. Every `docs/audits/` unit whose front
@@ -167,10 +174,17 @@ and must use the qualified binaries and recorded digests.
    enforces this on the checked-out tree (it fails on every `final`,
    `in-progress`, `before-qualification` or unclassified unit and names each
    path); development (`npm run lifecycle:check`, part of `npm run ci`) accepts
-   a declared temporary unit. For a `deferred` unit, confirm `after-issue:#N`
-   is still open, optionally with `--closed-issues FILE` from
-   `gh issue list --state closed --limit 1000 --json number --jq '.[].number'`;
-   the check never calls the API. `Artifact qualification` (dispatch and `rc/*`
+   a declared temporary unit. The check never calls the API. The three
+   workflows below generate the closed-issue snapshot it needs for each
+   `deferred` unit's `after-issue:#N` with `scripts/snapshot-closed-issues.py`
+   (the workflow's read-only token) and pass it as `--closed-issues`; the job
+   fails if the snapshot cannot be generated, is empty, or reaches its 5000-issue
+   limit (a result that reaches the limit is treated as truncated), and a unit
+   whose issue has closed fails release mode. `Reconcile Release` counts only
+   issues closed at or before the source revision's commit time. Locally,
+   `python3 -B scripts/snapshot-closed-issues.py --out FILE` makes the same
+   file. Keep an epic that a `deferred` unit waits on open until the release it
+   qualifies has been closed out. `Artifact qualification` (dispatch and `rc/*`
    pushes), `Release` and `Reconcile Release` run it in release mode before
    anything is built or published, and it approves and publishes nothing.
 5. Run the local checks below before merging. After merge, record the exact
@@ -537,6 +551,12 @@ corpus identity, registry file checksums, qualification/publication/recovery run
 IDs, clean-install results, and annotated tag target. Label reconstructed
 evidence explicitly if an automated manifest failed. Copy necessary evidence
 before Actions artifacts expire.
+
+In the same closeout commit, flip the version status block in the root
+[`README.md`](../README.md), [`docs/quickstart.md`](quickstart.md) and
+[`docs/getting-started.md`](getting-started.md) to published: set "Latest
+published" to the version just recorded and remove the candidate wording. No
+check reads the block, so this step is explicit.
 
 Update the dated changelog entry and public installation guidance to reflect
 what actually published through a reviewed pull request to `main`. A release is

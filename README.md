@@ -24,8 +24,14 @@ always gives the same result.
 
 ## Quick start
 
-Every release so far is a beta. The newest published version is `0.1.0-beta.14`;
-the stable `0.1.0` is not published yet. Pick your runtime, install, and redact
+Every release so far is a beta; the stable `0.1.0` is not published yet.
+
+> **Version status.** Latest published: `0.1.0-beta.13`. Release candidate:
+> `0.1.0-beta.14`, which becomes the latest published version when its
+> [release record](docs/releases/status.md) lands. The install commands below
+> pin the candidate, because the install paths are qualified against it.
+
+Pick your runtime, install, and redact
 one synthetic value in about five minutes:
 
 | Runtime | Install | Steps |
@@ -35,7 +41,7 @@ one synthetic value in about five minutes:
 | Rust 1.88 or newer | `cargo add redact-secret` | [Rust](docs/quickstart.md#rust) |
 | Command line | `cargo install redact-secret-cli --locked --version 0.1.0-beta.14` | [CLI](docs/quickstart.md#command-line); `--version` is required while every release is a beta |
 
-These install the newest beta. The [quickstart](docs/quickstart.md#which-version-you-get)
+These pin the release candidate. The [quickstart](docs/quickstart.md#which-version-you-get)
 pins an exact version, says what a bare install resolves today, and says what
 changes when `0.1.0` is published. No prebuilt CLI binary is published.
 

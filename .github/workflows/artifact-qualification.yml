@@ -179,6 +179,9 @@ jobs:
     needs: plan
     permissions:
       contents: read
+      # Read-only: `gh issue list` builds the closed-issue snapshot that
+      # release mode needs to judge an `after-issue:#N` exception.
+      issues: read
 
     steps:
       - name: Check out repository
@@ -190,10 +193,14 @@ jobs:
       - name: Check that no historical review body is carried into qualification
         env:
           RELEASE_MODE: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/rc/')) }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           python3 -B -m unittest discover -s scripts/tests -p 'test_check_audit_lifecycle.py'
           if [[ "$RELEASE_MODE" == "true" ]]; then
-            python3 -B scripts/check-audit-lifecycle.py --release
+            # The check stays offline. The snapshot is generated here and the
+            # job fails if it cannot be generated, is empty or is truncated.
+            python3 -B scripts/snapshot-closed-issues.py --repo "$GITHUB_REPOSITORY" --out "$RUNNER_TEMP/closed-issues.txt"
+            python3 -B scripts/check-audit-lifecycle.py --release --closed-issues "$RUNNER_TEMP/closed-issues.txt"
           else
             python3 -B scripts/check-audit-lifecycle.py
           fi

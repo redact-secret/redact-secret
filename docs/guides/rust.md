@@ -2,8 +2,11 @@
 
 [Documentation home](../README.md) · [Installation](../getting-started.md)
 
-The `redact-secret` crate is imported as `redact_secret`. It has no normal
-runtime dependencies and performs no network or filesystem access. Add it with
+The `redact-secret` crate is imported as `redact_secret`. It performs no
+network, filesystem, or environment access: processing is local and
+deterministic. It is not dependency-free: its one normal dependency is
+`unicode-normalization` (pinned exactly, pure table-driven Unicode NFC, which
+brings `tinyvec`); it has no optional dependencies and no Cargo features. Add it with
 `cargo add redact-secret`, which selects the newest beta while no stable
 release exists; the [quickstart](../quickstart.md#rust) pins an exact version
 and shows a complete program.
@@ -109,6 +112,10 @@ cancelled and have no deadline; the limits above are the only bounds. See
 [Cancellation and time bounds](../reference/api-contract.md#cancellation-and-time-bounds).
 
 ## Action policy
+
+Introduced in `0.1.0-beta.14`; `load_action_policy`, `ActionPolicy` and
+`compare_action_policies` are absent from `0.1.0-beta.13`, so pin the crate
+version that has them.
 
 `load_action_policy` parses a declarative action policy document
 (`actionPolicyRevision: 1`, see the [action policy guide](action-policy.md))

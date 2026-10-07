@@ -17,9 +17,16 @@ spent downloading packages or compiling.
 
 ## Which version you get
 
-Every release so far is a beta; the stable `0.1.0` is not published yet. The
-commands below pin the newest published beta, `0.1.0-beta.14` (PyPI spells it
-`0.1.0b14`), so they give the same result tomorrow as today. Pin the version in
+Every release so far is a beta; the stable `0.1.0` is not published yet.
+
+> **Version status.** Latest published: `0.1.0-beta.13`. Release candidate:
+> `0.1.0-beta.14`, which becomes the latest published version when its
+> [release record](releases/status.md) lands. The commands below pin the
+> candidate because this page is qualified against it; until it is published,
+> install `0.1.0-beta.13` by substituting that version (PyPI spells the
+> candidate `0.1.0b14`).
+
+The pinned commands give the same result tomorrow as today. Pin the version in
 your own lockfile too.
 
 - A bare `npm install @redact-secret/core` resolves the `latest` tag, which a
