@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "redact-secret.implementation-handoff/v1",
+  "issue": { "repo": "redact-secret/redact-secret", "number": 1110 },
+  "state": "implementation-ready",
+  "identity": {
+    "family": "ory:network-api-key",
+    "route": "new-detector",
+    "detector": "ory-token",
+    "findingTypes": ["ory_session_token", "ory_oauth2_token"]
+  },
+  "task": "Add an always-redact detector, ory-token, for the Ory session token and the Ory OAuth2 access, refresh and authorization-code tokens, with synthetic fixtures for every positive, twin and benign sibling below.",
+  "positives": [
+    {
+      "id": "session-token",
+      "description": "Prefix ory_st_ followed by exactly 32 characters of [A-Za-z0-9] (39 bytes total). Finding type ory_session_token."
+    },
+    {
+      "id": "oauth2-token",
+      "description": "Prefix ory_at_, ory_rt_ or ory_ac_, then a key part of at least 43 characters of [A-Za-z0-9_-], one '.', then a signature of exactly 43 characters of [A-Za-z0-9_-]. A wider key part (44 or 48 bytes) still matches. Finding type ory_oauth2_token."
+    },
+    {
+      "id": "carrier-contexts",
+      "description": "Each shape is claimed bare and in an X-Session-Token header, an Authorization Bearer header, an ORY_ACCESS_TOKEN assignment, a constructor argument and an OAuth2 token response JSON."
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "admin-keys",
+      "kind": "gated",
+      "description": "ory_pat_, ory_apikey_ and ory_wak_ admin keys get no type and no claim.",
+      "reason": "No provider source gives a body length or alphabet; issuance-gated and tracked separately."
+    },
+    {
+      "id": "logout-token",
+      "kind": "excluded-shape",
+      "description": "ory_lo_ logout flow token.",
+      "reason": "A flow token passed in a logout URL, not an account credential; out of the first contract."
+    },
+    {
+      "id": "jwt-access-token",
+      "kind": "excluded-shape",
+      "description": "JWT access tokens, which carry no Ory prefix.",
+      "reason": "They stay with the jwt detector."
+    },
+    {
+      "id": "custom-oauth2-prefix",
+      "kind": "accepted-false-negative",
+      "description": "Enterprise custom OAuth2 prefixes and pre-2023 unprefixed session tokens.",
+      "reason": "No distinctive shape."
+    }
+  ],
+  "twins": [
+    {
+      "id": "session-length-off-by-one",
+      "kind": "near-miss-twin",
+      "description": "ory_st_ with 31 or 33 body characters, or with a '-' or '_' in the body.",
+      "reason": "Violates the exact length and alphabet of the generator."
+    },
+    {
+      "id": "oauth2-segment-damage",
+      "kind": "near-miss-twin",
+      "description": "ory_at_ with a 42-byte key part, a 42- or 44-byte signature, no '.', two '.', or a '+' or '/' in the body.",
+      "reason": "Breaks the Hydra HMAC grammar; a third dot-separated segment is a JWT, not this token."
+    },
+    {
+      "id": "case-and-glue",
+      "kind": "near-miss-twin",
+      "description": "ORY_ST_ uppercase, or a leading or trailing glue byte around an otherwise valid body.",
+      "reason": "The prefix is case-sensitive and the boundary rule rejects glued runs."
+    },
+    {
+      "id": "cookie-and-placeholder-names",
+      "kind": "benign-sibling",
+      "description": "ory_kratos_session and ory_session_ cookie names, ory_st_ placeholders shorter than 32, an ory_pat_ placeholder, and ORY_SESSION_TOKEN=${ORY_SESSION_TOKEN}.",
+      "reason": "Names and references, not token values."
+    },
+    {
+      "id": "jwt-mentioning-prefix",
+      "kind": "benign-sibling",
+      "description": "A JWT whose payload merely mentions ory_at_.",
+      "reason": "The jwt detector owns it; ory-token must not claim a substring of a JWT."
+    }
+  ],
+  "policy": {
+    "defaultAction": "redact",
+    "confidence": "high",
+    "tradeoffs": {
+      "falsePositive": "An unrelated run matching ory_(st|at|rt|ac)_ plus the exact body grammar would be redacted; the exact lengths make this rare.",
+      "falseNegative": "Admin keys, JWT access tokens, custom prefixes and pre-2023 session tokens are not detected by this change."
+    }
+  },
+  "conformance": {
+    "fixturesRequired": ["positive", "near-miss-twin", "benign-sibling", "boundary", "carrier-context"],
+    "bindingsEquivalent": true,
+    "syntheticOnly": true
+  },
+  "research": {
+    "handoff": "https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/ory.md",
+    "verdict": "ready",
+    "tier": "T1",
+    "readAt": "2816897f96c405c3eb8c87a0c70eba5df273c121",
+    "adoption": {
+      "ruling": "https://github.com/redact-secret/redact-secret/issues/1110",
+      "adoptedOn": "2026-10-07"
+    },
+    "limitations": ["Admin key body length and alphabet are not documented by any source"]
+  },
+  "evaluation": {
+    "benchmarkIssue": "redact-secret/redact-secret-benchmarks#583",
+    "owner": "benchmarks-maintainer",
+    "evidenceLabel": "project-authored",
+    "supportStatus": "separate"
+  },
+  "surfaces": [
+    "crates/secret-scan-core/src/detectors/**",
+    "conformance/fixtures/**",
+    "docs/specs/detector-families.md",
+    "CHANGELOG.md"
+  ],
+  "commands": ["npm run check:detector", "npm run check:rust", "npm run check:js"]
+}

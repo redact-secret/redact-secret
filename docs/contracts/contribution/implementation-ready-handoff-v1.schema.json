@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/redact-secret/redact-secret/blob/main/docs/contracts/contribution/implementation-ready-handoff-v1.schema.json",
+  "title": "Redact Secret implementation-ready handoff v1",
+  "description": "The machine-readable form of an implementation-ready issue. It carries identifiers, links, grammars described in words, and command lines, never a credential value, never benchmark corpus content, and never a support status. A file that validates says the issue body is complete enough to start coding; it does not say the family is supported.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "issue",
+    "state",
+    "identity",
+    "task",
+    "positives",
+    "exclusions",
+    "twins",
+    "policy",
+    "conformance",
+    "research",
+    "evaluation",
+    "surfaces",
+    "commands"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "redact-secret.implementation-handoff/v1" },
+    "issue": {
+      "description": "The core implementation issue this handoff belongs to. One issue, one handoff; research and implementation are never one issue.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo", "number"],
+      "properties": {
+        "repo": { "const": "redact-secret/redact-secret" },
+        "number": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "state": {
+      "description": "The work-item state this file claims. Only implementation-ready has a handoff payload; the other four states carry nothing to validate.",
+      "const": "implementation-ready"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "route", "findingTypes"],
+      "properties": {
+        "family": {
+          "description": "Taxonomy id (provider:family) from the benchmarks taxonomy, or a core-owned contextual or PII family id.",
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*(:[a-z0-9][a-z0-9-]*)?$"
+        },
+        "route": { "enum": ["new-detector", "extend-detector", "contextual-rule", "fixture-only", "policy-change"] },
+        "detector": {
+          "description": "Detector id the change lands in. Required unless route is fixture-only; a new detector names the id it will take.",
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "findingTypes": {
+          "description": "Finding kinds the change adds or changes (snake_case). Empty only for fixture-only.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "task": {
+      "description": "Section 1 of the issue body: one task a contributor can read cold.",
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 600
+    },
+    "positives": {
+      "description": "Section 2: supported shapes and contexts, in words or character classes. No literal that matches a real credential.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/shape" }
+    },
+    "exclusions": {
+      "description": "Section 3a: explicit exclusions, including every unresolved limitation (a gated body, an undocumented length). Nothing gated is inside the supported contract.",
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/shape" },
+          {
+            "type": "object",
+            "required": ["kind"],
+            "properties": { "kind": { "enum": ["excluded-shape", "gated", "accepted-false-negative"] } }
+          }
+        ]
+      }
+    },
+    "twins": {
+      "description": "Section 3b: near-miss twins and benign siblings the implementation must not flag, each with the reason it is a control.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/shape" },
+          {
+            "type": "object",
+            "required": ["kind", "reason"],
+            "properties": { "kind": { "enum": ["near-miss-twin", "benign-sibling"] } }
+          }
+        ]
+      }
+    },
+    "policy": {
+      "description": "Policy classification. Detection stays separate from enforcement: this states the default the product contract adopted, not a new enforcement mechanism.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["defaultAction", "confidence", "tradeoffs"],
+      "properties": {
+        "defaultAction": { "enum": ["redact", "warn", "block", "none"] },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "tradeoffs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["falsePositive", "falseNegative"],
+          "properties": {
+            "falsePositive": { "type": "string", "minLength": 10 },
+            "falseNegative": { "type": "string", "minLength": 10 }
+          }
+        }
+      }
+    },
+    "conformance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fixturesRequired", "bindingsEquivalent", "syntheticOnly"],
+      "properties": {
+        "fixturesRequired": {
+          "description": "Fixture groups the PR adds to the shared corpus.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "enum": ["positive", "near-miss-twin", "benign-sibling", "boundary", "carrier-context"] },
+          "uniqueItems": true
+        },
+        "bindingsEquivalent": {
+          "description": "The equivalence harness across bindings must stay green (true for any detector change).",
+          "type": "boolean"
+        },
+        "syntheticOnly": {
+          "description": "Fixture values are built at run time from repeated filler or are unmistakably synthetic; never a realistic key literal.",
+          "const": true
+        }
+      }
+    },
+    "research": {
+      "description": "Section 6 (maintainer evidence): the revision-bound research handoff and the core adoption ruling. The implementer does not need to read these to start.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["handoff", "adoption", "verdict", "readAt"],
+      "properties": {
+        "handoff": { "$ref": "#/$defs/permalink" },
+        "dossier": { "$ref": "#/$defs/link" },
+        "verdict": { "const": "ready" },
+        "tier": { "enum": ["T1", "T2", "T3"] },
+        "readAt": {
+          "description": "The 40-hex commit of the research source the handoff was read at.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "adoption": {
+          "description": "Where core adopted the supported/excluded contract (an issue comment or ADR link) and the date.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ruling", "adoptedOn"],
+          "properties": {
+            "ruling": { "$ref": "#/$defs/link" },
+            "adoptedOn": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" }
+          }
+        },
+        "limitations": {
+          "description": "Unresolved limitations, each restated as an exclusion above and gated here by what is missing.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 5 }
+        }
+      }
+    },
+    "evaluation": {
+      "description": "Independent evaluation linkage. Implementation-ready is a coding handoff and carries no support verdict; these fields only name who measures next.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["benchmarkIssue", "owner", "supportStatus"],
+      "properties": {
+        "benchmarkIssue": {
+          "description": "The redact-secret-benchmarks issue that will measure the exact candidate (the reverse handoff target).",
+          "type": "string",
+          "pattern": "^redact-secret/redact-secret-benchmarks#[0-9]+$"
+        },
+        "owner": {
+          "description": "Role that owns the measurement.",
+          "const": "benchmarks-maintainer"
+        },
+        "evidenceLabel": { "enum": ["project-authored", "independent"] },
+        "supportStatus": {
+          "description": "Always the literal separate: promotion and stable support are derived by benchmarks from measured evidence and are never written here.",
+          "const": "separate"
+        }
+      }
+    },
+    "surfaces": {
+      "description": "Section 4: files or surfaces likely to change (paths or globs; a hint, not a limit).",
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^[A-Za-z0-9_./*{},-]+$" }
+    },
+    "commands": {
+      "description": "Section 5: exact scoped local checks, run from the repository root.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^(npm run|cargo|python3|node) [A-Za-z0-9_:./ =@+-]+$" }
+    }
+  },
+  "$defs": {
+    "shape": {
+      "type": "object",
+      "required": ["id", "description"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "description": {
+          "description": "A shape or context in words or a character-class grammar. Quote only provider-documented prefixes. Never a complete credential-shaped literal.",
+          "type": "string",
+          "minLength": 5
+        },
+        "reason": { "type": "string", "minLength": 5 },
+        "kind": { "type": "string" }
+      }
+    },
+    "link": { "type": "string", "pattern": "^https://github\\.com/redact-secret/[A-Za-z0-9._-]+/(blob|issues|pull)/.+" },
+    "permalink": {
+      "description": "A past-state citation: a 40-hex commit permalink into redact-secret, credential-evidence or redact-secret-benchmarks.",
+      "type": "string",
+      "pattern": "^https://github\\.com/redact-secret/[A-Za-z0-9._-]+/blob/[0-9a-f]{40}/.+"
+    }
+  }
+}

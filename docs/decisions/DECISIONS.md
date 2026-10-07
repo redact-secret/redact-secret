@@ -95,3 +95,4 @@ Current rules: `docs/specs/evidence-and-gates.md`.
 - [Move performance results, criteria, and judgement to redact-secret-benchmarks](2026-09-22-move-performance-results-criteria-and-judgement-to-benchmarks.md)
 - [Define pii-v1 qualification and national-ID arrival gates](2026-09-26-define-pii-v1-qualification-and-national-id-arrival-gates.md)
 - [Retire historical audit bodies before release qualification instead of retaining them permanently](2026-10-06-retire-historical-audit-bodies-before-release-qualification.md)
+- [Define the implementation-ready handoff as a coding-only work-item state with a frozen field list and shared vocabulary](2026-10-07-define-the-implementation-ready-handoff-contract.md)
