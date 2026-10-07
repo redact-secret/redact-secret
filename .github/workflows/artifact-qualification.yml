@@ -293,6 +293,7 @@ jobs:
           name: support-matrix-drift
           path: support-matrix-drift.json
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
   rust:
     name: Rust
@@ -520,6 +521,7 @@ jobs:
             bindings/node/index.js
             bindings/node/index.d.ts
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
   browser:
     name: Browser ${{ matrix.engine }}
@@ -604,6 +606,7 @@ jobs:
           name: wasm-web
           path: bindings/wasm/pkg/
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
       - name: Upload the common browser artifact
         if: matrix.engine == 'chromium'
@@ -612,6 +615,7 @@ jobs:
           name: wasm-web-common
           path: bindings/wasm/pkg-common/
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
   cli:
     name: CLI ${{ matrix.target }}
@@ -681,6 +685,7 @@ jobs:
             target/${{ matrix.target }}/release/redact-secret
             target/${{ matrix.target }}/release/redact-secret.exe
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
   pr-macos-smoke:
     name: PR macOS artifact smoke
@@ -807,6 +812,7 @@ jobs:
           name: installed-javascript-node-${{ matrix.node-version }}
           path: installed-javascript-node-${{ matrix.node-version }}.json
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
   package-consumer-browser:
     name: Installed browser package (${{ matrix.engine }})
@@ -876,6 +882,7 @@ jobs:
           name: installed-javascript-browser-${{ matrix.engine }}
           path: installed-javascript-browser-${{ matrix.engine }}.json
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
   # The Node WebAssembly fallback (`decision-add-node-wasm-fallback`) and the
   # Cloudflare Workers path (`decision-verify-edge-runtimes`) run the
@@ -1054,6 +1061,7 @@ jobs:
           name: clean-install-${{ matrix.lane }}
           path: clean-install-${{ matrix.lane }}.json
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
   # Issue #720: the MCP AI-context golden path (`examples/mcp-redact`,
   # `buildSafeContext`) run on the installed candidate instead of the fake
@@ -1143,6 +1151,7 @@ jobs:
           name: golden-path-${{ matrix.lane }}
           path: golden-path-${{ matrix.lane }}.json
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
   inventory:
     name: Artifact inventory
@@ -1332,3 +1341,4 @@ jobs:
           name: artifact-inventory
           path: artifact-inventory.json
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}

@@ -138,6 +138,7 @@ jobs:
       - name: Build the source distribution
         uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b # v1.51.0
         with:
+          maturin-version: v1.15.0
           command: sdist
           args: --out dist -m bindings/python/Cargo.toml
 
@@ -156,6 +157,7 @@ jobs:
           name: python-sdist
           path: dist/*.tar.gz
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
   wheels:
     name: Wheel ${{ matrix.target }}
@@ -172,24 +174,28 @@ jobs:
       matrix:
         include:
           - target: x86_64-unknown-linux-gnu
+            container: "quay.io/pypa/manylinux2014_x86_64@sha256:ffd6d1f11237599748657996b750db6b3a5b724fea5a81cd9ea65add4f45b6c9"
             runner: ubuntu-latest
             manylinux: auto
             smoke: host
             python-floor: "3.10"
             python-latest: "3.14"
           - target: aarch64-unknown-linux-gnu
+            container: "quay.io/pypa/manylinux2014_aarch64@sha256:9026a55e05e76ad74d9a4e6be814a5abda26cde08b1baa659ea4f7ee16b246e3"
             runner: ubuntu-24.04-arm
             manylinux: auto
             smoke: host
             python-floor: "3.10"
             python-latest: "3.14"
           - target: x86_64-unknown-linux-musl
+            container: "ghcr.io/rust-cross/rust-musl-cross@sha256:ce75e9174325d4fbb3de85c309e2d7ca29f7500169bc4b5d2c611ff7e86d549a"
             runner: ubuntu-latest
             manylinux: musllinux_1_2
             smoke: alpine
             python-floor: "3.10"
             python-latest: "3.14"
           - target: aarch64-unknown-linux-musl
+            container: "ghcr.io/rust-cross/rust-musl-cross@sha256:ecae5dd62d1c938c14f8071d36c16fa699860aace03bfb5284fb1216474d2643"
             runner: ubuntu-24.04-arm
             manylinux: musllinux_1_2
             smoke: alpine
@@ -237,11 +243,19 @@ jobs:
         with:
           version: ${{ inputs.rehearsal-version }}
 
+      # Issue #1273: the action's floating inputs are pinned. `maturin-version`
+      # is the version it resolved from `maturin>=1.10,<2`; Linux targets name
+      # their build image by index digest (the action's default is a `:latest`
+      # tag); non-Linux entries leave `container` empty. The action installs
+      # sccache itself as `sccache>=0.10.0` and offers no version input; that
+      # compiler cache is accepted unpinned (see SECURITY.md, pin review).
       - name: Build the wheel
         uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b # v1.51.0
         with:
+          maturin-version: v1.15.0
           target: ${{ matrix.target }}
           manylinux: ${{ matrix.manylinux }}
+          container: ${{ matrix.container }}
           args: --release --out dist -m bindings/python/Cargo.toml
           sccache: "true"
 
@@ -294,6 +308,7 @@ jobs:
           name: python-wheel-${{ matrix.target }}
           path: dist/*.whl
           if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
   pr-macos-wheel:
     name: PR macOS wheel smoke
@@ -315,6 +330,7 @@ jobs:
       - name: Build the macOS wheel
         uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b # v1.51.0
         with:
+          maturin-version: v1.15.0
           target: aarch64-apple-darwin
           args: --release --out dist -m bindings/python/Cargo.toml
           sccache: "true"

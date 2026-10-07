@@ -33,6 +33,7 @@ jobs:
   test:
     name: Node ${{ matrix.node-version }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     strategy:
@@ -73,6 +74,7 @@ jobs:
   lint:
     name: Lint and format (Ruff, Biome)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
 
@@ -114,6 +116,7 @@ jobs:
   rust-policy:
     name: Rust format, lint, and dependency policy
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
 
@@ -169,6 +172,7 @@ jobs:
   rust-native:
     name: Rust native host (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     permissions:
       contents: read
     strategy:
@@ -247,6 +251,7 @@ jobs:
   rust-coverage:
     name: Rust statement coverage
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
 
@@ -291,6 +296,7 @@ jobs:
   js-coverage:
     name: JavaScript statement coverage
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
 
@@ -324,6 +330,7 @@ jobs:
   python-coverage:
     name: Python statement coverage
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
 
@@ -373,6 +380,7 @@ jobs:
   rust-msrv:
     name: Rust MSRV
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
 
@@ -396,6 +404,7 @@ jobs:
   rust-wasm:
     name: Rust wasm32 target
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
 
@@ -420,7 +429,10 @@ jobs:
       - name: Install wasm-bindgen-cli
         # Must match the `wasm-bindgen` version in Cargo.toml exactly: the
         # test runner refuses to run a Wasm binary built against a different
-        # `wasm-bindgen` version than its own.
+        # `wasm-bindgen` version than its own. `-D warnings` is for workspace
+        # code, so it is cleared for this third-party build.
+        env:
+          RUSTFLAGS: ""
         run: cargo install wasm-bindgen-cli --version 0.2.128 --locked
 
       - name: Test the browser binding for wasm32 (via Node, no browser needed)
@@ -512,6 +524,7 @@ jobs:
     name: Shadow scorer cross-runtime determinism
     needs: [rust-native, rust-wasm]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
 
@@ -568,6 +581,7 @@ jobs:
   benchmark-pin-drift:
     name: Benchmark pin drift (commit ancestry, vendored manifest and schema)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     env:
@@ -601,6 +615,7 @@ jobs:
   reference-architectures:
     name: Reference architectures (registry installs)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
 
@@ -631,6 +646,7 @@ jobs:
   cross-repository-links:
     name: Cross-repository links (blob permalinks resolve)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     env:
@@ -652,6 +668,7 @@ jobs:
     name: Changelog coverage (pull requests)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
 
@@ -685,6 +702,7 @@ jobs:
     name: Scoring artifact identity (pull requests)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
 
@@ -708,6 +726,7 @@ jobs:
   decision-permalinks:
     name: ADR permalink existence (full history)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
 

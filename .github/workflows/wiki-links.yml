@@ -15,6 +15,7 @@ jobs:
   wiki-links:
     name: Wiki cross-repository links
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     env:

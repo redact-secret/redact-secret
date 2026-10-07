@@ -173,14 +173,31 @@ deferral of npm trusted publishing is recorded in
 Provenance is kept with the artifacts: npm and PyPI attestations stay with the
 published files, and every run, including a failed one, uploads a
 `release-manifest-<version>` workflow artifact (source commit, version,
-artifact set, registry state) under the repository's default Actions artifact
-retention, which the workflow does not override.
+artifact set, registry state) with an explicit 90-day retention
+([docs/releasing.md](docs/releasing.md)).
 
 The Cargo supply chain is checked in CI by `cargo deny check --locked`, with
 the policy in `deny.toml`. It allows only the crates.io index as a source,
 denies unknown registries and Git sources, denies yanked crates, restricts
 licenses to an allow-list, and denies wildcard dependencies. Multiple versions
 of one crate only warn.
+
+Pinning a SHA does not pin what the action resolves at run time. Review these
+inputs with the action pins in `.github/workflows/python-wheels.yml`
+(`PyO3/maturin-action`, issue #1273):
+
+| Input | Pinned value | Resolved how |
+|---|---|---|
+| `maturin-version` | `v1.15.0` | the version the action resolved from `maturin>=1.10,<2` in `bindings/python/pyproject.toml` (run logs: `Installing 'maturin' from tag 'v1.15.0'`) |
+| `container`, `x86_64-unknown-linux-gnu` | `quay.io/pypa/manylinux2014_x86_64@sha256:ffd6d1f11237599748657996b750db6b3a5b724fea5a81cd9ea65add4f45b6c9` | the action's default `:latest` image, by the index digest its run pulled |
+| `container`, `aarch64-unknown-linux-gnu` | `quay.io/pypa/manylinux2014_aarch64@sha256:9026a55e05e76ad74d9a4e6be814a5abda26cde08b1baa659ea4f7ee16b246e3` | same |
+| `container`, `x86_64-unknown-linux-musl` | `ghcr.io/rust-cross/rust-musl-cross@sha256:ce75e9174325d4fbb3de85c309e2d7ca29f7500169bc4b5d2c611ff7e86d549a` | same, from `:x86_64-musl` |
+| `container`, `aarch64-unknown-linux-musl` | `ghcr.io/rust-cross/rust-musl-cross@sha256:ecae5dd62d1c938c14f8071d36c16fa699860aace03bfb5284fb1216474d2643` | same, from `:aarch64-musl` |
+| `sccache` | `"true"`, accepted unpinned | the action installs `sccache>=0.10.0` itself (0.16.0 in the last run) and has no version input; it is a compiler cache and does not alter the compiled output |
+
+Update the maturin version and the four image digests together at each review,
+and record the new values here. Non-Linux targets build on the host and leave
+`container` empty.
 
 Inspect the resulting configuration and logs for permission expansion,
 unexpected install-script exposure, publishing authority, and plaintext-secret

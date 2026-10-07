@@ -94,6 +94,61 @@ flowchart TD
   files, unreadable registry state, or expired original artifacts block
   recovery. A dry run prints the missing PyPI filenames without publishing.
 
+## Workflow timeouts, artifact retention and Actions settings
+
+Issue #1273. Every job in `ci.yml`, `release.yml`, `reconcile-release.yml`,
+`notify-benchmarks.yml`, `scorecard.yml` and `wiki-links.yml` sets
+`timeout-minutes` (a reusable-workflow caller job cannot). Values are several
+times the longest successful duration in recent runs (release runs 2026-10-03
+and 2026-10-07, plus recent PR runs): 30 for the Rust native, coverage and wasm
+jobs (measured at most 10), 10 to 15 for the lightweight jobs, and 20 to 30 for
+publish, registry-install, reconcile and tag jobs (measured at most 4.2). A job
+that hits its limit fails; raise the value rather than rerunning blindly.
+
+Every `actions/upload-artifact` step sets `retention-days`:
+
+| Workflow | Retention | Why |
+|---|---|---|
+| `release.yml` (registry state, artifact digest, release manifest) | 90 days | release evidence; the platform maximum |
+| `artifact-qualification.yml`, `python-wheels.yml` | 14 days on `pull_request`, otherwise 90 | non-PR runs feed `release.yml` and `Reconcile Release`, which downloads the original qualified artifacts of the source run and blocks if they expired |
+| `package-release-rehearsal.yml` | 30 days | rehearsal evidence is not a release record |
+
+The repository settings are a maintainer action, not a workflow change. Read
+the current state:
+
+```bash
+gh api repos/redact-secret/redact-secret/actions/permissions
+gh api repos/redact-secret/redact-secret/actions/permissions/selected-actions
+```
+
+Target: `sha_pinning_required: true` and `allowed_actions: selected` with the
+allowlist below (every external action in `.github/workflows` and
+`.github/actions`; local actions and same-repository workflows need no entry).
+Apply it in this order:
+
+```bash
+gh api -X PUT repos/redact-secret/redact-secret/actions/permissions \
+  -F enabled=true -f allowed_actions=selected -F sha_pinning_required=true
+gh api -X PUT repos/redact-secret/redact-secret/actions/permissions/selected-actions \
+  -F github_owned_allowed=true -F verified_allowed=false \
+  -f 'patterns_allowed[]=advanced-security/dismiss-alerts@*' \
+  -f 'patterns_allowed[]=dtolnay/rust-toolchain@*' \
+  -f 'patterns_allowed[]=EmbarkStudios/cargo-deny-action@*' \
+  -f 'patterns_allowed[]=ossf/scorecard-action@*' \
+  -f 'patterns_allowed[]=PyO3/maturin-action@*' \
+  -f 'patterns_allowed[]=pypa/gh-action-pypi-publish@*' \
+  -f 'patterns_allowed[]=sigstore/cosign-installer@*' \
+  -f 'patterns_allowed[]=Swatinem/rust-cache@*' \
+  -f 'patterns_allowed[]=taiki-e/install-action@*'
+```
+
+`github_owned_allowed` covers `actions/*` (checkout, setup-node, setup-python,
+upload-artifact, download-artifact, create-github-app-token) and
+`github/codeql-action`. The selected-actions endpoint returns 409 while
+`allowed_actions` is `all`, so the two commands run in this order; apply them
+while no release is running, then rerun a workflow to confirm. Re-derive the list with
+`grep -rhoE 'uses: [^ ]+' .github | sort -u` when an action is added.
+
 ## Product and artifact identity
 
 All product packages share one SemVer version and source revision. Python uses

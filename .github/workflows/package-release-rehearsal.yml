@@ -216,3 +216,4 @@ jobs:
           name: dependency-cutover-plan
           path: dependency-cutover-plan.json
           if-no-files-found: error
+          retention-days: 30
