@@ -150,7 +150,9 @@ and must use the qualified binaries and recorded digests.
    in prose and no check reads them: the Quick start in the root
    [`README.md`](../README.md) and the install commands in
    [`docs/getting-started.md`](getting-started.md#install-a-published-release).
-   Change them in the same commit, and at `0.1.0` drop the `@beta` and
+   Change them in the same commit, and mark them with the version status
+   block (latest published versus release candidate) that the three pages
+   carry. At `0.1.0` drop the `@beta` and
    `--version` qualifiers the quickstart explains.
 4. Retire historical review bodies before qualification, in the same reviewed
    pull request or an earlier one. Every `docs/audits/` unit whose front
@@ -537,6 +539,12 @@ corpus identity, registry file checksums, qualification/publication/recovery run
 IDs, clean-install results, and annotated tag target. Label reconstructed
 evidence explicitly if an automated manifest failed. Copy necessary evidence
 before Actions artifacts expire.
+
+In the same closeout commit, flip the version status block in the root
+[`README.md`](../README.md), [`docs/quickstart.md`](quickstart.md) and
+[`docs/getting-started.md`](getting-started.md) to published: set "Latest
+published" to the version just recorded and remove the candidate wording. No
+check reads the block, so this step is explicit.
 
 Update the dated changelog entry and public installation guidance to reflect
 what actually published through a reviewed pull request to `main`. A release is
