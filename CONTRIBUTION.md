@@ -38,6 +38,12 @@ not need to reproduce the platform matrix, the wheel build, or the artifact
 qualifiers locally to open one. [Developer onboarding](docs/onboarding.md#run-the-repository-checks)
 has the full table and the complete sequence.
 
+`python3 -B scripts/contribution-readiness.py` summarizes your branch in the
+same words: what a detector, fixture, documentation, benchmark-regression or
+release change already has, and the exact command for what is missing. Pull
+requests get the same text in the CI step summary. It only reads; the gates
+stay strict and are the only thing that can fail a pull request.
+
 A boundary change -- a new or changed detector, PII context rule, policy,
 public API, evidence rule, or release gate -- also needs this reading, because
 the ADR and spec-file rules bind it:
