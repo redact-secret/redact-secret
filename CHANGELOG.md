@@ -7,6 +7,13 @@ evidence is linked from each published version.
 
 ### Documentation
 
+- The deferred quality backlog is retired from the tree (epic #1259). Fourteen of
+  its 25 findings were already closed, one is stale, and the ten still valid are
+  tracked by #1273 to #1276; the file stays readable through a pinned permalink,
+  and the comments, docstring and coverage note that cited it now cite that
+  permalink or the current state (one corpus note was reworded; the conformance
+  corpus identity is taken per release commit, so published records are
+  unaffected).
 - Documentation lifecycle (#1265, epic #1259,
   `decision-retire-historical-audit-bodies-before-release-qualification`):
   historical audit bodies, rejected research artifacts and the archive index

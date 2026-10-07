@@ -805,7 +805,7 @@ const EXCEPTION_CODES: readonly CanonicalExceptionCode[] = [
 ];
 const CONSUMER_PATH_PATTERN = /^[A-Za-z0-9_][A-Za-z0-9_./-]*$/;
 /** A bounded backlog id: either an existing ledger entry
- * (`docs/audits/deferred-quality-backlog.md`'s `C/F-03` style) or a
+ * (`C/F-03` style, as in the retired backlog https://github.com/redact-secret/redact-secret/blob/871207e201664ed17a654cbe2cfa9ab4433a06fc/docs/audits/deferred-quality-backlog.md) or a
  * newly-named kebab-case tracking slug (this repo's own `CASE_ID_PATTERN`
  * convention) for a gap this schema surfaces that has no ledger entry yet
  * (evidence-requirements.md §5-6). Either way it is a stable identifier a

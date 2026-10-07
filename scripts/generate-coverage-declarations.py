@@ -361,7 +361,8 @@ def resolve_shared_family(rows_by_type: dict[str, dict], type_names: list[str]) 
 
 
 def apply_known_exceptions(rows_by_type: dict[str, dict]) -> None:
-    """``C/F-03`` in ``docs/audits/deferred-quality-backlog.md`` names exactly
+    """``C/F-03`` in the retired deferred quality backlog (permalink:
+    ``https://github.com/redact-secret/redact-secret/blob/871207e201664ed17a654cbe2cfa9ab4433a06fc/docs/audits/deferred-quality-backlog.md``) names exactly
     two dimensions of ``authorization_credential``'s gap: at least one
     supported positive fixture per accepted scheme, plus one boundary
     fixture pinning ``MIN_AUTHORIZATION_VALUE_LENGTH``. Issue #105 closed
