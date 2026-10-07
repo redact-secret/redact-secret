@@ -25,8 +25,15 @@ export const defaultPlaceholderFormatter: PlaceholderFormatter = (
  * Formats `<JWT_1>`, `<AWS_ACCESS_KEY_ID_2>`, ... naming the finding type,
  * upper-cased with `.` and `-` mapped to `_`, matching the core's own typed
  * formatter.
+ *
+ * Case folding is ASCII-only (`a`-`z` only), like the core's
+ * `to_ascii_uppercase`: `String.prototype.toUpperCase` is full-Unicode and
+ * would turn `ß` into `SS` or `ı` into `I`. This runs as a callback, not the
+ * binding's built-in, because the binding accepts only a callback or the
+ * default; the two are kept equal by a test over every built-in type name.
  */
 export const typedPlaceholderFormatter: PlaceholderFormatter = (
   finding: SecretFinding,
   context: PlaceholderContext,
-): string => `<${finding.type.toUpperCase().replace(/[.-]/g, "_")}_${context.placeholderIndex}>`;
+): string =>
+  `<${finding.type.replace(/[a-z]/g, (c) => c.toUpperCase()).replace(/[.-]/g, "_")}_${context.placeholderIndex}>`;
