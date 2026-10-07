@@ -11,10 +11,9 @@ the supported runtimes, and how to build this checkout.
 Every published release so far is a beta; the stable `0.1.0` is not published
 yet.
 
-> **Version status.** Latest published: `0.1.0-beta.13`. Release candidate:
-> `0.1.0-beta.14`, which becomes the latest published version when its
-> [release record](releases/status.md) lands. The commands below pin the
-> candidate; substitute `0.1.0-beta.13` to install the latest published beta.
+> **Version status.** Latest published: `0.1.0-beta.14`
+> ([release record](releases/0.1.0-beta.14/README.md), [status](releases/status.md)).
+> The commands below pin it.
 
 [Release status](releases/status.md) lists what the registries currently
 carry. Select the version explicitly and keep it in your application's

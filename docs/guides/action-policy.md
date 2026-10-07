@@ -253,7 +253,7 @@ example `The supplied action policy is invalid. (INVALID_ACTION, rule 0)`.
 The WebAssembly artifacts carry the parser. Against the `db0e5c8d` build the
 brotli size grows by 5,653 bytes for `full` (164,789 to 170,442, 3.43%), 5,888
 for `common`, 6,090 for `full` with `pii` and 5,251 for `common` with `pii`; see
-the [evidence](../audits/evidence/1219/README.md).
+the [evidence](https://github.com/redact-secret/redact-secret/blob/0c62fd38bca75c5b28b042dc79789b708ebf1d17/docs/audits/evidence/1219/README.md).
 
 ### Compare in JavaScript
 
@@ -323,7 +323,7 @@ branch head that already held the core's comparison, the brotli size grows by
 4,363 bytes for `full` (171,919 to 176,282, 2.54%), 4,329 for `common`, 4,256 for
 `full` with `pii` and 4,612 for `common` with `pii`; against the `db0e5c8d` build
 the parser, the digest and the comparison together add 11,493 bytes to `full`
-(7.0%). See the [evidence](../audits/evidence/1220/README.md).
+(7.0%). See the [evidence](https://github.com/redact-secret/redact-secret/blob/0c62fd38bca75c5b28b042dc79789b708ebf1d17/docs/audits/evidence/1220/README.md).
 
 ## Command line
 

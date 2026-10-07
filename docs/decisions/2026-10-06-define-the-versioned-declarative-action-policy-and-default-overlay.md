@@ -261,7 +261,7 @@ the rule index from the raw WebAssembly error text would still leave `full` at
 WebAssembly without the option was rejected because every runtime must load and
 evaluate the same documents. Future growth of the
 parser re-measures against these figures, and the evidence is
-[`docs/audits/evidence/1219`](../audits/evidence/1219/README.md).
+[`docs/audits/evidence/1219`](https://github.com/redact-secret/redact-secret/blob/0c62fd38bca75c5b28b042dc79789b708ebf1d17/docs/audits/evidence/1219/README.md).
 
 A binding must not hold a compiled policy in a process-global, thread-local or
 one-slot cache another caller can evict or overwrite (the single ruleset slot

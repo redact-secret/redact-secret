@@ -373,7 +373,7 @@ the digest and the comparison together add 11,493 bytes to `full` (7.0%). About
 glue and about 900 the flat result; a nested object result cost 881 bytes more
 than the flat array the package now rebuilds. The cost is
 accepted and recorded in
-[the evidence](../audits/evidence/1220/README.md); later growth of the
+[the evidence](https://github.com/redact-secret/redact-secret/blob/0c62fd38bca75c5b28b042dc79789b708ebf1d17/docs/audits/evidence/1220/README.md); later growth of the
 comparison re-measures against it.
 
 ### Reopening bar

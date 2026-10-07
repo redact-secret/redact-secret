@@ -14,7 +14,9 @@ evidence is linked from each published version.
   `docs/audits/` keeps only the retained reviews, each with an owner and a
   retirement trigger. No detection, redaction or public API behavior changes.
 
-## 0.1.0-beta.14 — 2026-10-06
+## 0.1.0-beta.14 — 2026-10-07
+
+[Publication and qualification evidence](docs/releases/0.1.0-beta.14/README.md).
 
 ### Support status
 
@@ -94,7 +96,8 @@ evidence is linked from each published version.
   head that already held the core's comparison unlinked: `full` +4,363 bytes
   (2.54%), `common` +4,329, `full` with `pii` +4,256, `common` with `pii`
   +4,612); the evidence is
-  `docs/audits/evidence/1220/README.md`. Existing results are unchanged.
+  [evidence](https://github.com/redact-secret/redact-secret/blob/0c62fd38bca75c5b28b042dc79789b708ebf1d17/docs/audits/evidence/1220/README.md).
+  Existing results are unchanged.
 
 - Rust and CLI: a versioned declarative action policy (#1219,
   `decision-define-the-versioned-declarative-action-policy-and-default-overlay`).
@@ -136,7 +139,7 @@ evidence is linked from each published version.
   them, brotli quality 11, against `db0e5c8d`: `full` +5,653 bytes (164,789 to
   170,442, 3.43%), `common` +5,888, `full` with `pii` +6,090 and `common` with
   `pii` +5,251. The decision accepts that cost and records the figures
-  ([evidence](docs/audits/evidence/1219/README.md)).
+  ([evidence](https://github.com/redact-secret/redact-secret/blob/0c62fd38bca75c5b28b042dc79789b708ebf1d17/docs/audits/evidence/1219/README.md)).
 
 - Python: `action_policy`, a keyword-only argument of `scan`,
   `scan_and_redact` and `IncrementalSanitizer` (#1219,
