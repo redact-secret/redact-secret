@@ -44,6 +44,24 @@ release change already has, and the exact command for what is missing. Pull
 requests get the same text in the CI step summary. It only reads; the gates
 stay strict and are the only thing that can fail a pull request.
 
+To start a new detector from an `implementation-ready` issue, generate its
+skeleton instead of copying the layout by hand:
+
+```bash
+npm run contrib:new-detector -- <detector-id> --dry-run   # print the plan, write nothing
+npm run contrib:new-detector -- <detector-id>             # or --handoff <file>.handoff.json
+```
+
+It writes the module and test skeleton and adds the registry row, policy
+classification, inventory entry, conformance fixture stubs, spec row and
+changelog line, each marked `TODO(scaffold)`. It refuses to overwrite any file
+or entry and writes nothing unless every target is clear. Placeholders are
+synthetic only, and it does no research, benchmark classification or
+promotion. It then prints the regeneration and scoped-check commands to run
+after you replace the markers (`git grep -n --untracked 'TODO(scaffold)' -- . ':!scripts/' ':!CONTRIBUTION.md'`). The
+[handoff contract](docs/contracts/contribution/implementation-ready-handoff.md)
+defines the optional input file.
+
 A boundary change -- a new or changed detector, PII context rule, policy,
 public API, evidence rule, or release gate -- also needs this reading, because
 the ADR and spec-file rules bind it:
