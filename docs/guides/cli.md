@@ -50,6 +50,9 @@ be combined, which is how one rule makes a ruleset detection redact.
 
 ## Compare action policies
 
+`--action-policy` and `--compare-action-policy` were introduced in
+`0.1.0-beta.14`; a `0.1.0-beta.13` binary has neither.
+
 `--compare-action-policy <path>` previews policies instead of enforcing one. It
 is repeatable (1 to 3 times), needs exactly one explicit file path, and refuses
 `--redact` and standard input with a usage error (exit 2). Detection runs once;

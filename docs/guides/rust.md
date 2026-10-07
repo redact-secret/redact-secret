@@ -113,6 +113,10 @@ cancelled and have no deadline; the limits above are the only bounds. See
 
 ## Action policy
 
+Introduced in `0.1.0-beta.14`; `load_action_policy`, `ActionPolicy` and
+`compare_action_policies` are absent from `0.1.0-beta.13`, so pin the crate
+version that has them.
+
 `load_action_policy` parses a declarative action policy document
 (`actionPolicyRevision: 1`, see the [action policy guide](action-policy.md))
 into an `ActionPolicy`. The value is immutable, `Clone`, `Send` and `Sync`, and

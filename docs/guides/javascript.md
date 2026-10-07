@@ -11,6 +11,58 @@ observable without making every scan asynchronous. Initialization is
 idempotent; a failed attempt may be retried. It also checks that the binding
 version matches the wrapper version.
 
+## Which release has what
+
+`@beta` selects the newest published beta. These names are newer than
+`0.1.0-beta.13` and are absent from any older release; check the
+[version status](../quickstart.md#which-version-you-get) for which version is
+published today.
+
+| API | Introduced in |
+| --- | --- |
+| `status()` (also `./common`) | `0.1.0-beta.14` |
+| `actionPolicy` option, `INVALID_ACTION_POLICY` | `0.1.0-beta.14` |
+| `defaultPolicy` | `0.1.0-beta.14` |
+| `compareActionPolicies` | `0.1.0-beta.14` |
+
+A named import of a missing export fails to link, so a program that must run
+on an older release imports the namespace and tests each name before use. This
+file runs unchanged on `0.1.0-beta.13` (it takes the callback branch) and on
+`0.1.0-beta.14` (it takes the declarative branch), and prints the same
+`default: redacted` and `keep-github: unchanged` lines on both:
+
+```js
+import * as core from "@redact-secret/core";
+
+await core.initialize();
+
+// `status`, `actionPolicy`, `defaultPolicy` and `compareActionPolicies` were
+// added in 0.1.0-beta.14. A namespace import of an older release has no such
+// property, where a named import of a missing export fails to link.
+const hasStatus = typeof core.status === "function";
+const hasActionPolicy = typeof core.compareActionPolicies === "function" && typeof core.defaultPolicy === "object";
+
+const TEXT = "API_KEY=" + ["ghp", "_SYNTHETICREVOKED", "0".repeat(20)].join("");
+
+console.log("status:", hasStatus ? JSON.stringify(core.status()) : "not available before 0.1.0-beta.14");
+
+// Keep GitHub tokens and redact the rest. A release with action policies takes
+// a declarative document; an older release takes a callback, which must itself
+// spell out what the default would have done for every other finding.
+const keepGithub = hasActionPolicy
+  ? {
+      actionPolicy: {
+        actionPolicyRevision: 1,
+        base: "default",
+        rules: [{ id: "keep-github", match: { type: ["github_token"] }, action: "warn" }],
+      },
+    }
+  : { policy: { evaluate: (finding) => (finding.type === "github_token" ? "warn" : "redact") } };
+
+console.log("default:", core.scanAndRedact(TEXT).text === TEXT ? "unchanged" : "redacted");
+console.log("keep-github:", core.scanAndRedact(TEXT, keepGithub).text === TEXT ? "unchanged" : "redacted");
+```
+
 ```ts
 import { initialize, scanAndRedact } from "@redact-secret/core";
 
@@ -43,7 +95,7 @@ the unsupported list.
 
 ## Status query
 
-`status()` reports whether this entry point is initialized, and its public
+Introduced in `0.1.0-beta.14`. `status()` reports whether this entry point is initialized, and its public
 activation, without loading, initializing or reconfiguring anything. It is
 synchronous, takes no input, never throws, and returns a frozen object with
 three fixed fields and nothing else.
@@ -158,7 +210,9 @@ before any downstream use. [Safe integration](safe-integration.md) explains
 that distinction and failure handling.
 
 To change only a few actions and keep the default for every other finding, pass
-a declarative `actionPolicy` instead of a callback. It takes a plain object,
+a declarative `actionPolicy` instead of a callback (introduced in
+`0.1.0-beta.14`, as are `defaultPolicy` and `compareActionPolicies` below; see
+[which release has what](#which-release-has-what) for a fallback on older releases). It takes a plain object,
 JSON text or bytes, on `scan`, `scanAndRedact`, `createIncrementalSanitizer` and
 the stream factories; the Rust core evaluates it on both runtimes, and a call or
 session takes a callback or an action policy, never both (`INVALID_OPTIONS`).

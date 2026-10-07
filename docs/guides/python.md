@@ -43,6 +43,10 @@ throwing merely because it found a blocked credential.
 
 ## Declarative action policy
 
+Introduced in `0.1.0-beta.14` (`action_policy=`, `InvalidActionPolicyError`);
+`0.1.0-beta.13` has no `action_policy` keyword, so there keep using a `policy`
+callback.
+
 To change what a few rules name and keep the default action for every other
 finding, pass `action_policy` instead of writing a callback that must copy the
 default. The contract and the document format are in the
@@ -90,6 +94,9 @@ nothing.
   findings gain no field.
 
 ## Explain and compare action policies
+
+Introduced in `0.1.0-beta.14`; `redact_secret.compare_action_policies` does not
+exist in an older release (`getattr(redact_secret, "compare_action_policies", None)`).
 
 Before adopting a change, `compare_action_policies` shows what each of 1 to 4
 policies would choose for the same findings. Detection runs **once**; every
@@ -384,7 +391,7 @@ assert redact_secret.pii_activation() == (
 )
 ```
 
-`status()` reports whether `initialize()` has fixed the selection and its
+Introduced in `0.1.0-beta.14`: `status()` reports whether `initialize()` has fixed the selection and its
 public activation, without initializing or changing anything. It takes no
 input, never raises, and returns an immutable `CoreStatus` with exactly three
 fields, `initialized`, `profile` (always `"full"`) and `activation` (the

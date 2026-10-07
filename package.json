@@ -37,7 +37,7 @@
     "ai-context-boundary:test": "node --test conformance/ai-context-boundary.test.mjs",
     "mcp-boundary:test": "node --test conformance/mcp-boundary.test.mjs",
     "mcp-resources-read:test": "node --test conformance/mcp-resources-read.test.mjs",
-    "examples:test": "node --test examples/safe-integration/integration.test.mjs examples/mcp-redact/redact-tool-call.test.mjs examples/mcp-redact/wrap-tool-call.test.mjs examples/mcp-redact/streaming-tool-result.test.mjs examples/mcp-redact/agent-context.test.mjs examples/configuration-ownership/guide-sync.test.mjs && npm run examples:python",
+    "examples:test": "node --test examples/safe-integration/integration.test.mjs examples/mcp-redact/redact-tool-call.test.mjs examples/mcp-redact/wrap-tool-call.test.mjs examples/mcp-redact/streaming-tool-result.test.mjs examples/mcp-redact/agent-context.test.mjs examples/configuration-ownership/guide-sync.test.mjs examples/version-fallback/guide-sync.test.mjs && npm run examples:python",
     "examples:install": "npm ci --prefix examples/mcp-redact --ignore-scripts --no-audit --no-fund",
     "reference:logging": "npm ci --prefix examples/logging-redaction --ignore-scripts --no-audit --no-fund && node examples/logging-redaction/smoke.mjs",
     "reference:tracing": "npm ci --prefix examples/tracing-masking --ignore-scripts --no-audit --no-fund && node examples/tracing-masking/smoke.mjs",
