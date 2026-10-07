@@ -3,14 +3,17 @@
 What Redact Secret intends to do over the next year, and what it intends
 not to do. Dates are targets, not promises. Issues and milestones are the
 authoritative tracking; this page summarizes them and is reviewed at every
-release. Last reviewed: 2026-10-02 (preparing `0.1.0-beta.13`; the last published
-version is `0.1.0-beta.12`).
+release. Last reviewed: 2026-10-06 against `3dbaa5b4` (the last published
+version is `0.1.0-beta.13`; the release candidate is `0.1.0-beta.14`, which is
+not published and has no release record yet). The Beta.13 epic status below is
+dated 2026-10-02 and was not re-reviewed after beta.13 was published.
 
 ## Near term: stable `v0.1.0` (Q4 2026)
 
 The Beta.13 epic ([#1065](https://github.com/redact-secret/redact-secret/issues/1065))
 freezes the contract and proves stable-release readiness. State on
-2026-10-02, with what is still open named:
+2026-10-02 (during the Beta.13 preparation; beta.13 has since been published),
+with what was still open named:
 
 - Freeze the stable public API, behavior, and extension contracts
   ([#1066](https://github.com/redact-secret/redact-secret/issues/1066)) and
@@ -41,14 +44,16 @@ freezes the contract and proves stable-release readiness. State on
   ([#1071](https://github.com/redact-secret/redact-secret/issues/1071)).
   Not started; it needs the items above.
 
-## Next: detector coverage (Beta.14 and after)
+## Next: detector coverage (Beta.14 candidate and after)
 
-Add provider families researched under
+The `0.1.0-beta.14` candidate carries the Buildkite, Fly, Mapbox, Pydantic
+Logfire, Sourcegraph, Square, Unkey, and Xata detectors, which have no support
+status until their benchmarks arrival evidence lands. Next, add the remaining
+provider families researched under
 [#1014](https://github.com/redact-secret/redact-secret/issues/1014) and
-[#860](https://github.com/redact-secret/redact-secret/issues/860) — Buildkite,
-Fly, Mapbox, Ory, Pydantic Logfire, Sourcegraph, Square, Unkey, Xata, and
-others — each with synthetic conformance fixtures and stated false-positive
-and false-negative trade-offs. Move opt-in structured PII families from
+[#860](https://github.com/redact-secret/redact-secret/issues/860) (Ory and
+others), each with synthetic conformance fixtures and stated false-positive and
+false-negative trade-offs. Move opt-in structured PII families from
 `provisional` toward `stable` as their evidence qualifies.
 
 ## Later in the year
