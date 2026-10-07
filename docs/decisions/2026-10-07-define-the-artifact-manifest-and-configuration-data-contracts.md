@@ -220,6 +220,13 @@ tests are authoritative; the decision of each section is unchanged.
   `describeConfig()` takes no argument and describes what the runtime is fixed
   to; a preview is `resolveConfig`. [API contract](../reference/api-contract.md#detector-selection-and-effective-configuration)
   has the rest.
+- **#1252.** The policy diagnostics run inside `resolveConfig`, over the policy
+  that loaded. Two codes are added to the open set: `ACTION_POLICY_RULE_ON_NOT_INCLUDED_DETECTOR`
+  (a `full` built-in this artifact lacks, apart from the compiled-but-disabled
+  `ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR`) and `ACTION_POLICY_ANALYSIS_UNCERTAIN`
+  (`info`: a callback, or a name an open source could emit). An item may carry a
+  `related` pointer, and `id` may be a rule id. A declared closed vocabulary
+  (Rust only) makes an unknown name an error. See the [action policy guide](../guides/action-policy.md#diagnose-a-policy-before-use).
 
 ## Rejected
 

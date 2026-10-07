@@ -191,9 +191,23 @@ them. The snapshot holds ids, counts and digests only: no input byte, no ruleset
 body or rule pattern, no value, no path and no sensitivity score. Its `digest` is
 the SHA-256 of its canonical JSON without `digest`, the same rule as the manifest.
 
+A policy that loaded is also checked against the catalog and the resolved
+configuration (issue #1252; [guide](../guides/action-policy.md#diagnose-a-policy-before-use)).
+The revision-1 parser is unchanged, so the checks add only diagnostics: a
+`type` or `detector` no list knows, a detector that is compiled but disabled or
+not included in the artifact, and a rule provably shadowed by one earlier rule
+are warnings (`ACTION_POLICY_UNKNOWN_TYPE`, `ACTION_POLICY_UNKNOWN_DETECTOR`,
+`ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR`,
+`ACTION_POLICY_RULE_ON_NOT_INCLUDED_DETECTOR`, `ACTION_POLICY_SHADOWED_RULE`);
+a callback, or a name a ruleset or PII selection could emit, is `info`
+`ACTION_POLICY_ANALYSIS_UNCERTAIN`. A diagnostic's `id` is a catalog detector id
+or a rule id, and `related` points at the earlier rule of a shadow. Rust alone
+offers the closed vocabulary (`ConfigRequest::closed_types`, `closed_detectors`:
+an unknown name is then an error) and `SampleRuleHits`.
+
 | Surface | Name |
 | --- | --- |
-| Rust | `DetectionSelection`, `DetectorRegistry::with_detection`, `BuiltInRegistry::with_detection`, `IncrementalSanitizer::with_detection_policy_and_formatter` (and the `common`, PII-aware forms), `resolve_config`, `describe_config`, `ConfigRequest`, `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic`, `ConfigSeverity`, `DetectionConfigError` |
+| Rust | `DetectionSelection`, `DetectorRegistry::with_detection`, `BuiltInRegistry::with_detection`, `IncrementalSanitizer::with_detection_policy_and_formatter` (and the `common`, PII-aware forms), `resolve_config`, `describe_config`, `ConfigRequest`, `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic`, `ConfigSeverity`, `DetectionConfigError`, `SampleRuleHits`, `ConfigRequest::closed_types`, `ConfigRequest::closed_detectors` |
 | JavaScript (root and `./common`) | `initialize({ detection })`, `resolveConfig(config?, options?)`, `describeConfig()`, `status().configuration`, types `DetectionSelection`, `RuntimeConfig`, `ResolveConfigOptions`, `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic` |
 | Node addon | `initializeDetection`, `initializeCommonDetection`, `resolveConfig`, `resolveConfigCommon` |
 | WebAssembly | `initialize(pii, detection?)`, `resolveConfig` |

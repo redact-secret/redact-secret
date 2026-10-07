@@ -236,6 +236,34 @@ describe("resolveConfig", () => {
     });
   });
 
+  it("carries a policy diagnostic's rule id and related pointer through, frozen and unchanged", async () => {
+    // The core owns the analysis (issue #1252); JavaScript only forwards it.
+    const item = {
+      code: "ACTION_POLICY_SHADOWED_RULE",
+      id: "narrow",
+      path: "actionPolicy.rules[1]",
+      related: "actionPolicy.rules[0]",
+      severity: "warning",
+    };
+    const double = recorded({
+      answer: () => {
+        const document = JSON.parse(resolutionText()) as { diagnostics: { items: unknown[] } };
+        document.diagnostics.items = [item];
+        return JSON.stringify(document);
+      },
+    });
+    const runtime = await initialized(double);
+
+    const resolution = runtime.resolveConfig({
+      actionPolicy: { actionPolicyRevision: 1, base: "default", rules: [] },
+    });
+
+    expect(resolution.ok).toBe(true);
+    expect(resolution.diagnostics.items).toEqual([item]);
+    expect(resolution.diagnostics.items[0]?.related).toBe("actionPolicy.rules[0]");
+    expect(Object.isFrozen(resolution.diagnostics.items[0])).toBe(true);
+  });
+
   it("does not change what a later resolution or a later call sees when the caller mutates its data", async () => {
     const double = recorded();
     const runtime = await initialized(double);

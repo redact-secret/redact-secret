@@ -1012,8 +1012,8 @@ fn artifact_manifest_is_public_side_effect_free_and_bounded() {
 fn detector_selection_and_configuration_resolution_are_public() {
     use redact_secret::{
         ArtifactKind, ArtifactManifest, ConfigDiagnostic, ConfigRequest, ConfigResolution,
-        ConfigSeverity, ConfigSnapshot, DetectionConfigError, DetectionSelection, describe_config,
-        resolve_config,
+        ConfigSeverity, ConfigSnapshot, DetectionConfigError, DetectionSelection, SampleRuleHits,
+        describe_config, resolve_config,
     };
 
     // A selection is applied when a registry is composed.
@@ -1052,6 +1052,7 @@ fn detector_selection_and_configuration_resolution_are_public() {
     assert_eq!(diagnostic.code(), "OVERLAP_OUTCOMES_MAY_CHANGE");
     assert_eq!(diagnostic.path(), "detection");
     assert_eq!(diagnostic.id(), None);
+    assert_eq!(diagnostic.related(), None);
     // Describing a registry composed with the same selection gives the same
     // detection identity as resolving it.
     let jwt_only = registry()
@@ -1061,4 +1062,24 @@ fn detector_selection_and_configuration_resolution_are_public() {
         describe_config(&manifest, &jwt_only).detection_digest(),
         snapshot.detection_digest()
     );
+
+    // The action policy diagnostic layer: a closed vocabulary makes an
+    // unknown name an error, and sample hits are counted apart from it.
+    let policy = br#"{"actionPolicyRevision":1,"base":"default","rules":[
+        {"id":"typo","match":{"type":["jwt_tokne"]},"action":"block"}]}"#;
+    let open = resolve_config(&manifest, &ConfigRequest::new().action_policy(policy));
+    assert!(open.is_ok());
+    assert_eq!(open.diagnostics()[0].code(), "ACTION_POLICY_UNKNOWN_TYPE");
+    let strict = resolve_config(
+        &manifest,
+        &ConfigRequest::new()
+            .action_policy(policy)
+            .closed_types(&["jwt"])
+            .closed_detectors(&[]),
+    );
+    assert!(!strict.is_ok());
+    let loaded = redact_secret::load_action_policy(policy).unwrap();
+    let hits: SampleRuleHits = SampleRuleHits::for_policy(&loaded);
+    assert_eq!(hits.rule_hits(), &[0]);
+    assert_eq!(hits.no_rule_matched(), 0);
 }

@@ -82,15 +82,62 @@ detection, and it changes no default.
 - `type` and `detector` names are open sets. A name no built-in emits loads and
   matches only when a finding carries it, so a typo in a name is silent. A typo
   in a loosening rule leaves the default; a typo in a tightening rule leaves the
-  default instead of the stricter action you meant. Test every rule against a
-  representative input and check the reported action; the
-  [comparison](#explain-and-compare) names the rule that decided each finding.
+  default instead of the stricter action you meant. The loader still accepts
+  them; [`resolveConfig`](#diagnose-a-policy-before-use) reports them as
+  warnings. Test every rule against a representative input and check the
+  reported action; the [comparison](#explain-and-compare) names the rule that
+  decided each finding.
 - A rule on `contextual_secret` lowers or raises every finding of that type,
   because findings carry no credential role.
-- A broad early rule shadows a later one. Revision 1 does not analyse shadowing,
-  and a rule an earlier rule fully covers loads and never fires.
+- A broad early rule shadows a later one, and a rule an earlier rule fully covers
+  loads and never fires. The loader does not analyse this;
+  [`resolveConfig`](#diagnose-a-policy-before-use) reports the cases it can prove.
 - An `allow` rule can leave a credential in the output. The default is unchanged
   and the policy owner owns that change.
+
+## Diagnose a policy before use
+
+`resolveConfig` (JavaScript) and `resolve_config` (Rust) check a policy that
+loaded against the artifact's catalog and the resolved configuration, and report
+findings as `config-diagnostics/v1` items. They never change loading: the same
+document is accepted or rejected as before, a typo leaves `ok` true, and the
+only place it shows is the diagnostics. Each item carries a code, a severity, a
+fixed-syntax `path` such as `actionPolicy.rules[2].match.type[0]`, and an `id`
+that is only a catalog detector id or a rule id. A name you typed is never
+echoed, only its position. At most 256 items are returned, errors first; the
+`truncated` flag says when more existed.
+
+| Code | Severity | Meaning |
+| --- | --- | --- |
+| `ACTION_POLICY_UNKNOWN_TYPE` | warning | No detector this artifact includes declares that `type`. It may be a typo, or a ruleset, custom or future type |
+| `ACTION_POLICY_UNKNOWN_DETECTOR` | warning | Neither the catalog nor the supplied ruleset has that `detector` id |
+| `ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR` | warning | The detector (or the only detector declaring that type) is compiled in but disabled by the selection |
+| `ACTION_POLICY_RULE_ON_NOT_INCLUDED_DETECTOR` | warning | A `full` built-in this artifact does not include, for example a provider detector in `common` |
+| `ACTION_POLICY_SHADOWED_RULE` | warning | One earlier rule matches everything this rule matches, so this rule never decides a finding. `related` names the earlier rule |
+| `ACTION_POLICY_ANALYSIS_UNCERTAIN` | info | Nothing can be proven: a callback policy, or a name a ruleset or PII selection could emit |
+
+A shadow is reported only when it is provable from the two documents. A rule
+matches when every key it has holds, a key holds when the finding's value is in
+its set, the first matching rule wins, and a `default` action stops evaluation
+too. So an earlier rule shadows a later one when, for each key, it has no such
+key or the later rule has it with a subset of the members. Partial overlap,
+disjoint rules, a narrow rule before a broad one, a later rule that needs a key
+the earlier lacks, and a combination of several earlier rules are not reported,
+so some real shadowing goes unreported but no rule that can fire is called dead.
+The test compares your own strings, so it holds for custom names too.
+
+The diagnostics say nothing about whether a finding of a type can occur or about
+detection coverage. Which rules decided a set of sample findings is a separate
+question: a Rust caller folds the `DecisionBasis` of a comparison into
+`SampleRuleHits`. A rule with no sample hit is not unreachable and is never
+reported for that reason.
+
+Only a vocabulary you declare closed makes an unknown name an error. In Rust,
+`ConfigRequest::closed_types` and `closed_detectors` turn
+`ACTION_POLICY_UNKNOWN_TYPE` and `ACTION_POLICY_UNKNOWN_DETECTOR` into errors
+(`ok` is then false) for names outside the catalog, the supplied ruleset and
+your list. JavaScript has no such option, because `runtime-config/v1` carries no
+vocabulary member.
 
 ## Explain and compare
 

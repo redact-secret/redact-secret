@@ -111,7 +111,7 @@ documentation, inside a function that returns `Result`.)
 | PII selection | `PiiSelection` |
 | Artifact manifest | `ArtifactManifest`, `ArtifactKind`, `ArtifactManifestError` |
 | Detector selection | `DetectionSelection`, `DetectionConfigError` |
-| Effective configuration | `resolve_config`, `describe_config`, `ConfigRequest`, `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic`, `ConfigSeverity` |
+| Effective configuration | `resolve_config`, `describe_config`, `ConfigRequest`, `ConfigResolution`, `ConfigSnapshot`, `ConfigDiagnostic`, `ConfigSeverity`, `SampleRuleHits` |
 | Declarative rulesets | `load_ruleset`, `RulesetError`, `RulesetErrorClass` |
 | Declarative action policy | `load_action_policy`, `ActionPolicy`, `ActionPolicyError`, `ActionPolicyErrorClass`, `MAX_ACTION_POLICY_BYTES` |
 | Explain and compare action policies | `compare_action_policies`, `compare_action_policies_with_limits`, `ComparedPolicy`, `ActionComparison`, `ComparedFinding`, `ActionDecision`, `DecisionBasis`, `ComparedSide`, `PolicyBinding`, `ActionCounts`, `DetectionIdentity`, `MAX_COMPARED_POLICIES` |

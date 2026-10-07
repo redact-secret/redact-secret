@@ -77,6 +77,37 @@ evidence is linked from each published version.
   - Cost: the standard WebAssembly artifacts carry the selection, the resolver
     and a small JSON reader; the measured delta is in the pull request.
 
+- Action policy diagnostics (#1252, epic #1246,
+  `decision-define-the-artifact-manifest-and-configuration-data-contracts`):
+  `resolveConfig` and `resolve_config` now check a revision-1 action policy
+  against the artifact catalog and the resolved configuration and report what
+  the open-vocabulary parser leaves silent, as `config-diagnostics/v1` items
+  (the policy still loads exactly as before, so a typo surfaces only here and
+  an existing configuration stays `ok`). Warnings tell apart a rule `type` no
+  included detector declares (`ACTION_POLICY_UNKNOWN_TYPE`), a rule `detector`
+  the catalog and the supplied ruleset do not know
+  (`ACTION_POLICY_UNKNOWN_DETECTOR`), a built-in that is compiled but disabled
+  (`ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR`), a `full` built-in this artifact
+  does not include (`ACTION_POLICY_RULE_ON_NOT_INCLUDED_DETECTOR`), and a rule
+  provably shadowed by one earlier rule (`ACTION_POLICY_SHADOWED_RULE`, with the
+  shadowed rule's id and a `related` pointer to the earlier rule). A shadow is
+  reported only when the earlier rule matches everything the later one does
+  under AND-across-keys, OR-within-sets and first-rule-wins, where a `default`
+  action also stops evaluation; partial overlap, disjoint rules and a broad rule
+  placed after a narrow one are never reported. A callback policy, and a type no
+  list can vouch for while a ruleset or PII selection could emit it, are
+  reported as `info` `ACTION_POLICY_ANALYSIS_UNCERTAIN`. Output is bounded (at
+  most 256 items, errors first, `truncated` says when it was cut) and carries
+  rule ids and positions only, never an input name, snippet or document byte.
+  New names: the optional `related` member of a diagnostic (JavaScript
+  `ConfigDiagnostic.related`, Rust `ConfigDiagnostic::related`), and Rust-only
+  `SampleRuleHits` (sample rule hits, kept apart from static reachability: no
+  hit never proves a rule dead) and `ConfigRequest::closed_types` /
+  `closed_detectors` (strict validation, an error instead of a warning, only
+  for a vocabulary the caller declares closed; not offered in JavaScript, whose
+  `runtime-config/v1` has no such member). The `ConfigDiagnostic` id may now be
+  a rule id as well as a catalog detector id.
+
 ### Fixed
 
 - JavaScript `typedPlaceholderFormatter` upper-cases only ASCII letters in a

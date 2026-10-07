@@ -188,6 +188,7 @@ pub struct ArtifactManifest {
     pii: bool,
     selection: bool,
     ids: Vec<&'static str>,
+    declared: Vec<(&'static str, &'static [&'static str])>,
     not_included: Vec<&'static str>,
     digest: String,
     json: String,
@@ -264,6 +265,10 @@ impl ArtifactManifest {
         }
         let entries: Vec<Entry> = entries.collect();
         let ids: Vec<&'static str> = entries.iter().map(|entry| entry.id).collect();
+        let declared = entries
+            .iter()
+            .map(|entry| (entry.id, entry.types))
+            .collect();
         let not_included: Vec<&'static str> = BUILT_IN_PACKS
             .iter()
             .map(|(id, _)| *id)
@@ -290,6 +295,7 @@ impl ArtifactManifest {
             pii,
             selection,
             ids,
+            declared,
             not_included,
             digest,
             json,
@@ -325,6 +331,15 @@ impl ArtifactManifest {
     /// The included built-in detector ids, in canonical registration order.
     pub fn detector_ids(&self) -> impl Iterator<Item = &str> {
         self.ids.iter().copied()
+    }
+
+    /// Each included detector with the finding types it declares, in
+    /// canonical order (the manifest's `detectors[].types`; not a closed
+    /// vocabulary).
+    pub(crate) fn declared_types(
+        &self,
+    ) -> impl Iterator<Item = (&'static str, &'static [&'static str])> + '_ {
+        self.declared.iter().copied()
     }
 
     /// The `full` built-in ids this artifact does not include, in canonical

@@ -36,13 +36,14 @@
 //! replaces the document and its rules are never merged, and an action
 //! (including `allow`) never enables or disables a detector.
 
-use crate::action_policy::load_action_policy;
+use crate::action_policy::{ActionPolicy, load_action_policy};
 use crate::detectors::built_in_ids;
 use crate::error::SecretScanErrorCode;
 use crate::json::{self, Value};
 use crate::limits::{DEFAULT_MAX_FINDINGS, DEFAULT_MAX_INPUT_BYTES};
 use crate::manifest::{ArtifactKind, ArtifactManifest};
 use crate::pii::{PiiSelection, is_reserved_detector_id};
+use crate::policy_diagnostics;
 use crate::registry::DetectorRegistry;
 use crate::ruleset::load_ruleset;
 use crate::selection::{
@@ -92,14 +93,16 @@ impl ConfigSeverity {
 ///
 /// `path` is a fixed-syntax pointer such as `detection.include[3]`; an
 /// unknown member is addressed by its position (`detection.@1`), never its
-/// name. `id` is only ever a canonical detector id from the catalog. No
-/// input string is echoed: a user can paste a secret where an id belongs.
+/// name. `id` is only ever a canonical detector id from the catalog or the id
+/// of a rule in a validated action policy. No input string is echoed: a user
+/// can paste a secret where an id belongs.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ConfigDiagnostic {
     code: &'static str,
     severity: ConfigSeverity,
     path: String,
-    id: Option<&'static str>,
+    id: Option<String>,
+    related: Option<String>,
 }
 
 impl ConfigDiagnostic {
@@ -121,25 +124,64 @@ impl ConfigDiagnostic {
         &self.path
     }
 
-    /// The canonical detector id this concerns, when it concerns one.
+    /// The canonical detector id, or the action policy rule id, this
+    /// concerns, when it concerns one.
     #[must_use]
-    pub const fn id(&self) -> Option<&'static str> {
-        self.id
+    pub fn id(&self) -> Option<&str> {
+        self.id.as_deref()
+    }
+
+    /// The pointer to a second part of the input that explains this finding
+    /// (the earlier rule that shadows a later one), when there is one.
+    #[must_use]
+    pub fn related(&self) -> Option<&str> {
+        self.related.as_deref()
     }
 }
 
+/// Collects diagnostics without growing past what the output can show: at most
+/// [`DIAGNOSTICS_MAX`] of each severity are kept (the final list takes errors
+/// first, so no more can ever appear), and every one is still counted, so the
+/// output says when it was cut.
 #[derive(Default)]
-struct Diagnostics {
+pub(crate) struct Diagnostics {
     items: Vec<ConfigDiagnostic>,
+    seen: [usize; 3],
+}
+
+const fn rank(severity: ConfigSeverity) -> usize {
+    match severity {
+        ConfigSeverity::Error => 0,
+        ConfigSeverity::Warning => 1,
+        ConfigSeverity::Info => 2,
+    }
 }
 
 impl Diagnostics {
     fn push(&mut self, severity: ConfigSeverity, code: &'static str, path: &str) {
+        self.push_item(severity, code, path, None, None);
+    }
+
+    /// A diagnostic with an `id` and an optional `related` pointer.
+    pub(crate) fn push_item(
+        &mut self,
+        severity: ConfigSeverity,
+        code: &'static str,
+        path: &str,
+        id: Option<&str>,
+        related: Option<&str>,
+    ) {
+        let slot = rank(severity);
+        self.seen[slot] += 1;
+        if self.seen[slot] > DIAGNOSTICS_MAX {
+            return;
+        }
         self.items.push(ConfigDiagnostic {
             code,
             severity,
             path: path.to_owned(),
-            id: None,
+            id: id.map(str::to_owned),
+            related: related.map(str::to_owned),
         });
     }
 
@@ -147,30 +189,27 @@ impl Diagnostics {
         self.push(ConfigSeverity::Error, code, path);
     }
 
-    fn has_error(&self) -> bool {
-        self.items
-            .iter()
-            .any(|item| item.severity == ConfigSeverity::Error)
+    pub(crate) const fn has_error(&self) -> bool {
+        self.seen[0] > 0
     }
 
     /// Errors first, then warnings, then notes, each in document order; at
     /// most [`DIAGNOSTICS_MAX`].
-    fn finish(self) -> (Vec<ConfigDiagnostic>, bool) {
+    pub(crate) fn finish(self) -> (Vec<ConfigDiagnostic>, bool) {
+        let total: usize = self.seen.iter().sum();
         let mut ordered = Vec::with_capacity(self.items.len().min(DIAGNOSTICS_MAX));
-        let mut seen = 0;
         for severity in [
             ConfigSeverity::Error,
             ConfigSeverity::Warning,
             ConfigSeverity::Info,
         ] {
             for item in self.items.iter().filter(|item| item.severity == severity) {
-                seen += 1;
                 if ordered.len() < DIAGNOSTICS_MAX {
                     ordered.push(item.clone());
                 }
             }
         }
-        (ordered, seen > DIAGNOSTICS_MAX)
+        (ordered, total > DIAGNOSTICS_MAX)
     }
 }
 
@@ -192,6 +231,8 @@ pub struct ConfigRequest<'a> {
     action_policy: Option<&'a [u8]>,
     callback: bool,
     disclose_ruleset: bool,
+    closed_types: Option<&'a [&'a str]>,
+    closed_detectors: Option<&'a [&'a str]>,
 }
 
 impl<'a> ConfigRequest<'a> {
@@ -204,6 +245,8 @@ impl<'a> ConfigRequest<'a> {
             action_policy: None,
             callback: false,
             disclose_ruleset: false,
+            closed_types: None,
+            closed_detectors: None,
         }
     }
 
@@ -234,6 +277,31 @@ impl<'a> ConfigRequest<'a> {
     #[must_use]
     pub const fn callback_policy(mut self) -> Self {
         self.callback = true;
+        self
+    }
+
+    /// Declares the finding types of the caller's own closed vocabulary: the
+    /// types an action policy rule may name beyond those the artifact's
+    /// detectors declare. With it, a rule `type` that is neither declared by
+    /// an enabled detector nor listed here is an **error**
+    /// (`ACTION_POLICY_UNKNOWN_TYPE`, severity `error`) and the resolution is
+    /// rejected. Without it the same finding is only a warning, because a
+    /// custom, ruleset or future type is legitimate under the revision-1 open
+    /// vocabulary. Loading an action policy is unaffected either way.
+    #[must_use]
+    pub const fn closed_types(mut self, types: &'a [&'a str]) -> Self {
+        self.closed_types = Some(types);
+        self
+    }
+
+    /// Declares the caller's closed set of custom detector ids an action
+    /// policy rule may name beyond the catalog and the supplied ruleset. With
+    /// it, a rule `detector` that is none of those is an **error**
+    /// (`ACTION_POLICY_UNKNOWN_DETECTOR`, severity `error`); without it, a
+    /// warning.
+    #[must_use]
+    pub const fn closed_detectors(mut self, detectors: &'a [&'a str]) -> Self {
+        self.closed_detectors = Some(detectors);
         self
     }
 
@@ -362,7 +430,11 @@ struct RulesetFacts {
 
 enum PolicyFacts {
     Default,
-    Document { digest: String, rule_count: usize },
+    Document {
+        digest: String,
+        rule_count: usize,
+        policy: ActionPolicy,
+    },
     Callback,
 }
 
@@ -422,8 +494,13 @@ pub fn resolve_config(
         enabled,
     };
 
+    advise(manifest, &effective, request, &mut diagnostics);
+    // A declared closed vocabulary turns an unknown policy name into an error.
+    if diagnostics.has_error() {
+        let (items, truncated) = diagnostics.finish();
+        return envelope(None, items, truncated);
+    }
     let snapshot = build_snapshot(manifest, &effective, request.disclose_ruleset);
-    advise(manifest, &effective, &mut diagnostics);
     let (items, truncated) = diagnostics.finish();
     envelope(Some(snapshot), items, truncated)
 }
@@ -613,6 +690,7 @@ fn resolve_policy(
                 PolicyFacts::Document {
                     digest: format!("sha256:{}", policy.document_sha256_hex()),
                     rule_count: policy.rule_count(),
+                    policy,
                 },
                 true,
             ),
@@ -632,7 +710,12 @@ fn resolve_policy(
 
 /// The warnings and notes that need the resolved facts.
 #[inline(never)]
-fn advise(manifest: &ArtifactManifest, effective: &Effective<'_>, diagnostics: &mut Diagnostics) {
+fn advise(
+    manifest: &ArtifactManifest,
+    effective: &Effective<'_>,
+    request: &ConfigRequest<'_>,
+    diagnostics: &mut Diagnostics,
+) {
     if effective.enabled.is_empty() {
         diagnostics.push(
             ConfigSeverity::Warning,
@@ -646,6 +729,33 @@ fn advise(manifest: &ArtifactManifest, effective: &Effective<'_>, diagnostics: &
             "OVERLAP_OUTCOMES_MAY_CHANGE",
             "detection",
         );
+    }
+    match &effective.policy {
+        PolicyFacts::Document { policy, .. } => {
+            let ruleset: &[String] = effective
+                .ruleset
+                .as_ref()
+                .map_or(&[], |facts| &facts.detector_ids);
+            policy_diagnostics::analyze(
+                policy,
+                &policy_diagnostics::Context {
+                    manifest,
+                    enabled: &effective.enabled,
+                    ruleset_ids: ruleset,
+                    ruleset_present: effective.ruleset.is_some(),
+                    pii_active: !effective.pii.is_off(),
+                    closed_types: request.closed_types,
+                    closed_detectors: request.closed_detectors,
+                },
+                diagnostics,
+            );
+        }
+        PolicyFacts::Callback => diagnostics.push(
+            ConfigSeverity::Info,
+            policy_diagnostics::UNCERTAIN,
+            "actionPolicy",
+        ),
+        PolicyFacts::Default => {}
     }
 }
 
@@ -753,9 +863,9 @@ impl SnapshotFacts<'_> {
 
         let (policy_source, policy_digest, policy_rules) = match &effective.policy {
             PolicyFacts::Default => ("default", None, None),
-            PolicyFacts::Document { digest, rule_count } => {
-                ("document", Some(digest.as_str()), Some(*rule_count))
-            }
+            PolicyFacts::Document {
+                digest, rule_count, ..
+            } => ("document", Some(digest.as_str()), Some(*rule_count)),
             PolicyFacts::Callback => ("callback", None, None),
         };
         let policy_revision = policy_rules.map(|_| 1);
@@ -919,12 +1029,17 @@ fn envelope(
             rendered.push(',');
         }
         let (code, path, severity) = (item.code, &item.path, item.severity.as_str());
-        let id = OptStr(item.id);
-        // `path` is fixed syntax: letters, digits and `.@[]$` only.
+        let id = OptStr(item.id.as_deref());
+        // `path` is fixed syntax: letters, digits and `.@[]$` only. A rule id
+        // and a detector id are validated identifiers.
         let _ = write!(
             rendered,
-            "{{\"code\":\"{code}\",\"id\":{id},\"path\":\"{path}\",\"severity\":\"{severity}\"}}"
+            "{{\"code\":\"{code}\",\"id\":{id},\"path\":\"{path}\","
         );
+        if let Some(related) = &item.related {
+            let _ = write!(rendered, "\"related\":\"{related}\",");
+        }
+        let _ = write!(rendered, "\"severity\":\"{severity}\"}}");
     }
     let ok = snapshot.is_some();
     // The snapshot is spliced in as already-rendered JSON so its member order

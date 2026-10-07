@@ -859,8 +859,7 @@
     {
       "name": "a-policy-document-replaces-the-default-and-allow-does-not-disable-a-detector",
       "profiles": [
-        "full",
-        "common"
+        "full"
       ],
       "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"allow-github\",\"match\":{\"type\":[\"github_token\"]},\"action\":\"allow\"}]}",
       "expect": {
@@ -874,6 +873,30 @@
         "origins": {
           "actionPolicy": "runtime"
         }
+      }
+    },
+    {
+      "name": "a-provider-type-rule-on-the-common-artifact-is-undeclared-not-rejected",
+      "profiles": [
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"allow-github\",\"match\":{\"type\":[\"github_token\"]},\"action\":\"allow\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_UNKNOWN_TYPE"
+        ],
+        "policySource": "document",
+        "policyDigest": "sha256:639a0e632fdec8204559779bab20cbc975d782cb4e22b17273e3b2c0d53566a9",
+        "policyRuleCount": 1,
+        "disabledCount": 0,
+        "mode": "all-included",
+        "origins": {
+          "actionPolicy": "runtime"
+        },
+        "paths": [
+          "actionPolicy.rules[0].match.type[0]"
+        ]
       }
     },
     {
@@ -902,10 +925,15 @@
       "callback": true,
       "expect": {
         "ok": true,
-        "codes": [],
+        "codes": [
+          "ACTION_POLICY_ANALYSIS_UNCERTAIN"
+        ],
         "policySource": "callback",
         "policyExplainable": false,
-        "policyDigest": null
+        "policyDigest": null,
+        "paths": [
+          "actionPolicy"
+        ]
       }
     },
     {
@@ -1022,6 +1050,120 @@
           "detection.include[0]",
           "limits.maxInputBytes",
           "ruleset"
+        ]
+      }
+    },
+    {
+      "name": "a-typo-in-a-tightening-rule-loads-and-warns-without-echo",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"tighten\",\"match\":{\"type\":[\"jwt_tokne\"]},\"action\":\"block\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_UNKNOWN_TYPE"
+        ],
+        "paths": [
+          "actionPolicy.rules[0].match.type[0]"
+        ],
+        "policySource": "document",
+        "policyRuleCount": 1
+      }
+    },
+    {
+      "name": "an-unknown-detector-id-in-a-rule-warns",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"tighten\",\"match\":{\"detector\":[\"jwt-tokne\"]},\"action\":\"block\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_UNKNOWN_DETECTOR"
+        ],
+        "paths": [
+          "actionPolicy.rules[0].match.detector[0]"
+        ]
+      }
+    },
+    {
+      "name": "a-rule-on-a-detector-this-artifact-does-not-include-is-not-a-typo",
+      "profiles": [
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"tighten\",\"match\":{\"detector\":[\"github-token\"]},\"action\":\"block\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_RULE_ON_NOT_INCLUDED_DETECTOR"
+        ],
+        "paths": [
+          "actionPolicy.rules[0].match.detector[0]"
+        ]
+      }
+    },
+    {
+      "name": "a-rule-on-a-disabled-detector-is-reported-with-its-detection-note",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "detection": {
+          "exclude": [
+            "jwt"
+          ]
+        }
+      },
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"tighten\",\"match\":{\"detector\":[\"jwt\"],\"type\":[\"jwt\"]},\"action\":\"block\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR",
+          "ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR",
+          "OVERLAP_OUTCOMES_MAY_CHANGE"
+        ],
+        "paths": [
+          "actionPolicy.rules[0].match.type[0]",
+          "actionPolicy.rules[0].match.detector[0]",
+          "detection"
+        ]
+      }
+    },
+    {
+      "name": "a-broad-early-rule-shadows-a-narrow-later-rule-and-a-default-action-stops-evaluation",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"broad\",\"match\":{\"type\":[\"jwt\",\"private_key\"]},\"action\":\"default\"},{\"id\":\"narrow\",\"match\":{\"type\":[\"jwt\"],\"confidence\":[\"high\"]},\"action\":\"block\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_SHADOWED_RULE"
+        ],
+        "paths": [
+          "actionPolicy.rules[1]"
+        ]
+      }
+    },
+    {
+      "name": "partial-overlap-disjoint-and-a-broad-later-rule-are-not-shadowed",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "actionPolicy": "{\"actionPolicyRevision\":1,\"base\":\"default\",\"rules\":[{\"id\":\"narrow-first\",\"match\":{\"type\":[\"jwt\"],\"confidence\":[\"high\"]},\"action\":\"block\"},{\"id\":\"disjoint\",\"match\":{\"type\":[\"jwt\"],\"confidence\":[\"low\"]},\"action\":\"warn\"},{\"id\":\"partial\",\"match\":{\"type\":[\"jwt\",\"bearer_token\"],\"confidence\":[\"high\",\"low\"]},\"action\":\"allow\"},{\"id\":\"broad-last\",\"match\":{\"type\":[\"jwt\"]},\"action\":\"warn\"},{\"id\":\"contained\",\"match\":{\"type\":[\"jwt\"],\"confidence\":[\"high\"],\"obfuscation\":[\"none\"]},\"action\":\"warn\"}]}",
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_SHADOWED_RULE"
+        ],
+        "paths": [
+          "actionPolicy.rules[4]"
         ]
       }
     }

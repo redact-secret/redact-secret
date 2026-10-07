@@ -156,6 +156,7 @@ core-public-api = [
   "RegisteredDetector",
   "RulesetError",
   "RulesetErrorClass",
+  "SampleRuleHits",
   "ScanResult",
   "SecretScanError",
   "SecretScanErrorCode",

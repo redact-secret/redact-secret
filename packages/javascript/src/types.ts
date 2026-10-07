@@ -218,8 +218,18 @@ export interface ConfigDiagnostic {
    * addressed by its position (`detection.@1`), never its name.
    */
   readonly path: string;
-  /** Only ever a canonical detector id from the catalog; `null` otherwise. */
+  /**
+   * Only ever a canonical detector id from the catalog or the id of a rule in a
+   * validated action policy; `null` otherwise. Never a string the input gave
+   * for an unknown name.
+   */
   readonly id: string | null;
+  /**
+   * A second pointer that explains this finding, present only when there is
+   * one: for `ACTION_POLICY_SHADOWED_RULE`, the earlier rule that provably
+   * matches everything this rule matches. Absent otherwise.
+   */
+  readonly related?: string;
 }
 
 /**

@@ -452,6 +452,18 @@ ids, counts and digests only, and withholds a ruleset's ids and digest unless
 `discloseRulesetIdentity` is set. A callback is recorded as a dynamic reference,
 `explainable: false`.
 
+When you pass an `actionPolicy`, the diagnostics also check it against the
+artifact's catalog and your selection, without changing how it loads. They warn
+about a rule `type` no included detector declares
+(`ACTION_POLICY_UNKNOWN_TYPE`), a `detector` nobody knows
+(`ACTION_POLICY_UNKNOWN_DETECTOR`), a detector that is compiled but disabled
+(`ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR`) or not in this artifact
+(`ACTION_POLICY_RULE_ON_NOT_INCLUDED_DETECTOR`), and a rule an earlier rule
+provably covers (`ACTION_POLICY_SHADOWED_RULE`; `related` points at the earlier
+rule). A callback, or a name a ruleset or PII selection could emit, is reported
+as `info` `ACTION_POLICY_ANALYSIS_UNCERTAIN`. No input name is echoed, only its
+position. See the [action policy guide](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/action-policy.md#diagnose-a-policy-before-use).
+
 ```ts
 import { describeConfig, initialize, resolveConfig, status } from "@redact-secret/core";
 

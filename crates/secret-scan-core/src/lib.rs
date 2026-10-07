@@ -67,7 +67,7 @@
 //! | Profiles and PII activation | [`Profile`], [`PiiSelection`] |
 //! | Artifact manifest | [`ArtifactManifest`], [`ArtifactKind`], [`ArtifactManifestError`] |
 //! | Detector selection | [`DetectionSelection`], [`DetectionConfigError`] |
-//! | Effective configuration | [`resolve_config`], [`describe_config`], [`ConfigRequest`], [`ConfigResolution`], [`ConfigSnapshot`], [`ConfigDiagnostic`], [`ConfigSeverity`] |
+//! | Effective configuration | [`resolve_config`], [`describe_config`], [`ConfigRequest`], [`ConfigResolution`], [`ConfigSnapshot`], [`ConfigDiagnostic`], [`ConfigSeverity`], [`SampleRuleHits`] |
 //! | Identifiers and units | [`is_identifier`], [`MAX_IDENTIFIER_LENGTH`], [`RANGE_UNIT`], [`VERSION`] |
 //! | Detector building blocks | [`shannon_entropy`] |
 //!
@@ -158,6 +158,7 @@ mod normalize;
 mod pii;
 mod pipeline;
 mod policy;
+mod policy_diagnostics;
 mod redact;
 mod registry;
 mod ruleset;
@@ -195,6 +196,7 @@ pub use pipeline::{
     scan_and_redact_with_limits, scan_with_limits,
 };
 pub use policy::DefaultPolicy;
+pub use policy_diagnostics::SampleRuleHits;
 pub use redact::{
     MAX_PLACEHOLDER_LENGTH, default_placeholder_formatter, redact, redact_with_limits,
     typed_placeholder_formatter,
