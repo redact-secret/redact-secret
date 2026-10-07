@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 100,
+  "fixtureCount": 101,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1606,6 +1606,22 @@
         }
       ],
       "note": "Issue #1110: the 39-byte \u006fry_st_ session token and the dotted \u006fry_rt_ OAuth2 token (43-byte key, dot, 43-byte signature) stay whole at every UTF-8 byte and char partition, including splits inside the prefix, at the dot and in the signature, while the 31-byte session twin on the last line never emits a finding."
+    },
+    {
+      "id": "baseten-api-key-incremental-exact-width-partitions",
+      "input": "BASETEN_API_KEY=b10_Synth000.FixtureFixtureFixtureFixture0000\nb10_Synth000.FixtureFixtureFixtureFixture000\n",
+      "text": "BASETEN_API_KEY=<SECRET_1>\nb10_Synth000.FixtureFixtureFixtureFixture000\n",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 61
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ key stays one whole finding at every UTF-8 byte and char partition, including splits inside the prefix, at the separator and at the last secret byte, while the one-byte-short twin on the next line never emits one."
     }
   ]
 }

@@ -32,6 +32,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `axiom_api_token` | `axiom-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (axiom-go runtime check, R6), UUID layout and lowercase hex T1 by example (docs response example and SDK fixtures, R5), grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
 | `axiom_personal_token` | `axiom-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; prefix T1 (axiom-go runtime check, R6), UUID layout and lowercase hex T1 by example (R5), grammar and trade-offs in [Beta.12 broad-discovery families, ranks 6 to 10 (#1014)](#beta12-broad-discovery-families-ranks-6-to-10-1014) |
 | `azure_devops_personal_access_token` | `azure-devops-personal-access-token` | `always-redact` | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/642/README.md) |
+| `baseten_api_key` | `baseten-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider documentation publishes the scanner regex; core adoption ruling 2026-10-07), pre-cutoff unprefixed keys are an accepted false negative, grammar and trade-offs in [Beta.15 credential families (#1111)](#beta15-credential-families-1111) |
 | `bearer_token` | `bearer-token` | `always-redact` | [Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `bitwarden_secrets_manager_access_token` | `bitwarden-secrets-manager-access-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider parser, server generator and docs example, R1), grammar and trade-offs in [Beta.12 broad-discovery provider families (#1014)](#beta12-broad-discovery-provider-families-1014) |
 | `browserbase_api_key` | `browserbase-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 (provider docs prefix; alphabet and 20-byte floor from the provider's CI gate, R2), grammar and trade-offs in [Tier B provider families (#860)](#tier-b-provider-families-860) |
@@ -1672,6 +1673,36 @@ an operator-changed HMAC hasher with a different signature width; and the
 `ory_session_` and `ory_kratos_session` cookie names, which are names and fail
 the body grammar. Tests: `crates/secret-scan-core/src/detectors/ory_token.rs`,
 `tests/ory_token_1110.rs`, the `ory-token-*` fixtures of the synchronous corpus.
+
+## Beta.15 credential families (#1111)
+
+Baseten ([#1111](https://github.com/redact-secret/redact-secret/issues/1111),
+evidence note: [`docs/audits/evidence/1111/README.md`](../audits/evidence/1111/README.md);
+research record: [#1012](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1012/baseten.md)).
+The core adoption ruling is dated 2026-10-07: the provider's documentation
+states the prefix, separator, both body lengths and the alphabet as a scanner
+regex, so the grammar is T1 and needs no issuance observation. The detector is
+a new always-redact detector with `Provider` specificity and high confidence;
+the identifier boundary applies on both sides, with `.` not counted as glue so
+a key that ends a sentence is still claimed. No support-status claim is made;
+benchmarks arrival and profile evidence are separate.
+
+| Family | Detector | Grammar | Finding type | Tier |
+| --- | --- | --- | --- | --- |
+| `baseten:api-key` | `baseten-api-key` | `b10_` + exactly 8 `[A-Za-z0-9]` + `.` + exactly 32 `[A-Za-z0-9]` (45 bytes); case-sensitive prefix | `baseten_api_key` | T1 (provider documentation publishes the regex `b10_[A-Za-z0-9]{8}\.[A-Za-z0-9]{32}`; the key-format changelog agrees) |
+
+Exclusions: a key created before 2026-10-01 15:00 GMT carries no `b10_` prefix,
+has no documented shape and still authenticates, so it is an accepted false
+negative; the visible key prefix used for revocation (`b10_` plus the 8-character
+id) lacks the secret half and is not claimed; any other id or secret length, a
+`-` or `_` in the body, a separator other than `.`, `B10_` and look-alike
+prefixes (`b1o_`, `b100_`, `b10-`, `bt10_`) are not keys. False positives: an
+unrelated run with the exact `b10_` 8.32 grammar is redacted, including the
+provider's own documentation placeholder, which has the exact shape. False
+negatives: pre-cutoff keys and any future format change. Cost: one prefix on the
+shared known-format scan. Tests: the detector module's unit tests and the
+`baseten-api-key-*` conformance fixtures, including an incremental exact-width
+partition fixture.
 
 ## Rules
 

@@ -7307,12 +7307,58 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "ory_oauth2_token"
+    },
+    {
+      "detector": "baseten-api-key",
+      "evidence": {
+        "fixtureCount": 41,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "baseten-api-key-positive-authorization-api-key-header",
+        "baseten-api-key-positive-bare",
+        "baseten-api-key-positive-chat-sentence",
+        "baseten-api-key-positive-cli-argument",
+        "baseten-api-key-positive-crlf-unicode-prefix",
+        "baseten-api-key-positive-curl",
+        "baseten-api-key-positive-dotenv",
+        "baseten-api-key-positive-json-api-key",
+        "baseten-api-key-positive-log",
+        "baseten-api-key-positive-punctuation-adjacent",
+        "baseten-api-key-positive-repeated-value",
+        "baseten-api-key-positive-second-key",
+        "baseten-api-key-positive-shell-export",
+        "baseten-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "baseten_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 159,
+    "supported": 160,
     "unresolved": 0
   }
 }

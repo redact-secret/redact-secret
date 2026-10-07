@@ -17698,6 +17698,135 @@
       "type": "ory_oauth2_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "baseten-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "baseten-api-key-positive-authorization-api-key-header",
+            "baseten-api-key-positive-bare",
+            "baseten-api-key-positive-chat-sentence",
+            "baseten-api-key-positive-cli-argument",
+            "baseten-api-key-positive-crlf-unicode-prefix",
+            "baseten-api-key-positive-curl",
+            "baseten-api-key-positive-dotenv",
+            "baseten-api-key-positive-json-api-key",
+            "baseten-api-key-positive-log",
+            "baseten-api-key-positive-punctuation-adjacent",
+            "baseten-api-key-positive-repeated-value",
+            "baseten-api-key-positive-second-key",
+            "baseten-api-key-positive-shell-export",
+            "baseten-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "baseten-api-key-overlap-bearer-header",
+            "baseten-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "baseten-api-key-adversarial-glued-keys",
+            "baseten-api-key-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "baseten-api-key-boundary-dash-in-secret",
+            "baseten-api-key-boundary-double-dot",
+            "baseten-api-key-boundary-glued-trailing-dash",
+            "baseten-api-key-boundary-glued-trailing-underscore",
+            "baseten-api-key-boundary-hyphen-separator",
+            "baseten-api-key-boundary-id-7",
+            "baseten-api-key-boundary-id-9",
+            "baseten-api-key-boundary-lookalike-b100",
+            "baseten-api-key-boundary-lookalike-b1o",
+            "baseten-api-key-boundary-lookalike-bt10",
+            "baseten-api-key-boundary-lookalike-hyphen",
+            "baseten-api-key-boundary-missing-separator",
+            "baseten-api-key-boundary-pre-cutoff-unprefixed",
+            "baseten-api-key-boundary-secret-31",
+            "baseten-api-key-boundary-secret-33",
+            "baseten-api-key-boundary-underscore-in-id",
+            "baseten-api-key-boundary-underscore-separator",
+            "baseten-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "baseten-api-key-negative-env-reference",
+            "baseten-api-key-negative-masked",
+            "baseten-api-key-negative-prefix-only",
+            "baseten-api-key-negative-short-placeholder",
+            "baseten-api-key-negative-visible-key-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "baseten-api-key-boundary-dash-in-secret",
+            "baseten-api-key-boundary-double-dot",
+            "baseten-api-key-boundary-glued-trailing-dash",
+            "baseten-api-key-boundary-glued-trailing-underscore",
+            "baseten-api-key-boundary-hyphen-separator",
+            "baseten-api-key-boundary-id-7",
+            "baseten-api-key-boundary-id-9",
+            "baseten-api-key-boundary-lookalike-b100",
+            "baseten-api-key-boundary-lookalike-b1o",
+            "baseten-api-key-boundary-lookalike-bt10",
+            "baseten-api-key-boundary-lookalike-hyphen",
+            "baseten-api-key-boundary-missing-separator",
+            "baseten-api-key-boundary-pre-cutoff-unprefixed",
+            "baseten-api-key-boundary-secret-31",
+            "baseten-api-key-boundary-secret-33",
+            "baseten-api-key-boundary-underscore-in-id",
+            "baseten-api-key-boundary-underscore-separator",
+            "baseten-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for baseten_api_key (baseten-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "baseten_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -17735,6 +17864,7 @@
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "aws-secret-access-key-incremental-adjacent-lines",
+            "baseten-api-key-incremental-exact-width-partitions",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",
@@ -17844,6 +17974,8 @@
             "aws-secret-access-key-adversarial-long-line",
             "axiom-token-adversarial-long-run",
             "azdo-pat-adversarial-long-padding",
+            "baseten-api-key-adversarial-glued-keys",
+            "baseten-api-key-adversarial-prefix-run",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
             "bitwarden-sm-access-token-adversarial-glued-tokens",
@@ -18180,6 +18312,7 @@
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "aws-secret-access-key-incremental-adjacent-lines",
+            "baseten-api-key-incremental-exact-width-partitions",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",
@@ -18350,6 +18483,8 @@
             "aws-secret-access-key-adversarial-long-line",
             "axiom-token-adversarial-long-run",
             "azdo-pat-adversarial-long-padding",
+            "baseten-api-key-adversarial-glued-keys",
+            "baseten-api-key-adversarial-prefix-run",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
             "bitwarden-sm-access-token-adversarial-glued-tokens",
@@ -18747,6 +18882,7 @@
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "aws-secret-access-key-incremental-adjacent-lines",
+            "baseten-api-key-incremental-exact-width-partitions",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",

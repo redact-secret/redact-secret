@@ -172,6 +172,12 @@ evidence is linked from each published version.
   admin keys (`ory_pat_`, `ory_apikey_`, `ory_wak_`), the `ory_lo_` logout
   token, enterprise custom OAuth2 prefixes and pre-2023 unprefixed session
   tokens are not claimed.
+- `baseten-api-key` (#1111): Baseten API keys created from 2026-10-01 15:00 GMT,
+  `b10_` + exactly 8 `[A-Za-z0-9]` + `.` + exactly 32 `[A-Za-z0-9]`
+  (`baseten_api_key`), always redacted. The grammar is the regex Baseten's
+  documentation publishes (T1). Keys created before the cutoff carry no prefix
+  and stay unclaimed; the visible key prefix and any other length or separator
+  are not keys.
 
 ### Fixed
 

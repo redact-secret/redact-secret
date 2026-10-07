@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 4237,
+  "fixtureCount": 4278,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -95888,6 +95888,701 @@
           "maxFindings": 0,
           "maxRuntimeMs": 250
         }
+      },
+    {
+      "id": "baseten-api-key-positive-bare",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-second-key",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Revoked1.FillerFillerFillerFillerFiller00",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 45
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-dotenv",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "BASETEN_API_KEY=b10_Synth000.FixtureFixtureFixtureFixture0000\n",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 61
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-shell-export",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export BASETEN_API_KEY=\"b10_Synth000.FixtureFixtureFixtureFixture0000\"\n",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 69
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-yaml",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  BASETEN_API_KEY: b10_Synth000.FixtureFixtureFixtureFixture0000\n",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 69
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-json-api-key",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"api_key\": \"b10_Synth000.FixtureFixtureFixtureFixture0000\"}",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 58
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-authorization-api-key-header",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Api-Key b10_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 23,
+          "end": 68
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-curl",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H 'Authorization: Api-Key b10_Synth000.FixtureFixtureFixtureFixture0000' https://inference.example.test/predict",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 32,
+          "end": 77
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-cli-argument",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "baseten login --api-key b10_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 69
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-chat-sentence",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Here is my key b10_Synth000.FixtureFixtureFixtureFixture0000 can you debug this?",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 60
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-punctuation-adjacent",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The key is b10_Synth000.FixtureFixtureFixtureFixture0000.",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 56
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-log",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-10-07T12:00:00Z INFO client init token=b10_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 89
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-crlf-unicode-prefix",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 키 reviewed format\r\nb10_Synth000.FixtureFixtureFixtureFixture0000\r\n",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 73
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-positive-repeated-value",
+      "detector": "baseten-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "first=b10_Synth000.FixtureFixtureFixtureFixture0000 second=b10_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6,
+          "end": 51
+        },
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 59,
+          "end": 104
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ + 8 + '.' + 32 alphanumeric key is claimed whole."
+    },
+    {
+      "id": "baseten-api-key-overlap-context",
+      "detector": "baseten-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_key=b10_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 56
+        }
+      ],
+      "note": "Issue #1111: the provider type wins over a generic contextual secret at the same span."
+    },
+    {
+      "id": "baseten-api-key-overlap-bearer-header",
+      "detector": "baseten-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer b10_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 67
+        }
+      ],
+      "note": "Issue #1111: the provider type wins over the bearer-token detector at the same span."
+    },
+    {
+      "id": "baseten-api-key-boundary-id-7",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth00.FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: a 7-character id is not the documented key."
+    },
+    {
+      "id": "baseten-api-key-boundary-id-9",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth0000.FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: a 9-character id is not the documented key."
+    },
+    {
+      "id": "baseten-api-key-boundary-secret-31",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000.FixtureFixtureFixtureFixture000",
+      "expected": [],
+      "note": "Issue #1111: a 31-character secret is not the documented key."
+    },
+    {
+      "id": "baseten-api-key-boundary-secret-33",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000.FixtureFixtureFixtureFixture00000",
+      "expected": [],
+      "note": "Issue #1111: a 33-character secret is not the documented key."
+    },
+    {
+      "id": "baseten-api-key-boundary-missing-separator",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: the '.' separator is required."
+    },
+    {
+      "id": "baseten-api-key-boundary-hyphen-separator",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000-FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: a '-' does not replace the '.' separator."
+    },
+    {
+      "id": "baseten-api-key-boundary-underscore-separator",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000_FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: a '_' does not replace the '.' separator."
+    },
+    {
+      "id": "baseten-api-key-boundary-double-dot",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000..FixtureFixtureFixtureFixture000",
+      "expected": [],
+      "note": "Issue #1111: two separators are not the documented key."
+    },
+    {
+      "id": "baseten-api-key-boundary-dash-in-secret",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000.FixtureFix-ureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: the secret alphabet is alphanumeric only."
+    },
+    {
+      "id": "baseten-api-key-boundary-underscore-in-id",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Syn_h000.FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: the id alphabet is alphanumeric only."
+    },
+    {
+      "id": "baseten-api-key-boundary-uppercase-prefix",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "B10_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: the prefix is case-sensitive."
+    },
+    {
+      "id": "baseten-api-key-boundary-lookalike-b1o",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b1o_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: not the Baseten prefix."
+    },
+    {
+      "id": "baseten-api-key-boundary-lookalike-b100",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b100_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: not the Baseten prefix."
+    },
+    {
+      "id": "baseten-api-key-boundary-lookalike-hyphen",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10-Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: not the Baseten prefix."
+    },
+    {
+      "id": "baseten-api-key-boundary-lookalike-bt10",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "bt10_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: an alphanumeric byte glued before the prefix is not a key."
+    },
+    {
+      "id": "baseten-api-key-boundary-glued-trailing-underscore",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000.FixtureFixtureFixtureFixture0000_x",
+      "expected": [],
+      "note": "Issue #1111: a directly glued suffix is not a key."
+    },
+    {
+      "id": "baseten-api-key-boundary-glued-trailing-dash",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000.FixtureFixtureFixtureFixture0000-1",
+      "expected": [],
+      "note": "Issue #1111: a directly glued suffix is not a key."
+    },
+    {
+      "id": "baseten-api-key-boundary-pre-cutoff-unprefixed",
+      "detector": "baseten-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: keys created before the 2026-10-01 cutoff carry no prefix and are an accepted false negative."
+    },
+    {
+      "id": "baseten-api-key-negative-prefix-only",
+      "detector": "baseten-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "the b10_ prefix",
+      "expected": [],
+      "note": "Issue #1111: the bare prefix names the format, it is not a key."
+    },
+    {
+      "id": "baseten-api-key-negative-visible-key-prefix",
+      "detector": "baseten-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "baseten org api-key delete --prefix b10_Synth000",
+      "expected": [],
+      "note": "Issue #1111: the visible key prefix lacks the secret half."
+    },
+    {
+      "id": "baseten-api-key-negative-env-reference",
+      "detector": "baseten-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "BASETEN_API_KEY=${BASETEN_API_KEY}\n",
+      "expected": [],
+      "note": "Issue #1111: a reference is not a value."
+    },
+    {
+      "id": "baseten-api-key-negative-masked",
+      "detector": "baseten-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000.********************************",
+      "expected": [],
+      "note": "Issue #1111: a masked value is not a key."
+    },
+    {
+      "id": "baseten-api-key-negative-short-placeholder",
+      "detector": "baseten-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "BASETEN_API_KEY=b10_xxxxxxxx.xxxx",
+      "expected": [],
+      "note": "Issue #1111: a short placeholder is not a key."
+    },
+    {
+      "id": "baseten-api-key-adversarial-prefix-run",
+      "detector": "baseten-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_b10_",
+      "expected": [],
+      "note": "Issue #1111: repeated prefixes stay linear and bounded.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
       }
+    },
+    {
+      "id": "baseten-api-key-adversarial-glued-keys",
+      "detector": "baseten-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000b10_Synth000.FixtureFixtureFixtureFixture0000",
+      "expected": [],
+      "note": "Issue #1111: back-to-back glued keys are never claimed and stay linear.",
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
+    }
   ]
 }

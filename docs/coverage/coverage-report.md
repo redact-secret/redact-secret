@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 159/159 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 160/160 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 159 |
+| supported | 160 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 170.
+Coverage declarations: 171.
 
 ## Coverage by detector
 
@@ -35,6 +35,7 @@ Coverage declarations: 170.
 | aws-secret-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | axiom-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| baseten-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bitwarden-secrets-manager-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | browserbase-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -163,6 +164,7 @@ Coverage declarations: 170.
 | axiom_api_token | axiom-token | provider | supported | not-applicable | none |
 | axiom_personal_token | axiom-token | provider | supported | not-applicable | none |
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
+| baseten_api_key | baseten-api-key | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | bitwarden_secrets_manager_access_token | bitwarden-secrets-manager-access-token | provider | supported | not-applicable | none |
 | browserbase_api_key | browserbase-api-key | provider | supported | not-applicable | none |
@@ -333,15 +335,15 @@ Coverage declarations: 170.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 170 | 0 | 0 |
-| boundary | 159 | 0 | 0 |
-| host-context | 159 | 0 | 0 |
+| adversarial | 171 | 0 | 0 |
+| boundary | 160 | 0 | 0 |
+| host-context | 160 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 170 | 0 | 0 |
-| near-miss-negative | 159 | 0 | 0 |
-| overlap | 159 | 0 | 0 |
-| positive | 159 | 0 | 0 |
-| range | 170 | 0 | 0 |
+| malformed | 171 | 0 | 0 |
+| near-miss-negative | 160 | 0 | 0 |
+| overlap | 160 | 0 | 0 |
+| positive | 160 | 0 | 0 |
+| range | 171 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

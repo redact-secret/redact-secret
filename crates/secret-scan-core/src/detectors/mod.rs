@@ -17,6 +17,7 @@ mod aws;
 mod aws_bedrock;
 mod axiom;
 mod azure_devops;
+mod baseten_api_key;
 mod bearer_token;
 mod bitwarden;
 mod browserbase;
@@ -428,6 +429,7 @@ pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
         row("mapbox-token", &mapbox::MAPBOX),
         row("fly-token", &fly::FLY),
         row("ory-token", &ory_token::ORY_TOKEN),
+        row("baseten-api-key", &baseten_api_key::BASETEN_API_KEY),
         row("jwt", &jwt::JwtDetector),
         row("bearer-token", &bearer_token::BearerTokenDetector),
         row("connection-string", &ConnectionStringDetector),
@@ -819,6 +821,10 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
         )],
     ),
     (ory_token::ID, &[Literals::Shapes(ory_token::SHAPES)]),
+    (
+        baseten_api_key::ID,
+        &[Literals::Shapes(baseten_api_key::SHAPES)],
+    ),
 ];
 
 /// The prefilter declaration groups of the declared built-in `id`, resolved
@@ -997,6 +1003,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("mapbox-token", Pack::Provider),
     ("fly-token", Pack::Provider),
     ("ory-token", Pack::Provider),
+    ("baseten-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -1163,6 +1170,7 @@ mod tests {
                 "mapbox-token",
                 "fly-token",
                 "ory-token",
+                "baseten-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
