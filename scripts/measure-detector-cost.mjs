@@ -46,7 +46,8 @@ import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSyn
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { brotliCompressSync, gzipSync, constants as zlibConstants } from "node:zlib";
+
+import { brotliSize, gzipSize } from "./lib/artifact-size.mjs";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const MOD_RS = join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors", "mod.rs");
@@ -410,16 +411,6 @@ function buildNative() {
 
 function buildWasm(outDir) {
   run("node", ["scripts/build-browser-artifact.mjs", "--out-dir", outDir]);
-}
-
-export function gzipSize(buffer) {
-  return gzipSync(buffer, { level: 9 }).length;
-}
-
-export function brotliSize(buffer) {
-  return brotliCompressSync(buffer, {
-    params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 11 },
-  }).length;
 }
 
 function measureSizes(nativeBinaryPath, wasmDir) {

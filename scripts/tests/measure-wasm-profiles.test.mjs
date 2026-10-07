@@ -317,3 +317,9 @@ test("piiGuardFailures rejects a default build that is not smaller than its pii 
     "common .wasm (220000 B) is not smaller than common-pii (220000 B)",
   ]);
 });
+
+test("the profile tool takes its size helpers from the shared library, not the detector-cost experiment (#1268)", () => {
+  const source = readFileSync(join(REPO_ROOT, "scripts", "measure-wasm-profiles.mjs"), "utf8");
+  assert.match(source, /from "\.\/lib\/artifact-size\.mjs"/);
+  assert.doesNotMatch(source, /from "\.\/measure-detector-cost\.mjs"/);
+});
