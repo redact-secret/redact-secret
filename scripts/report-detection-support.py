@@ -45,9 +45,17 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pii_current_qualification import current_qualification_errors, current_qualification_sentence
+from support_matrix_source import (
+    active_matrix_path,
+    historical_pii_matrix,
+    matrix_source,
+)
+
 ROOT = Path(__file__).resolve().parents[1]
 INVENTORY_PATH = ROOT / "docs" / "coverage" / "detector-inventory.json"
-MATRIX_PATH = ROOT / "benchmarks" / "support-matrix.json"
+MATRIX_PATH = active_matrix_path(ROOT)
 PIN_SOURCE_PATH = ROOT / "benchmarks" / "pin-source.json"
 PIN_MANIFEST_PATH = ROOT / "benchmarks" / "pin-manifest.json"
 ALLOWLIST_PATH = ROOT / "docs" / "coverage" / "detector-family-coverage-allowlist.json"
@@ -144,9 +152,14 @@ def build(source_revision: str) -> dict:
 
     pii_ids = shipped_pii_families()
     pii_docs = documented_pii_status()
+    current = matrix.get("piiCurrentQualification")
+    errors = current_qualification_errors(current, set(pii_ids))
+    if errors:
+        raise ValueError("; ".join(errors))
     # The PII families are top-level `piiFamilies` of the pinned matrix (benchmarks 573e128),
     # never rows of `families`; a matrix that predates the key has none.
-    pii_matrix_status = {row["family"]: row["status"] for row in matrix.get("piiFamilies", [])}
+    historical = historical_pii_matrix(matrix)
+    pii_matrix_status = {row["family"]: row["status"] for row in historical.get("piiFamilies", [])}
     pii_matrix = sorted(pii_matrix_status)
     pii_rows = [
         {
@@ -158,29 +171,40 @@ def build(source_revision: str) -> dict:
         for family in pii_ids
     ]
 
-    report = matrix["sourceReport"]
+    source = matrix_source(matrix)
+    measured_commit, measured_version = source["productRevision"], source["productVersion"]
     return {
         "sourceRevision": source_revision,
+        "matrixSource": source,
         "benchmarks": {
-            "matrixSourceReportRevision": report["revision"],
-            "matrixSourceReportDirty": report["dirty"],
-            "matrixMeasuredProductCommit": report["product"]["sourceCommit"],
-            "matrixMeasuredProductVersion": report["product"]["declaredVersion"],
-            "matrixFixtureCount": report["fixtureIndex"]["fixtureCount"],
-            "matrixFixtureIndexDigest": report["fixtureIndex"]["digest"],
-            "matrixTaxonomyDigest": report["taxonomyDigest"],
+            "matrixSourceReportRevision": source["revision"],
+            "matrixSourceReportDirty": source["dirty"],
+            "matrixMeasuredProductCommit": measured_commit,
+            "matrixMeasuredProductVersion": measured_version,
+            "matrixFixtureCount": source["fixtureCount"],
+            "matrixFixtureIndexDigest": source["fixtureDigest"],
+            "matrixTaxonomyDigest": source["taxonomyDigest"],
             "pinSourceBenchmarkCommit": pin_source["benchmarkCommit"],
             "pinManifestRevision": pin_manifest["revision"],
             "pinManifestRedactSecretRevision": pin_manifest["pins"]["redactSecretRevision"],
         },
-        "measuredProductIsSourceRevision": report["product"]["sourceCommit"] == source_revision,
+        "measuredProductIsSourceRevision": measured_commit == source_revision,
         "shipped": {
             "credentialDetectors": len(rows),
             "credentialFindingTypes": len(inventory["types"]),
             "piiFamilies": len(pii_ids),
         },
         "matrix": {
-            "providers": matrix["providerCount"],
+            "providers": (
+                len({row["provider"] for row in matrix["families"] if row.get("provider")})
+                if source["kind"] == "qualification-view"
+                else matrix["providerCount"]
+            ),
+            **(
+                {"sourceReportedProviderCount": matrix["providerCount"]}
+                if source["kind"] == "qualification-view"
+                else {}
+            ),
             "families": matrix["familyCount"],
             "familiesByStatus": family_counts,
             "familiesWithoutShippedDetector": families_without_detector,
@@ -193,6 +217,7 @@ def build(source_revision: str) -> dict:
             r["detector"] for r in rows if r["weakestStatus"] == "shipped-but-unmeasured"
         ],
         "piiFamilies": pii_rows,
+        "piiCurrentQualification": current,
         "piiQualification": {
             **load(PII_BINDING_PATH)["qualification"],
             "codeChangedSinceQualification": load(PII_BINDING_PATH)["codeChangedSinceQualification"],
@@ -203,14 +228,33 @@ def build(source_revision: str) -> dict:
 
 def markdown(report: dict) -> str:
     b = report["benchmarks"]
+    measured = (
+        f"Product commit the matrix measured: `{b['matrixMeasuredProductCommit']}` (`{b['matrixMeasuredProductVersion']}`)"
+        if b["matrixMeasuredProductCommit"]
+        else f"Published npm package the matrix measured: `@redact-secret/core@{b['matrixMeasuredProductVersion']}`; source commit not recorded"
+    )
+    source = report.get("matrixSource", {})
+    if source.get("kind") == "qualification-view":
+        identity_lines = [
+            f"- Canonical qualification view pinned at benchmarks `{source['revision']}`; policy `{source['policyRevision']}`.",
+            "- The view records no measurement timestamp or product source commit.",
+            *[
+                f"- Population `{p['population']}`: semantic `{p['semanticDigest']}`, artifact `{p['artifactDigest']}`."
+                for p in source["populations"]
+            ],
+        ]
+    else:
+        identity_lines = [
+            f"- Pinned matrix generated by benchmarks revision: `{b['matrixSourceReportRevision']}` (dirty: {str(b['matrixSourceReportDirty']).lower()})",
+            f"- Corpus identity: {b['matrixFixtureCount']} fixtures, index digest `{b['matrixFixtureIndexDigest']}`, taxonomy digest `{b['matrixTaxonomyDigest']}`",
+        ]
     out = [
         "# Detector and PII family support join",
         "",
         f"- Source revision (`git rev-parse HEAD`): `{report['sourceRevision']}`",
-        f"- Pinned matrix generated by benchmarks revision: `{b['matrixSourceReportRevision']}` (dirty: {str(b['matrixSourceReportDirty']).lower()})",
-        f"- Product commit the matrix measured: `{b['matrixMeasuredProductCommit']}` (`{b['matrixMeasuredProductVersion']}`); "
+        *identity_lines,
+        f"- {measured}; "
         + ("same as the source revision." if report["measuredProductIsSourceRevision"] else "NOT the source revision."),
-        f"- Corpus identity: {b['matrixFixtureCount']} fixtures, index digest `{b['matrixFixtureIndexDigest']}`, taxonomy digest `{b['matrixTaxonomyDigest']}`",
         f"- `benchmarks/pin-source.json` benchmarkCommit: `{b['pinSourceBenchmarkCommit']}`; `benchmarks/pin-manifest.json` revision: `{b['pinManifestRevision']}` (redactSecretRevision `{b['pinManifestRedactSecretRevision']}`)",
         "",
         "## Counts",
@@ -247,6 +291,7 @@ def markdown(report: dict) -> str:
         out.append(
             f"| `{row['family']}` | {'yes' if row['inPinnedMatrix'] else 'no'} | {row['documentedStatus'] or 'none'} |"
         )
+    out += ["", current_qualification_sentence(report.get("piiCurrentQualification"))]
     q = report["piiQualification"]
     out += [
         "",

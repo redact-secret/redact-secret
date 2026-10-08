@@ -270,7 +270,10 @@ jobs:
             echo "No previous release tag found; skipping the support-matrix drift gate." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          if ! git show "$previous_tag:benchmarks/support-matrix.json" > baseline-support-matrix.json 2>/dev/null; then
+          # Canonical qualification-view releases use their native snapshot.
+          # Earlier tags retain the historical legacy contract.
+          if ! git show "$previous_tag:benchmarks/support-matrix-from-view.json" > baseline-support-matrix.json 2>/dev/null &&
+             ! git show "$previous_tag:benchmarks/support-matrix.json" > baseline-support-matrix.json 2>/dev/null; then
             echo "found=false" >> "$GITHUB_OUTPUT"
             echo "$previous_tag predates benchmarks/support-matrix.json; skipping the support-matrix drift gate." >> "$GITHUB_STEP_SUMMARY"
             exit 0

@@ -113,6 +113,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import json
 import re
 import subprocess
@@ -155,12 +156,17 @@ VENDORED_FILES: tuple[tuple[Path, str, str | None], ...] = (
     # The manifest ref is the exact commit in PIN_SOURCE_PATH, supplied by
     # sync_vendored_files. None deliberately means "never use a live branch".
     (MANIFEST_PATH, BENCHMARKS_MANIFEST_PATH, None),
+    (Path("benchmarks/support-matrix-from-view.json"), "benchmarks/support-matrix-from-view.json", None),
+    (Path("benchmarks/support-matrix-view-schema.json"), "schemas/support-matrix-from-view-v1.json", None),
     (
         SUPPORT_MATRIX_SCHEMA_PATH,
         BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH,
         BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF,
     ),
 )
+HISTORICAL_MATRIX_PATH = Path("benchmarks/support-matrix.json")
+# Exact retained bytes at core 5696d7e1a2950bdf54fa21244f351e1c4b171f25.
+HISTORICAL_MATRIX_SHA256 = "8f6c9d91120407fa82271183e00355c270628bc484d39a88e8a83306b7645552"
 PRODUCT_BRANCH = "main"
 # actions/checkout (fetch-depth: 0, pull_request trigger) fetches every
 # branch into refs/remotes/origin/* and checks out a detached PR merge ref --
@@ -518,6 +524,18 @@ def sync_vendored_files(
     return written
 
 
+def check_historical_matrix(root: Path) -> list[str]:
+    try:
+        actual = hashlib.sha256((root / HISTORICAL_MATRIX_PATH).read_bytes()).hexdigest()
+    except OSError:
+        return ["retained historical support matrix is missing"]
+    return (
+        []
+        if actual == HISTORICAL_MATRIX_SHA256
+        else ["historical support matrix differs from its retained immutable core snapshot"]
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("root", nargs="?", default=Path.cwd(), type=Path)
@@ -565,6 +583,7 @@ def main(argv: list[str] | None = None) -> int:
     product_version = load_json(root / PRODUCT_MANIFEST_PATH)["version"]
 
     errors = check_reconciliation(manifest, ledger)
+    errors += check_historical_matrix(root)
     warnings = check_pinned_version(manifest, product_version)
     if args.check_ancestry:
         facts = resolve_ancestry_facts(root, manifest, ledger)
@@ -572,16 +591,18 @@ def main(argv: list[str] | None = None) -> int:
         errors += findings.errors
         warnings += findings.warnings
 
-        live_source = (
-            f"{BENCHMARKS_REPO}@{BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF}:{BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH}"
-        )
-        local_schema = (root / SUPPORT_MATRIX_SCHEMA_PATH).read_text(encoding="utf-8")
-        live_schema = gh_fetch_file(
-            BENCHMARKS_REPO,
-            BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF,
-            BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH,
-        )
-        errors += check_schema_drift(local_schema, live_schema, live_source=live_source)
+        for local_path, upstream_path, declared_ref in VENDORED_FILES:
+            if local_path == MANIFEST_PATH:
+                continue  # Manifest ancestry and exact bytes are checked below.
+            upstream_ref = pinned_commit if declared_ref is None else declared_ref
+            live_source = f"{BENCHMARKS_REPO}@{upstream_ref}:{upstream_path}"
+            try:
+                local_copy = (root / local_path).read_text(encoding="utf-8")
+            except OSError:
+                errors.append(f"{local_path}: missing vendored evidence; sync the exact benchmark pin")
+                continue
+            live_copy = gh_fetch_file(BENCHMARKS_REPO, upstream_ref, upstream_path)
+            errors += check_schema_drift(local_copy, live_copy, live_source=live_source)
 
         errors += check_manifest_provenance(
             manifest,

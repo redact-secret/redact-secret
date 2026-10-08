@@ -137,15 +137,16 @@ class RepositoryTests(unittest.TestCase):
     def test_checked_in_state_passes(self) -> None:
         binding = json.loads(GATE.BINDING.read_text(encoding="utf-8"))
         matrix = json.loads(GATE.MATRIX.read_text(encoding="utf-8"))
+        historical = GATE.historical_pii_matrix(matrix)
         shipped = GATE.shipped_families()
         self.assertGreater(len(shipped), 0)
         errors = GATE.check(
             shipped,
             binding,
             GATE.DOC.read_text(encoding="utf-8"),
-            GATE.matrix_pii_statuses(matrix),
-            matrix_qualification=matrix.get("piiQualification"),
-            matrix_distribution=matrix.get("piiDistribution"),
+            GATE.matrix_pii_statuses(historical),
+            matrix_qualification=historical.get("piiQualification"),
+            matrix_distribution=historical.get("piiDistribution"),
         )
         self.assertEqual(errors, [])
 
