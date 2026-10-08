@@ -218,7 +218,7 @@ export function verifyLockUnchanged(repositoryLock, builtLock, leaf = LEAF_PACKA
   return problems;
 }
 
-function bundleEntry({ distDir }) {
+export function bundleEntry({ distDir }) {
   const imports = {
     runtime: JSON.stringify(join(distDir, "runtime.js")),
     binding: JSON.stringify(join(distDir, "runtime", "wasm-binding.js")),
@@ -233,7 +233,12 @@ import { assertWasmModuleShape, createBindingFromWasmModule } from ${imports.bin
 export * from ${imports.core};
 
 async function initializeModule(module) {
+  // Workers exposes a Node-compatible process, but its module lives in the
+  // deployed bundle rather than Node's file system.
+  const isCloudflareWorker =
+    typeof navigator !== "undefined" && navigator.userAgent === "Cloudflare-Workers";
   const isNode =
+    !isCloudflareWorker &&
     typeof process !== "undefined" &&
     process.versions !== undefined &&
     process.versions.node !== undefined &&
