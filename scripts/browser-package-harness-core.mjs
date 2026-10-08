@@ -369,8 +369,12 @@ export async function qualify(fixtures, api) {
     maxMultilineCodeUnits: 16_384,
   };
   const streamEncoder = new TextEncoder();
-  const streamFixture = synchronous.find((entry) => entry.expected.length === 1);
-  assert(streamFixture !== undefined, "no single-finding fixture available for the stream adapter checks");
+  // A finding may only warn, especially in common. These checks need actual
+  // redaction so their formatter-failure and plaintext assertions are reachable.
+  const streamFixture = synchronous.find(
+    (entry) => entry.expected.length === 1 && scanAndRedact(entry.input).text !== entry.input,
+  );
+  assert(streamFixture !== undefined, "no single-finding redacting fixture available for the stream adapter checks");
 
   function openStreamSession() {
     return createIncrementalSanitizer({ limits: STREAM_LIMITS });
