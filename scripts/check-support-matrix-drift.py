@@ -63,8 +63,11 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from support_matrix_source import active_matrix_path, is_view_matrix, matrix_source, matrix_schema_errors, view_source_errors
+
 ROOT = Path(__file__).resolve().parents[1]
-CANDIDATE_PATH = ROOT / "benchmarks" / "support-matrix.json"
+CANDIDATE_PATH = active_matrix_path(ROOT)
 SCHEMA_PATH = ROOT / "benchmarks" / "support-matrix-schema.json"
 ACKNOWLEDGEMENTS_PATH = ROOT / "benchmarks" / "support-matrix-drift-acknowledgements.json"
 
@@ -118,7 +121,7 @@ def validate_matrix(label: str, matrix: dict, schema: dict) -> list[str]:
     role `generate-support-matrix-docs.py`'s `validate_matrix` plays for the
     docs projection, duplicated rather than imported -- every script in
     `scripts/` is a standalone gate."""
-    errors: list[str] = []
+    errors: list[str] = matrix_schema_errors(matrix) + view_source_errors(matrix)
     family_properties = schema["properties"]["families"]["items"]["properties"]
     vocabulary = family_properties["status"]["enum"]
     evidence_tiers = family_properties.get("evidenceTier", {}).get("enum", [])
@@ -297,13 +300,14 @@ def check_regressions(regressions: list[dict], acknowledgements: dict) -> list[s
 
 
 def build_record(*, baseline: dict, candidate: dict, drift: dict[str, list[dict]]) -> dict:
-    def source_report(matrix: dict) -> dict:
+    def source_report(matrix: dict, *, active: bool = False) -> dict:
+        if is_view_matrix(matrix):
+            identity = matrix_source(matrix)
+            return {"kind": identity["kind"], "generatedAt": None, "runId": None, "revision": identity["revision"] if active else None,
+                    "policyRevision": identity["policyRevision"], "populations": identity["populations"],
+                    "publishedPackage": matrix["source"]["publishedPackage"]}
         report = matrix.get("sourceReport", {})
-        return {
-            "generatedAt": report.get("generatedAt"),
-            "runId": report.get("runId"),
-            "revision": report.get("revision"),
-        }
+        return {"generatedAt": report.get("generatedAt"), "runId": report.get("runId"), "revision": report.get("revision")}
 
     return {
         "schemaVersion": 1,
@@ -311,7 +315,7 @@ def build_record(*, baseline: dict, candidate: dict, drift: dict[str, list[dict]
         "taxonomySchemaVersion": candidate.get("taxonomySchemaVersion"),
         "familyCount": candidate.get("familyCount"),
         "baseline": source_report(baseline),
-        "candidate": source_report(candidate),
+        "candidate": source_report(candidate, active=True),
         "summary": {key: len(drift[key]) for key in drift},
         **drift,
     }

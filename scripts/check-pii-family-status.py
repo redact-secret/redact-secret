@@ -43,10 +43,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pii_current_qualification import current_qualification_errors, current_qualification_sentence
+from support_matrix_source import active_matrix_path, historical_pii_matrix, is_view_matrix, matrix_source, view_source_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 BINDING = ROOT / "docs" / "coverage" / "pii-family-status.json"
-MATRIX = ROOT / "benchmarks" / "support-matrix.json"
+MATRIX = active_matrix_path(ROOT)
 DOC = ROOT / "docs" / "reference" / "detection.md"
 SRC = ROOT / "crates" / "secret-scan-core" / "src"
 STATUSES = ("pending", "provisional", "stable")
@@ -171,13 +172,14 @@ def main() -> int:
     binding = json.loads(BINDING.read_text(encoding="utf-8"))
     matrix = json.loads(MATRIX.read_text(encoding="utf-8"))
     shipped = shipped_families()
+    historical = historical_pii_matrix(matrix)
     errors = check(
         shipped,
         binding,
         DOC.read_text(encoding="utf-8"),
-        matrix_pii_statuses(matrix),
-        matrix_qualification=matrix.get("piiQualification"),
-        matrix_distribution=matrix.get("piiDistribution"),
+        matrix_pii_statuses(historical),
+        matrix_qualification=historical.get("piiQualification"),
+        matrix_distribution=historical.get("piiDistribution"),
     )
     errors.extend(current_qualification_errors(matrix.get("piiCurrentQualification"), shipped))
     if errors:

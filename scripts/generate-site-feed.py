@@ -41,6 +41,9 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from support_matrix_source import matrix_schema_errors, CURRENT_MATRIX, HISTORICAL_PII, is_view_matrix, matrix_source
+
 ROOT = Path(__file__).resolve().parents[1]
 FEED_DIR = Path("docs/contracts/site-feed/v1")
 FEED_PATH = FEED_DIR / "feed.json"
@@ -190,7 +193,9 @@ def release_section(manifest: dict, path: Path) -> tuple[dict, datetime]:
     return section, utc_instant(observed, f"{path}: release_evidence.observed_at")
 
 
-def support_section(matrix: dict, release_manifest: dict) -> tuple[dict, datetime]:
+def support_section(matrix: dict, release_manifest: dict, root: Path = ROOT) -> tuple[dict, datetime | None]:
+    if is_view_matrix(matrix):
+        return view_support_section(matrix, root)
     report = matrix.get("sourceReport")
     require(isinstance(report, dict), f"{MATRIX_PATH}: sourceReport is missing")
     revision = report.get("revision")
@@ -241,19 +246,40 @@ def support_section(matrix: dict, release_manifest: dict) -> tuple[dict, datetim
     return section, utc_instant(report.get("generatedAt"), f"{MATRIX_PATH}: sourceReport.generatedAt")
 
 
-def build_feed(root: Path = ROOT) -> dict:
+def view_support_section(matrix: dict, root: Path) -> tuple[dict, None]:
+    require(not matrix_schema_errors(matrix, root), f"{MATRIX_PATH}: canonical schema validation failed")
+    identity = matrix_source(matrix, root)
+    families = matrix.get("families")
+    require(isinstance(families, list) and families, f"{MATRIX_PATH}: families is empty")
+    distribution = {status: sum(row.get("status") == status for row in families) for status in STATUS_ORDER}
+    require(matrix.get("familyCount") == len(families) and matrix.get("distribution") == distribution,
+            f"{MATRIX_PATH}: canonical family counts disagree")
+    section = {"benchmarksRevision": identity["revision"], "generatedAt": None,
+               "measuredProductVersion": identity["productVersion"], "measuredProductRevision": None,
+               "gatedLatestRelease": False, "providerCount": matrix.get("providerCount"), "familyCount": len(families),
+               "distribution": distribution, "families": [{"provider": row.get("provider"), "family": row.get("family"),
+                   "name": row.get("familyName"), "status": row.get("status"), "evidenceTier": row.get("evidenceTier"),
+                   "qualificationProfile": row.get("qualificationProfile")} for row in families],
+               "source": {"kind": "qualification-view", "policyRevision": identity["policyRevision"],
+                          "populations": [{key: population[key] for key in ("population", "semanticDigest", "artifactDigest")}
+                                          for population in identity["populations"]]}}
+    return section, None
+
+
+def build_feed(root: Path = ROOT, version: int = 1) -> dict:
     release_path = latest_release_record(root)
     release_manifest = load_json(root, release_path)
-    matrix = load_json(root, MATRIX_PATH)
+    matrix_path = CURRENT_MATRIX if version == 2 else MATRIX_PATH
+    matrix = load_json(root, matrix_path)
     release, release_time = release_section(release_manifest, release_path)
-    support, support_time = support_section(matrix, release_manifest)
+    support, support_time = support_section(matrix, release_manifest, root)
     sources = [
         {"role": role, "path": path.as_posix(), "sha256": hashlib.sha256(read_bytes(root, path)).hexdigest()}
-        for role, path in (("release-manifest", release_path), ("support-matrix", MATRIX_PATH))
+        for role, path in (("release-manifest", release_path), ("support-matrix", matrix_path))
     ]
     return {
-        "schemaVersion": SCHEMA_VERSION,
-        "generatedAt": max(release_time, support_time).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "schemaVersion": f"redact-secret.site-feed/v{version}",
+        "generatedAt": max(t for t in (release_time, support_time) if t is not None).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "sources": sources,
         "release": release,
         "supportMatrix": support,
@@ -265,23 +291,29 @@ def render(feed: dict) -> str:
 
 
 def schema_errors(feed: dict, root: Path = ROOT) -> list[str]:
-    schema = load_json(root, SCHEMA_PATH)
+    version = 2 if feed.get("schemaVersion") == "redact-secret.site-feed/v2" else 1
+    schema_path = Path(f"docs/contracts/site-feed/v{version}/feed.schema.json")
+    schema = load_json(root, schema_path)
     errors = []
     if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
         errors.append(f"{SCHEMA_PATH}: $schema is not JSON Schema draft 2020-12")
-    if (schema.get("properties", {}).get("schemaVersion") or {}).get("const") != SCHEMA_VERSION:
-        errors.append(f"{SCHEMA_PATH}: schemaVersion const is not {SCHEMA_VERSION}")
+    if (schema.get("properties", {}).get("schemaVersion") or {}).get("const") != f"redact-secret.site-feed/v{version}":
+        errors.append(f"{schema_path}: schemaVersion disagrees with feed version")
+    support = feed.get("supportMatrix", {})
+    if support.get("generatedAt") is None and support.get("source", {}).get("kind") != "qualification-view":
+        errors.append("support.generatedAt may be null only for a qualification-view source")
     errors.extend(f"{FEED_PATH}: {error}" for error in _SCHEMA_SUPPORT.validate_schema(feed, schema, schema))
     return errors
 
 
-def check(root: Path = ROOT) -> list[str]:
+def check(root: Path = ROOT, version: int = 1) -> list[str]:
     try:
-        expected = render(build_feed(root))
+        expected = render(build_feed(root, version))
     except FeedError as error:
         return [str(error)]
     errors = schema_errors(json.loads(expected), root)
-    committed_path = root / FEED_PATH
+    feed_path = Path(f"docs/contracts/site-feed/v{version}/feed.json")
+    committed_path = root / feed_path
     if not committed_path.is_file():
         errors.append(f"{FEED_PATH}: missing; run `npm run site-feed:generate`")
     elif committed_path.read_text(encoding="utf-8") != expected:
@@ -293,26 +325,30 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n", 1)[0])
     parser.add_argument("--check", action="store_true", help="fail when the committed feed is stale or invalid")
     parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument("--version", type=int, choices=(1, 2), default=None, help="one contract; default generates/checks both once the canonical matrix is adopted")
     args = parser.parse_args(argv)
+    versions = [args.version] if args.version else ([1, 2] if (args.root / CURRENT_MATRIX).is_file() else [1])
     if args.check:
-        errors = check(args.root)
+        errors = [error for version in versions for error in check(args.root, version)]
         for error in errors:
             print(f"site-feed: {error}", file=sys.stderr)
         if not errors:
             print(f"site-feed: {FEED_PATH} is current and valid")
         return 1 if errors else 0
-    try:
-        feed = build_feed(args.root)
-    except FeedError as error:
-        print(f"site-feed: {error}", file=sys.stderr)
-        return 1
-    errors = schema_errors(feed, args.root)
-    if errors:
-        for error in errors:
+    for version in versions:
+        try:
+            feed = build_feed(args.root, version)
+        except (FeedError, ValueError) as error:
             print(f"site-feed: {error}", file=sys.stderr)
-        return 1
-    (args.root / FEED_PATH).write_text(render(feed), encoding="utf-8")
-    print(f"site-feed: wrote {FEED_PATH}")
+            return 1
+        errors = schema_errors(feed, args.root)
+        if errors:
+            for error in errors:
+                print(f"site-feed: {error}", file=sys.stderr)
+            return 1
+        feed_path = Path(f"docs/contracts/site-feed/v{version}/feed.json")
+        (args.root / feed_path).write_text(render(feed), encoding="utf-8")
+        print(f"site-feed: wrote {feed_path}")
     return 0
 
 

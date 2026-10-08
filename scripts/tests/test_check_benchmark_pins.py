@@ -339,7 +339,7 @@ class ManifestProvenanceTests(unittest.TestCase):
         share one drift rule, and `--sync` rewrites exactly those files."""
         self.assertEqual(
             [str(local) for local, _, _ in CHECK.VENDORED_FILES],
-            [str(CHECK.MANIFEST_PATH), str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH)],
+            [str(CHECK.MANIFEST_PATH), "benchmarks/support-matrix-from-view.json", "benchmarks/support-matrix-view-schema.json", str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH)],
         )
         drift = CHECK.check_vendored_file_drift(CHECK.MANIFEST_PATH, "a", "b", live_source="x")
         self.assertEqual(len(drift), 1)
@@ -347,6 +347,21 @@ class ManifestProvenanceTests(unittest.TestCase):
             CHECK.check_schema_drift("a", "b", live_source="x")[0].split(" has drifted")[0],
             str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH),
         )
+
+
+class HistoricalSnapshotTests(unittest.TestCase):
+    def test_retained_snapshot_is_exact_and_not_resynced_from_benchmarks(self):
+        root = SCRIPT.parents[1]
+        self.assertEqual(CHECK.check_historical_matrix(root), [])
+        self.assertNotIn(CHECK.HISTORICAL_MATRIX_PATH, [local for local, _, _ in CHECK.VENDORED_FILES])
+
+    def test_missing_or_changed_snapshot_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.assertTrue(CHECK.check_historical_matrix(root))
+            (root / "benchmarks").mkdir()
+            (root / CHECK.HISTORICAL_MATRIX_PATH).write_text("{}")
+            self.assertTrue(CHECK.check_historical_matrix(root))
 
 
 class SyncVendoredFilesTests(unittest.TestCase):
@@ -368,6 +383,8 @@ class SyncVendoredFilesTests(unittest.TestCase):
             written,
             [
                 (CHECK.MANIFEST_PATH, pinned),
+                (Path("benchmarks/support-matrix-from-view.json"), pinned),
+                (Path("benchmarks/support-matrix-view-schema.json"), pinned),
                 (CHECK.SUPPORT_MATRIX_SCHEMA_PATH, CHECK.BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF),
             ],
         )
@@ -375,6 +392,8 @@ class SyncVendoredFilesTests(unittest.TestCase):
             requested,
             [
                 (CHECK.BENCHMARKS_REPO, pinned, CHECK.BENCHMARKS_MANIFEST_PATH),
+                (CHECK.BENCHMARKS_REPO, pinned, "benchmarks/support-matrix-from-view.json"),
+                (CHECK.BENCHMARKS_REPO, pinned, "schemas/support-matrix-from-view-v1.json"),
                 (
                     CHECK.BENCHMARKS_REPO,
                     CHECK.BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF,

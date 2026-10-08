@@ -86,6 +86,7 @@ SUPPORTED = {
     "minItems",
     "maxItems",
     "minLength",
+    "if", "then", "else", "allOf", "anyOf", "oneOf", "definitions", "minProperties", "uniqueItems",
 }
 
 
@@ -95,10 +96,24 @@ def validate_schema(value, schema: dict, root: dict, path: str = "$") -> list[st
         return [f"{path}: schema uses unsupported keywords {sorted(unknown)}"]
     if "$ref" in schema:
         ref = schema["$ref"]
-        if not ref.startswith("#/$defs/"):
+        if not ref.startswith("#/"):
             return [f"{path}: unsupported $ref {ref}"]
-        return validate_schema(value, root["$defs"][ref.removeprefix("#/$defs/")], root, path)
+        target = root
+        for part in ref[2:].split("/"):
+            target = target[part.replace("~1", "/").replace("~0", "~")]
+        return validate_schema(value, target, root, path)
     errors: list[str] = []
+    for keyword in ("anyOf", "oneOf"):
+        if keyword in schema:
+            matches = sum(not validate_schema(value, option, root, path) for option in schema[keyword])
+            if matches == 0 or (keyword == "oneOf" and matches != 1):
+                errors.append(f"{path}: fails {keyword}")
+    for subschema in schema.get("allOf", []):
+        errors.extend(validate_schema(value, subschema, root, path))
+    if "if" in schema:
+        branch = "else" if validate_schema(value, schema["if"], root, path) else "then"
+        if branch in schema:
+            errors.extend(validate_schema(value, schema[branch], root, path))
     if "type" in schema:
         types = schema["type"] if isinstance(schema["type"], list) else [schema["type"]]
         if not any(TYPES[name](value) for name in types):
@@ -118,6 +133,8 @@ def validate_schema(value, schema: dict, root: dict, path: str = "$") -> list[st
         if "maximum" in schema and value > schema["maximum"]:
             errors.append(f"{path}: above {schema['maximum']}")
     if isinstance(value, list):
+        if schema.get("uniqueItems") and len({json.dumps(item, sort_keys=True) for item in value}) != len(value):
+            errors.append(f"{path}: items must be unique")
         if len(value) < schema.get("minItems", 0):
             errors.append(f"{path}: fewer than {schema['minItems']} items")
         if "maxItems" in schema and len(value) > schema["maxItems"]:
@@ -126,6 +143,8 @@ def validate_schema(value, schema: dict, root: dict, path: str = "$") -> list[st
             for index, item in enumerate(value):
                 errors.extend(validate_schema(item, schema["items"], root, f"{path}[{index}]"))
     if isinstance(value, dict):
+        if len(value) < schema.get("minProperties", 0):
+            errors.append(f"{path}: too few properties")
         for key in schema.get("required", []):
             if key not in value:
                 errors.append(f"{path}: missing {key}")
@@ -135,6 +154,8 @@ def validate_schema(value, schema: dict, root: dict, path: str = "$") -> list[st
                 errors.extend(validate_schema(item, properties[key], root, f"{path}.{key}"))
             elif schema.get("additionalProperties") is False:
                 errors.append(f"{path}: unexpected key {key}")
+            elif isinstance(schema.get("additionalProperties"), dict):
+                errors.extend(validate_schema(item, schema["additionalProperties"], root, f"{path}.{key}"))
     return errors
 
 

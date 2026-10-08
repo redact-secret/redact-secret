@@ -7,6 +7,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parents[1] / "generate-site-feed.py"
@@ -112,6 +113,33 @@ class SiteFeedTest(unittest.TestCase):
         self.addCleanup(self.fixture.close)
         self.fixture.write_release(manifest("0.1.0-beta.9", observed="2026-09-10"))
         self.fixture.write_release(manifest("0.1.0-beta.10"))
+
+    def test_v2_uses_canonical_identity_while_v1_keeps_historical_contract(self):
+        from test_support_matrix_source import canonical
+        historical = matrix()
+        native = canonical()
+        native.update({key: historical[key] for key in ("families", "familyCount", "providerCount", "distribution")})
+        (self.fixture.root / GEN.CURRENT_MATRIX).write_text(json.dumps(native))
+        (self.fixture.root / "benchmarks/pin-source.json").write_text(json.dumps({"benchmarkCommit": BENCH}))
+        directory = Path("docs/contracts/site-feed/v2")
+        (self.fixture.root / directory).mkdir(parents=True)
+        shutil.copyfile(ROOT / directory / "feed.schema.json", self.fixture.root / directory / "feed.schema.json")
+        with patch.object(GEN, "matrix_schema_errors", return_value=[]):
+            self.assertEqual(self.fixture.generate(), 0)
+            old = json.loads(self.fixture.feed_text())
+            new = json.loads((self.fixture.root / directory / "feed.json").read_text())
+            self.assertEqual(old["schemaVersion"], "redact-secret.site-feed/v1")
+            self.assertIsInstance(old["supportMatrix"]["generatedAt"], str)
+            self.assertNotIn("source", old["supportMatrix"])
+            self.assertEqual(old["sources"][1]["path"], GEN.HISTORICAL_PII.as_posix())
+            self.assertEqual(new["schemaVersion"], "redact-secret.site-feed/v2")
+            self.assertIsNone(new["supportMatrix"]["generatedAt"])
+            self.assertIsNone(new["supportMatrix"]["measuredProductRevision"])
+            self.assertFalse(new["supportMatrix"]["gatedLatestRelease"])
+            self.assertEqual(new["supportMatrix"]["source"]["kind"], "qualification-view")
+            self.assertEqual(new["generatedAt"], "2026-09-20T00:00:00Z")
+            self.assertEqual(GEN.check(self.fixture.root, 2), [])
+            self.assertTrue(GEN.schema_errors(new | {"schemaVersion": "redact-secret.site-feed/v1"}, self.fixture.root))
 
     def test_regeneration_without_input_change_is_byte_identical(self):
         self.assertEqual(self.fixture.generate(), 0)

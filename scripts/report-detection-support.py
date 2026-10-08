@@ -47,10 +47,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pii_current_qualification import current_qualification_errors, current_qualification_sentence
+from support_matrix_source import active_matrix_path, historical_pii_matrix, is_view_matrix, matrix_source, view_source_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 INVENTORY_PATH = ROOT / "docs" / "coverage" / "detector-inventory.json"
-MATRIX_PATH = ROOT / "benchmarks" / "support-matrix.json"
+MATRIX_PATH = active_matrix_path(ROOT)
 PIN_SOURCE_PATH = ROOT / "benchmarks" / "pin-source.json"
 PIN_MANIFEST_PATH = ROOT / "benchmarks" / "pin-manifest.json"
 ALLOWLIST_PATH = ROOT / "docs" / "coverage" / "detector-family-coverage-allowlist.json"
@@ -153,7 +154,8 @@ def build(source_revision: str) -> dict:
         raise ValueError("; ".join(errors))
     # The PII families are top-level `piiFamilies` of the pinned matrix (benchmarks 573e128),
     # never rows of `families`; a matrix that predates the key has none.
-    pii_matrix_status = {row["family"]: row["status"] for row in matrix.get("piiFamilies", [])}
+    historical = historical_pii_matrix(matrix)
+    pii_matrix_status = {row["family"]: row["status"] for row in historical.get("piiFamilies", [])}
     pii_matrix = sorted(pii_matrix_status)
     pii_rows = [
         {
@@ -165,21 +167,19 @@ def build(source_revision: str) -> dict:
         for family in pii_ids
     ]
 
-    report = matrix["sourceReport"]
-    product = report.get("product") or {}
-    published = report.get("publishedPackage") or {}
-    measured_commit = product.get("sourceCommit")
-    measured_version = product.get("declaredVersion") or published.get("version")
+    source = matrix_source(matrix)
+    measured_commit, measured_version = source["productRevision"], source["productVersion"]
     return {
         "sourceRevision": source_revision,
+        "matrixSource": source,
         "benchmarks": {
-            "matrixSourceReportRevision": report["revision"],
-            "matrixSourceReportDirty": report["dirty"],
+            "matrixSourceReportRevision": source["revision"],
+            "matrixSourceReportDirty": source["dirty"],
             "matrixMeasuredProductCommit": measured_commit,
             "matrixMeasuredProductVersion": measured_version,
-            "matrixFixtureCount": report["fixtureIndex"]["fixtureCount"],
-            "matrixFixtureIndexDigest": report["fixtureIndex"]["digest"],
-            "matrixTaxonomyDigest": report["taxonomyDigest"],
+            "matrixFixtureCount": source["fixtureCount"],
+            "matrixFixtureIndexDigest": source["fixtureDigest"],
+            "matrixTaxonomyDigest": source["taxonomyDigest"],
             "pinSourceBenchmarkCommit": pin_source["benchmarkCommit"],
             "pinManifestRevision": pin_manifest["revision"],
             "pinManifestRedactSecretRevision": pin_manifest["pins"]["redactSecretRevision"],
