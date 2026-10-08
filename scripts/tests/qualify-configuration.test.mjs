@@ -15,6 +15,8 @@ import {
   JOURNEYS,
   SYNTHETIC,
 } from "../lib/configuration-journeys.mjs";
+import { qualifyCustomRuntime } from "../lib/custom-runtime-probes.mjs";
+import { renderCustomRuntimeConsumer } from "../lib/custom-runtime-qualification.mjs";
 import { copyRedactWasm } from "../lib/esbuild-redact-wasm.mjs";
 import {
   checkAdapterSurface,
@@ -30,6 +32,97 @@ import {
 
 const repo = (path) => fileURLToPath(new URL(`../../${path}`, import.meta.url));
 const sha256 = (text, encoding = "hex") => createHash("sha256").update(text).digest(encoding);
+
+test("artifact inventory waits for and requires successful configuration qualification", () => {
+  const workflow = readFileSync(repo(".github/workflows/artifact-qualification.yml"), "utf8");
+  const inventory = workflow.slice(workflow.indexOf("\n  inventory:"));
+  const dependencies = inventory.slice(0, inventory.indexOf("\n    if:"));
+  assert.match(dependencies, /\n {6}- configuration(?:\n|$)/);
+  assert.match(inventory, /CONFIGURATION_RESULT: \$\{\{ needs\.configuration\.result \}\}/);
+  assert.match(inventory, /"\$CONFIGURATION_RESULT"; do\n\s+if \[\[ "\$result" != "success" \]\]/);
+});
+
+test("custom runtime qualification rejects wrong artifacts, ignored policies and lost partitions", async () => {
+  const finding = { detector: "synthetic", type: "synthetic", start: 0, end: 9, action: "redact", confidence: "high" };
+  const expected = {
+    manifest: { digest: "sha256:synthetic", artifact: { variant: "custom" } },
+    enabled: ["synthetic"],
+    probes: { provider: "SYNTHETIC", benign: "ordinary" },
+    scans: { provider: [["synthetic", "synthetic", 0, 9, "redact", "high"]], benign: [] },
+    limits: {},
+    excluded: "excluded",
+  };
+  const api = {
+    async initialize(options) {
+      if (options?.detection) throw Object.assign(new Error("fixed"), { code: "INVALID_DETECTION_CONFIG" });
+    },
+    artifactManifest: () => expected.manifest,
+    describeConfig: () => ({ detection: { enabled: expected.enabled } }),
+    status: () => ({ profile: "custom" }),
+    scan: (input) => (input === "SYNTHETIC" ? [finding] : []),
+    scanAndRedact: (input, options) => ({
+      text: options?.actionPolicy ? input : "<SECRET_1>",
+      findings: [{ ...finding, action: options?.actionPolicy ? "allow" : "redact" }],
+    }),
+    createIncrementalSanitizer: () => ({ append: () => ({ text: "" }), finalize: () => ({ text: "<SECRET_1>" }) }),
+    resolveConfig: (config) => {
+      if (config.detection) return { ok: false, diagnostics: { items: [{ code: "DETECTOR_NOT_INCLUDED" }] } };
+      if (Object.hasOwn(config, "closedTypes") && config.schema !== "runtime-config/v2") {
+        return { ok: false, diagnostics: { items: [{ code: "UNKNOWN_FIELD", severity: "error" }] } };
+      }
+      if (
+        Object.hasOwn(config, "closedTypes") &&
+        (!Array.isArray(config.closedTypes) || config.closedTypes.some((value) => typeof value !== "string"))
+      ) {
+        return { ok: false, diagnostics: { items: [{ code: "WRONG_TYPE", severity: "error" }] } };
+      }
+      if (config.closedTypes?.length) return { ok: true, diagnostics: { items: [] } };
+      return {
+        ok: config.schema === "runtime-config/v1",
+        diagnostics: {
+          items: [
+            {
+              code: config.closedDetectors ? "ACTION_POLICY_UNKNOWN_DETECTOR" : "ACTION_POLICY_UNKNOWN_TYPE",
+              severity: config.schema === "runtime-config/v1" ? "warning" : "error",
+            },
+          ],
+        },
+      };
+    },
+    compareConfigurations: () => ({ results: [{ status: "error" }, { status: "scanned" }] }),
+  };
+  const result = await qualifyCustomRuntime(api, expected);
+  assert.equal(result.partitions, 10);
+  assert.equal(result.checks.length, 6);
+  for (const [change, message] of [
+    [{ artifactManifest: () => ({ digest: "another" }) }, /manifest differs/],
+    [{ scan: () => [] }, /narrowed full oracle/],
+    [{ scanAndRedact: () => ({ text: "<SECRET_1>", findings: [finding] }) }, /ignored the declarative policy/],
+    [
+      { createIncrementalSanitizer: () => ({ append: () => ({ text: "" }), finalize: () => ({ text: "lost" }) }) },
+      /partition differs/,
+    ],
+    [{ resolveConfig: () => ({ ok: true }) }, /excluded detector/],
+    [{ initialize: async () => {} }, /capability ceiling/],
+    [
+      { compareConfigurations: () => ({ results: [{ status: "scanned" }, { status: "scanned" }] }) },
+      /comparison ignored/,
+    ],
+  ]) {
+    await assert.rejects(qualifyCustomRuntime({ ...api, ...change }, expected), message);
+  }
+});
+
+test("Workers custom consumer preinitializes compiled WASM through the generated glue", () => {
+  const source = renderCustomRuntimeConsumer({}, true);
+  assert(source.includes('import module from "./vendor/redact/redact_secret_wasm_custom_bg.wasm";'));
+  assert(source.includes("initSync({ module });"));
+  assert(source.indexOf("initSync({ module });") < source.indexOf("export default"));
+  assert(!source.includes("WebAssembly.compile"));
+  const browser = renderCustomRuntimeConsumer({});
+  assert(browser.includes("window.__customRuntimeResult = qualifyCustomRuntime(api, expected)"));
+  assert(!browser.includes("initSync"));
+});
 
 test("no secret input byte or hash may leave a journey, in any form a reader could recognise", () => {
   const secret = SYNTHETIC.github;
@@ -76,6 +169,7 @@ test("the manifest digest is recomputed outside the artifact by the fixture's ca
 test("every journey the driver can run exists, and each one is a function", () => {
   assert.deepEqual(JOURNEY_NAMES.slice().sort(), [
     "adapterSurface",
+    "closedVocabulary",
     "comparison",
     "diagnostics",
     "effective",

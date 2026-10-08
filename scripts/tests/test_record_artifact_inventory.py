@@ -918,5 +918,127 @@ class EdgeRuntimeQualificationTests(unittest.TestCase):
             self.assertTrue(self.validate(reports))
 
 
+class ConfigurationQualificationTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.scratch = tempfile.TemporaryDirectory()
+        self.addCleanup(self.scratch.cleanup)
+        self.artifacts = Path(self.scratch.name)
+        self.directory = self.artifacts / "configuration-journeys"
+        self.custom = self.directory / "configuration-custom-artifact"
+        self.custom.mkdir(parents=True)
+        names = ["index.js", "redact_secret_wasm_custom.js", "redact_secret_wasm_custom_bg.wasm"]
+        files = {}
+        for name in names:
+            path = self.custom / name
+            path.write_text(f"synthetic {name}", encoding="utf-8")
+            files[name] = RECORD.digest(path)
+        core_dir = self.directory / "candidate"
+        core_dir.mkdir()
+        core = core_dir / "redact-secret-core-test.tgz"
+        core.write_bytes(b"synthetic packed identity")
+        manifest_digest = "sha256:" + "1" * 64
+        composition = "custom:" + "2" * 64
+        self.manifest = {
+            "sourceRevision": SOURCE_COMMIT,
+            "version": PRODUCT_VERSION,
+            "artifact": {"variant": "custom"},
+            "digest": manifest_digest,
+            "composition": {"id": composition},
+        }
+        self.build = {
+            "engine": {"sourceRevision": SOURCE_COMMIT, "sourceTreeDirty": False},
+            "manifest": {"digest": manifest_digest},
+            "composition": {"id": composition},
+            "files": files,
+        }
+        runtime = {
+            "executed": True,
+            "checks": [
+                "exact manifest and enabled set",
+                "selected, excluded and benign oracle probes",
+                "redaction and declarative policy override",
+                "incremental partition equivalence",
+                "excluded detector capability ceiling",
+                "v1 open and v2 closed policy vocabulary preview",
+            ],
+            "partitions": 49,
+            "binarySha256": files[names[2]],
+            "manifestDigest": manifest_digest,
+            "compositionId": composition,
+        }
+        self.report = {
+            "schema": "configuration-qualification/v1",
+            "sourceCommit": SOURCE_COMMIT,
+            "productVersion": PRODUCT_VERSION,
+            "published": False,
+            "packages": [
+                {
+                    "name": "@redact-secret/core",
+                    "version": PRODUCT_VERSION,
+                    "file": core.name,
+                    "sha256": RECORD.digest(core),
+                }
+            ],
+            "rows": [
+                {
+                    "id": "wasm/custom",
+                    "binary": {"file": names[2], "sha256": files[names[2]]},
+                    "exact": {"packagedManifestDigest": manifest_digest, "compositionId": composition},
+                }
+            ],
+            "customRuntimes": {
+                "chromium": dict(runtime, runtime="chromium"),
+                "workerd": dict(runtime, runtime="cloudflare-workers"),
+            },
+        }
+        strict = {"closedVocabulary": {"cases": 9, "ownerUnchanged": True, "comparison": True}}
+        self.report["rows"][0]["checks"] = strict
+        self.report["rows"].extend(
+            {"id": row_id, "checks": strict}
+            for row_id in ("node-addon/full", "node-addon/common", "wasm/full", "wasm/common")
+        )
+
+    def collect(self) -> tuple[dict, list[str]]:
+        for path, document in (
+            (self.directory / "configuration-journeys.json", self.report),
+            (self.custom / "build-report.json", self.build),
+            (self.custom / "artifact-manifest.custom.json", self.manifest),
+        ):
+            path.write_text(json.dumps(document), encoding="utf-8")
+        return RECORD.collect_configuration_qualification(self.artifacts, SOURCE_COMMIT, PRODUCT_VERSION)
+
+    def test_runtime_receipts_bind_the_exact_downloadable_files_and_candidate(self) -> None:
+        record, errors = self.collect()
+        self.assertEqual(errors, [])
+        self.assertEqual(record["sourceCommit"], SOURCE_COMMIT)
+        self.assertEqual(len(record["files"]), 3)
+        self.assertEqual(record["corePackage"]["sha256"], self.report["packages"][0]["sha256"])
+        self.assertEqual(record["reportSha256"], RECORD.digest(self.directory / "configuration-journeys.json"))
+
+    def test_wrong_source_dirty_build_and_missing_runtime_checks_fail(self) -> None:
+        original = json.dumps(self.report)
+        for key, value in (("executed", False), ("checks", []), ("binarySha256", "f" * 64), ("partitions", 0)):
+            self.report = json.loads(original)
+            self.report["customRuntimes"]["workerd"][key] = value
+            self.assertTrue(self.collect()[1], key)
+        self.report = json.loads(original)
+        self.build["engine"]["sourceTreeDirty"] = True
+        self.assertTrue(self.collect()[1])
+        self.build["engine"]["sourceTreeDirty"] = False
+        self.manifest["sourceRevision"] = "b" * 40
+        self.assertTrue(self.collect()[1])
+
+    def test_changed_executable_bytes_and_core_tarball_fail(self) -> None:
+        (self.custom / "index.js").write_text("changed", encoding="utf-8")
+        self.assertTrue(self.collect()[1])
+        (self.directory / "candidate" / self.report["packages"][0]["file"]).write_bytes(b"changed")
+        self.assertTrue(self.collect()[1])
+
+    def test_malformed_nested_evidence_returns_errors(self) -> None:
+        for value in (None, [], {"workerd": None}, {"chromium": {}, "workerd": {}}):
+            self.report["customRuntimes"] = value
+            self.assertTrue(self.collect()[1])
+
+
 if __name__ == "__main__":
     unittest.main()

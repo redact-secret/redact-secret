@@ -172,14 +172,13 @@ export interface InitializeOptions {
 }
 
 /**
- * What a caller asks for, as data (`runtime-config/v1`). Every key is
+ * What a caller asks for, as versioned runtime-config data. Every v1 key is
  * optional and an absent key inherits the artifact default; an explicit empty
  * value disables; an array or a policy document replaces and is never merged
  * with another layer. A callback is not data: pass it as
  * {@link ResolveConfigOptions.policy}.
  */
-export interface RuntimeConfig {
-  readonly schema?: "runtime-config/v1";
+interface RuntimeConfigData {
   readonly detection?: DetectionSelection;
   /** PII selectors, as for {@link InitializeOptions.pii}. Absent and `[]` are both off. */
   readonly pii?: readonly string[];
@@ -190,6 +189,26 @@ export interface RuntimeConfig {
   /** Whole-input limits; each field inherits the artifact default independently. */
   readonly limits?: { readonly maxInputBytes?: number; readonly maxFindings?: number };
 }
+
+/**
+ * Version 2 explicitly declares additional names for a closed policy vocabulary.
+ * An absent list preserves open-vocabulary warnings; `[]` closes it with no
+ * additional names. Artifact-declared types and known detector ids remain valid.
+ * This validates a preview, it does not enforce a policy on subsequent scans.
+ */
+export type RuntimeConfig = RuntimeConfigData &
+  (
+    | {
+        readonly schema?: "runtime-config/v1";
+        readonly closedTypes?: never;
+        readonly closedDetectors?: never;
+      }
+    | {
+        readonly schema: "runtime-config/v2";
+        readonly closedTypes?: readonly string[];
+        readonly closedDetectors?: readonly string[];
+      }
+  );
 
 /** Options of `resolveConfig` that are not configuration data. */
 export interface ResolveConfigOptions {

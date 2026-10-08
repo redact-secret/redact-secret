@@ -174,6 +174,23 @@ describe("resolveConfig", () => {
     expect(call?.disclose).toBe(false);
   });
 
+  it("forwards an explicitly tagged closed vocabulary unchanged to the shared resolver", async () => {
+    const double = recorded();
+    const runtime = await initialized(double);
+    double.resolveCalls.length = 0;
+    runtime.resolveConfig({
+      schema: "runtime-config/v2",
+      closedTypes: [],
+      closedDetectors: ["synthetic-detector"],
+    });
+    expect(double.resolveCalls).toHaveLength(1);
+    expect(JSON.parse(double.resolveCalls[0]?.config ?? "null")).toEqual({
+      schema: "runtime-config/v2",
+      closedTypes: [],
+      closedDetectors: ["synthetic-detector"],
+    });
+  });
+
   it("passes text and bytes through unchanged and records a callback without calling it", async () => {
     const double = recorded();
     const runtime = await initialized(double);

@@ -235,9 +235,18 @@ are warnings (`ACTION_POLICY_UNKNOWN_TYPE`, `ACTION_POLICY_UNKNOWN_DETECTOR`,
 `ACTION_POLICY_RULE_ON_NOT_INCLUDED_DETECTOR`, `ACTION_POLICY_SHADOWED_RULE`);
 a callback, or a name a ruleset or PII selection could emit, is `info`
 `ACTION_POLICY_ANALYSIS_UNCERTAIN`. A diagnostic's `id` is a catalog detector id
-or a rule id, and `related` points at the earlier rule of a shadow. Rust alone
-offers the closed vocabulary (`ConfigRequest::closed_types`, `closed_detectors`:
-an unknown name is then an error) and `SampleRuleHits`.
+or a rule id, and `related` points at the earlier rule of a shadow. A declared
+closed vocabulary makes an unknown name an error. Rust offers
+`ConfigRequest::closed_types` and `closed_detectors`; JavaScript uses
+`{ schema: "runtime-config/v2", closedTypes?, closedDetectors? }` in `resolveConfig`.
+Each list is an array of strings: absent retains open diagnostics, `[]` permits
+no additional names, and a supplied list adds caller-declared names to those
+recognized from the artifact and supplied ruleset. Neither list registers a
+detector or changes a scan. A v1 or untagged document rejects these fields;
+malformed arrays produce `WRONG_TYPE` without echoing their contents. Version 2
+retains the 262,144-byte document limit and the 256-item diagnostic limit.
+Passing both a JSON list and the corresponding Rust builder list is
+`INVALID_OPTIONS`. `SampleRuleHits` remains Rust-only.
 
 | Surface | Name |
 | --- | --- |

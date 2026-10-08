@@ -41,7 +41,7 @@
  *
  *     node scripts/qualify-configuration.mjs --candidate-dir <dir>
  *       (--custom-dir <dir> | --build-custom) [--cli-binary <path>] [--python <path>]
- *       [--require-unsupported] [--report <path>]
+ *       [--custom-out-dir <path>] [--require-unsupported] [--report <path>]
  *
  * It prints one summary line and writes the JSON report. The report is evidence for a
  * reviewer, not a published claim: no size or speed follows from it.
@@ -71,6 +71,7 @@ import {
   verifyNpmInstall,
 } from "./lib/candidate-install.mjs";
 import { canonicalDigest, EMAIL_INPUT, PII_ALL, PROBES, SYNTHETIC } from "./lib/configuration-journeys.mjs";
+import { qualifyCustomRuntimes } from "./lib/custom-runtime-qualification.mjs";
 import { copyRedactWasm } from "./lib/esbuild-redact-wasm.mjs";
 
 const LABEL = "configuration";
@@ -92,7 +93,9 @@ function parseArgs(argv) {
     const key = argv[index];
     if (key === "--require-unsupported") options.requireUnsupported = true;
     else if (key === "--build-custom") options.buildCustom = true;
-    else if (["--candidate-dir", "--custom-dir", "--cli-binary", "--python", "--report"].includes(key)) {
+    else if (
+      ["--candidate-dir", "--custom-dir", "--custom-out-dir", "--cli-binary", "--python", "--report"].includes(key)
+    ) {
       const value = argv[index + 1];
       if (value === undefined) throw new Error(`missing value for ${key}`);
       options[key.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = resolve(value);
@@ -102,7 +105,7 @@ function parseArgs(argv) {
   if (options.candidateDir === undefined || (options.customDir === undefined) === !options.buildCustom) {
     throw new Error(
       "usage: qualify-configuration.mjs --candidate-dir <dir> (--custom-dir <dir> | --build-custom) " +
-        "[--cli-binary <path>] [--python <path>] [--require-unsupported] [--report <path>]",
+        "[--custom-out-dir <path>] [--cli-binary <path>] [--python <path>] [--require-unsupported] [--report <path>]",
     );
   }
   return options;
@@ -646,6 +649,8 @@ async function qualifyRow(row, installed, report) {
     entry.checks.pii = "off; on is PII_SELECTOR_UNAVAILABLE (rejections)";
   }
   checkDiagnostics(row, await runJourney(row, "diagnostics"));
+  entry.checks.closedVocabulary = await runJourney(row, "closedVocabulary");
+  equal(entry.checks.closedVocabulary, { cases: 9, ownerUnchanged: true, comparison: true });
   checkRulesets(await runJourney(row, "rulesets"));
   checkAdapterSurface(row, await runJourney(row, "adapterSurface"));
   Object.assign(entry.checks, {
@@ -975,6 +980,12 @@ async function main() {
       customRow: custom,
       standard: rows[0].manifest,
     });
+    report.customRuntimes = await qualifyCustomRuntimes({ project, row: custom });
+    report.bundlers["custom-browser"].executed = true;
+    if (options.customOutDir !== undefined) {
+      fail(!existsSync(options.customOutDir), "custom output directory already exists");
+      cpSync(customDir, options.customOutDir, { recursive: true });
+    }
     report.quickstart = await qualifyQuickstart(project, env);
 
     if (options.report !== undefined) writeFileSync(options.report, `${JSON.stringify(report, null, 2)}\n`);

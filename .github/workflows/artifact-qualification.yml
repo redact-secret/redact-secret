@@ -152,7 +152,7 @@ jobs:
                   pr=true
                   break
                   ;;
-                scripts/qualify-configuration.mjs|scripts/lib/configuration-journeys.mjs|scripts/lib/configuration-worker.mjs|scripts/lib/esbuild-redact-wasm.mjs)
+                scripts/qualify-configuration.mjs|scripts/lib/configuration-journeys.mjs|scripts/lib/configuration-worker.mjs|scripts/lib/esbuild-redact-wasm.mjs|scripts/lib/custom-runtime-probes.mjs|scripts/lib/custom-runtime-qualification.mjs)
                   pr=true
                   break
                   ;;
@@ -1224,61 +1224,68 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: node-addon-x86_64-unknown-linux-gnu
-          path: candidate-inputs/addon
+          path: target/configuration-qualification/inputs/addon
 
       - name: Download the qualified wasm-bindgen build
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: wasm-web
-          path: candidate-inputs/wasm-web
+          path: target/configuration-qualification/inputs/wasm-web
 
       - name: Download the qualified common wasm-bindgen build
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: wasm-web-common
-          path: candidate-inputs/wasm-web-common
+          path: target/configuration-qualification/inputs/wasm-web-common
 
       - name: Download this host's CLI binary
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cli-x86_64-unknown-linux-gnu
-          path: candidate-inputs/cli
+          path: target/configuration-qualification/inputs/cli
 
       - name: Download this host's wheel
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: python-wheel-x86_64-unknown-linux-gnu
-          path: candidate-inputs/wheel
+          path: target/configuration-qualification/inputs/wheel
 
       - name: Pack the npm candidate
         run: |
           node scripts/pack-npm-candidate.mjs \
-            --addon-dir candidate-inputs/addon \
-            --wasm-dir candidate-inputs/wasm-web \
-            --wasm-common-dir candidate-inputs/wasm-web-common \
-            --out-dir candidate
+            --addon-dir target/configuration-qualification/inputs/addon \
+            --wasm-dir target/configuration-qualification/inputs/wasm-web \
+            --wasm-common-dir target/configuration-qualification/inputs/wasm-web-common \
+            --out-dir target/configuration-qualification/candidate
 
       - name: Install the wheel into a throwaway environment
         run: |
           python3 -m venv "$RUNNER_TEMP/wheel-env"
-          "$RUNNER_TEMP/wheel-env/bin/pip" install --no-index --find-links candidate-inputs/wheel redact-secret
-          chmod +x candidate-inputs/cli/redact-secret
+          "$RUNNER_TEMP/wheel-env/bin/pip" install --no-index --find-links target/configuration-qualification/inputs/wheel redact-secret
+          chmod +x target/configuration-qualification/inputs/cli/redact-secret
+
+      - name: Install Chromium for the custom artifact consumer
+        run: npx playwright install --with-deps chromium
 
       - name: Run the configuration journeys against the installed candidate
         run: |
           node scripts/qualify-configuration.mjs \
-            --candidate-dir candidate \
+            --candidate-dir target/configuration-qualification/candidate \
             --build-custom \
-            --cli-binary candidate-inputs/cli/redact-secret \
+            --custom-out-dir target/configuration-qualification/configuration-custom-artifact \
+            --cli-binary target/configuration-qualification/inputs/cli/redact-secret \
             --python "$RUNNER_TEMP/wheel-env/bin/python" \
             --require-unsupported \
-            --report configuration-journeys.json
+            --report target/configuration-qualification/configuration-journeys.json
 
       - name: Upload configuration qualification evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: configuration-journeys
-          path: configuration-journeys.json
+          path: |
+            target/configuration-qualification/configuration-journeys.json
+            target/configuration-qualification/configuration-custom-artifact/
+            target/configuration-qualification/candidate/redact-secret-core-*.tgz
           if-no-files-found: error
           retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
@@ -1299,6 +1306,7 @@ jobs:
       - package-consumer-wasm-runtimes
       - clean-install
       - golden-path
+      - configuration
     if: always()
     permissions:
       contents: read
@@ -1344,6 +1352,7 @@ jobs:
           WASM_RUNTIMES_RESULT: ${{ needs.package-consumer-wasm-runtimes.result }}
           CLEAN_INSTALL_RESULT: ${{ needs.clean-install.result }}
           GOLDEN_PATH_RESULT: ${{ needs.golden-path.result }}
+          CONFIGURATION_RESULT: ${{ needs.configuration.result }}
         run: |
           for result in \
             "$POLICY_RESULT" \
@@ -1356,7 +1365,8 @@ jobs:
             "$BROWSER_CONSUMER_RESULT" \
             "$WASM_RUNTIMES_RESULT" \
             "$CLEAN_INSTALL_RESULT" \
-            "$GOLDEN_PATH_RESULT"; do
+            "$GOLDEN_PATH_RESULT" \
+            "$CONFIGURATION_RESULT"; do
             if [[ "$result" != "success" ]]; then
               echo "Artifact inventory cannot pass because an upstream job finished with '$result'." >&2
               exit 1
