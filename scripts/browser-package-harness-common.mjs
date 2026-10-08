@@ -10,16 +10,8 @@
  * Everything else lives in `./browser-package-harness-core.mjs`, shared with
  * the `full` profile.
  *
- * Deliberately does NOT import `@redact-secret/core/web-stream`:
- * `packages/javascript/src/adapters/web-stream.ts` imports `runtime` from
- * `../session.js` at module scope, unconditionally — the `full` runtime —
- * so merely importing anything from that module would pull `full`'s
- * WebAssembly artifact loader into this bundle, defeating the point of
- * qualifying `common` on its own. `browser-package-harness-core.mjs` skips
- * every stream-adapter check when `WebStreamSanitizer` is omitted, so this
- * is a real, recorded coverage gap (the `common` package page cannot qualify
- * the stream adapters at all today), not a workaround that silently drops
- * coverage — see the issue #382 evidence record.
+ * The common stream subpath opens the same common runtime, so these checks
+ * also qualify its public factory without importing the full artifact.
  */
 
 import {
@@ -33,6 +25,7 @@ import {
   scanAndRedact,
   VERSION,
 } from "@redact-secret/core/common";
+import { createWebStreamSanitizer, WebStreamSanitizer } from "@redact-secret/core/common/web-stream";
 
 import { qualify as qualifyCore } from "./browser-package-harness-core.mjs";
 
@@ -47,4 +40,6 @@ export const qualify = (fixtures) =>
     redact,
     scan,
     scanAndRedact,
+    createWebStreamSanitizer,
+    WebStreamSanitizer,
   });

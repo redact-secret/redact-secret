@@ -920,10 +920,19 @@ export type IncrementalLimits = (InputLimitInBytes | InputLimitInCodeUnits) &
   (MultilineLimitInBytes | MultilineLimitInCodeUnits);
 
 /**
+ * Options for a session with built-in detectors and explicit retention limits.
+ *
  * Does not extend {@link RedactOptions}: that interface's `limits` is a
  * whole-input {@link WholeInputLimits}, a different shape from this
  * interface's own required incremental `limits`, so the two field
  * declarations would collide under one property name.
+ *
+ * @remarks
+ * A `ruleset` key is unsupported: own and inherited keys, including keys with
+ * value `undefined`, synchronously throw `INVALID_OPTIONS` after initialization.
+ * Validation does not read its value or invoke its getter. Structural typing
+ * can allow extra keys on variables; construct dedicated incremental options.
+ * Whole-input rulesets and incremental `actionPolicy` remain supported.
  */
 export interface IncrementalSanitizerOptions {
   readonly limits: IncrementalLimits;

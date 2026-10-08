@@ -176,6 +176,13 @@ and one fixed message.
 
 ## Load a ruleset on each surface
 
+Incremental sessions do not support rulesets. JavaScript rejects an own or
+inherited `ruleset` key even when its value is `undefined`. Callers migrating
+from beta.14 should follow the
+[dedicated incremental options or bounded whole-input examples](streaming.md#migrating-shared-options-from-beta14).
+If custom detection is required, removing the key loses that protection;
+independent whole-input scans of chunks can miss secrets crossing boundaries.
+
 - **Rust:** `redact_secret::load_ruleset(bytes) -> Result<Vec<Box<dyn Detector>>, RulesetError>`,
   registered the same way a native custom detector is:
   `DetectorRegistry::with_built_in(detectors)`.

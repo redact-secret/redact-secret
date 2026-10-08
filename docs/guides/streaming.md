@@ -58,33 +58,172 @@ const final = session.finalize();
 const safeText = first.text + second.text + final.text;
 ```
 
+### Migrating shared options from beta.14
+
+Released beta.14 silently ignored incremental `ruleset` options. The unreleased
+validation fix rejects the **presence of the key**, including own or inherited
+`ruleset: undefined`, without reading its value or calling its getter. After
+initialization the fixed error is `INVALID_OPTIONS`; before initialization it
+is `NOT_INITIALIZED`. This applies to Node/browser and full/common sessions.
+Whole-input rulesets and incremental `actionPolicy` remain supported.
+
+Under the accepted [contract-1 compatibility classification](../decisions/2026-10-02-define-the-0-1-x-stable-public-contract-and-its-compatibility-classes.md),
+rejecting this unsupported request alone does not mandate `0.2.0`. It still
+changes these beta.14 runtime call shapes. The first shipped release will be
+identified in CHANGELOG when a release version is approved.
+
+TypeScript can reject an extra key in a direct object literal but accept the
+same extra key on a variable through structural typing. If custom detection is
+not required, construct dedicated incremental options from supported fields,
+rather than spreading a whole-input options object:
+
+```ts
+import { createIncrementalSanitizer, initialize, typedPlaceholderFormatter } from "@redact-secret/core";
+import type { IncrementalSanitizerOptions } from "@redact-secret/core";
+
+await initialize();
+const sharedOptions = {
+  limits: {
+    maxInputBytes: 32_768,
+    maxBufferedBytes: 16_512,
+    maxTokenBytes: 8_192,
+    maxMultilineBytes: 16_384,
+  },
+  actionPolicy: JSON.stringify({ actionPolicyRevision: 1, base: "default", rules: [] }),
+  ruleset: undefined,
+};
+// Passing sharedOptions directly would compile, then throw INVALID_OPTIONS.
+const incrementalOptions: IncrementalSanitizerOptions = {
+  limits: sharedOptions.limits,
+  actionPolicy: sharedOptions.actionPolicy,
+  placeholderFormatter: typedPlaceholderFormatter,
+};
+const session = createIncrementalSanitizer(incrementalOptions);
+const safeText = session.append("ordinary text").text + session.finalize().text;
+```
+
+An incremental `policy` callback is another supported choice, but is mutually
+exclusive with `actionPolicy`; select one. The formatter is independent of
+that choice. Copy only options supported by the destination session, whose
+policy callback context differs from whole-input policy context.
+
+If custom detection is required, do not remove the ruleset to make the call
+succeed. Collect one logical input within an application-enforced byte bound
+and use whole-input processing. Bound collection before allocating or appending
+another chunk; the check below also bounds processing of an already collected
+string. Reject overflow without forwarding the original input. A ruleset
+finding has medium confidence and warns by default, so explicitly select
+redaction for its type:
+
+```ts
+import { initialize, scanAndRedact } from "@redact-secret/core";
+
+await initialize();
+const input = "TOKEN=ACME_" + "a".repeat(20); // synthetic
+const maxInputBytes = 32_768;
+if (new TextEncoder().encode(input).byteLength > maxInputBytes) {
+  throw new Error("Input exceeds the whole-input bound");
+}
+const ruleset = `ruleset-revision: 1
+
+detector: acme-internal-token
+specificity: contextual
+prefix: "ACME_"
+alphabet: alnum-dash
+run: at-least 20
+validator: none
+`;
+const result = scanAndRedact(input, {
+  ruleset,
+  actionPolicy: JSON.stringify({
+    actionPolicyRevision: 1,
+    base: "default",
+    rules: [{ id: "redact-acme", match: { type: ["acme-internal-token"] }, action: "redact" }],
+  }),
+});
+const safeText = result.text;
+```
+
+Use the ruleset grammar in the [rulesets guide](rulesets.md). Calling
+whole-input detection separately for each chunk is not an equivalent fallback:
+a secret crossing a chunk boundary can be missed.
+
+### Catch creation and execution errors
+
+All four public factories (`node-stream`, `web-stream`,
+`common/node-stream`, `common/web-stream`) can throw synchronously while creating
+the session, before returning a stream or consuming input. A trailing
+`pipeline(source, createNodeStreamSanitizer(options), sink).catch(...)` cannot
+catch that factory error, because the call happens before `pipeline` returns.
+Put creation and awaited execution in one `try`/`catch`. Limit, decoding,
+callback, cancellation, and upstream errors can also occur during execution;
+commit output only after success when all-or-nothing processing is required.
+The Node examples stream sanitized output to stdout, where a later failure can
+leave an incomplete prefix; check the exit status before accepting it.
+Log fixed codes or a fixed message, never arbitrary error text that might
+contain input.
+
 For byte streams, use the runtime adapter rather than decoding each chunk.
 The adapters own one fatal, stateful UTF-8 decoder, so a multibyte character
 may cross byte chunks without replacement or leakage:
 
 ```ts
 import { pipeline } from "node:stream/promises";
-import { initialize } from "@redact-secret/core";
+import { initialize, SecretScanError } from "@redact-secret/core";
 import { createNodeStreamSanitizer } from "@redact-secret/core/node-stream";
 
-await initialize();
-await pipeline(
-  process.stdin,
-  createNodeStreamSanitizer({
+try {
+  await initialize();
+  const sanitizer = createNodeStreamSanitizer({
     limits: {
       maxInputBytes: 32_768,
       maxBufferedBytes: 16_512,
       maxTokenBytes: 8_192,
       maxMultilineBytes: 16_384,
     },
-  }),
-  process.stdout,
-);
+  });
+  await pipeline(process.stdin, sanitizer, process.stdout);
+} catch (error) {
+  console.error(error instanceof SecretScanError ? error.code : "Stream sanitization failed");
+  process.exitCode = 1;
+}
 ```
 
-Browser code uses `createWebStreamSanitizer` from
-`@redact-secret/core/web-stream` with `source.pipeThrough(transform)`; the
-package README contains the complete typed example. Repository tests
+Browser code uses the same creation-and-execution boundary:
+
+```ts
+import { initialize, SecretScanError } from "@redact-secret/core";
+import { createWebStreamSanitizer } from "@redact-secret/core/web-stream";
+
+const source = new ReadableStream<Uint8Array>({
+  start(controller) {
+    controller.enqueue(new TextEncoder().encode("ordinary text"));
+    controller.close();
+  },
+});
+const chunks: string[] = [];
+const sink = new WritableStream<string>({
+  write(chunk) { chunks.push(chunk); },
+});
+try {
+  await initialize();
+  const sanitizer = createWebStreamSanitizer({
+    limits: {
+      maxInputBytes: 32_768,
+      maxBufferedBytes: 16_512,
+      maxTokenBytes: 8_192,
+      maxMultilineBytes: 16_384,
+    },
+  });
+  await source.pipeThrough(sanitizer).pipeTo(sink);
+  // Commit chunks only after this awaited completion succeeds.
+} catch (error) {
+  chunks.length = 0;
+  console.error(error instanceof SecretScanError ? error.code : "Stream sanitization failed");
+}
+```
+
+Repository tests
 type-check those Markdown examples, and artifact qualification executes the
 same public incremental and stream calls from clean candidate-package installs
 on Node.js 20, 22, and 24 and in Chromium, Firefox, and WebKit.
@@ -102,22 +241,24 @@ WebAssembly build:
 
 ```ts
 import { pipeline } from "node:stream/promises";
-import { initialize } from "@redact-secret/core/common";
+import { initialize, SecretScanError } from "@redact-secret/core/common";
 import { createNodeStreamSanitizer } from "@redact-secret/core/common/node-stream";
 
-await initialize();
-await pipeline(
-  process.stdin,
-  createNodeStreamSanitizer({
+try {
+  await initialize();
+  const sanitizer = createNodeStreamSanitizer({
     limits: {
       maxInputBytes: 32_768,
       maxBufferedBytes: 16_512,
       maxTokenBytes: 8_192,
       maxMultilineBytes: 16_384,
     },
-  }),
-  process.stdout,
-);
+  });
+  await pipeline(process.stdin, sanitizer, process.stdout);
+} catch (error) {
+  console.error(error instanceof SecretScanError ? error.code : "Stream sanitization failed");
+  process.exitCode = 1;
+}
 ```
 
 The browser equivalent imports `createWebStreamSanitizer` from

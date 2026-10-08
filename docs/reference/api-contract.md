@@ -457,6 +457,18 @@ removed. Naming both spellings of one limit with different values is
 `INVALID_LIMITS`. Sessions accept no custom detector and no ruleset, on any
 surface.
 
+For JavaScript Node and browser artifacts, in both `full` and `common`, a
+`ruleset` key on incremental options is rejected by presence, including an
+inherited key or a value of `undefined`, without reading its value or invoking
+its getter. After initialization this raises the fixed, input-free
+`INVALID_OPTIONS` synchronously before session allocation or input processing.
+Before initialization, `NOT_INITIALIZED` takes precedence. The four public
+Node/Web stream factories forward these options and raise the same error
+during the factory call, before returning a stream. Whole-input rulesets and
+incremental `actionPolicy` remain supported. TypeScript structural typing can
+accept variables with extra keys; see the
+[beta.14 migration and stream error examples](../guides/streaming.md#migrating-shared-options-from-beta14).
+
 **Detector profiles and PII.** `full` is the default and the authoritative
 baseline; `common` is a smaller structural/contextual subset for preventive
 use and by design reports fewer findings. Python and the CLI expose `full`

@@ -515,24 +515,162 @@ describe("detection is never a per-call argument", () => {
     expect(double.binding.calls).toEqual(before);
   });
 
-  it("rejects a ruleset on an incremental session instead of ignoring it", async () => {
-    const double = recorded();
-    const runtime = await initialized(double);
-    const before = [...double.binding.calls];
-    const limits = { maxInputBytes: 1024, maxBufferedBytes: 384, maxTokenBytes: 128, maxMultilineBytes: 256 };
-    for (const ruleset of ["ruleset-revision: 1\n", undefined, new Uint8Array(0)]) {
-      expect(() => runtime.createIncrementalSanitizer({ limits, ruleset } as never)).toThrowError(
-        expect.objectContaining({ code: "INVALID_OPTIONS" }),
-      );
-    }
-    expect(double.binding.calls).toEqual(before);
-  });
-
   it("leaves a call without the key exactly as before", async () => {
     const double = recorded();
     const runtime = await initialized(double);
     expect(runtime.scan("SYNTHETIC_REVOKED_VALUE", {})).toEqual([]);
     expect(runtime.scan("SYNTHETIC_REVOKED_VALUE")).toEqual([]);
     expect(runtime.scanAndRedact("SYNTHETIC_REVOKED_VALUE", {}).text).toBe("<SECRET_1>");
+  });
+});
+
+describe.each(["full", "common"] as const)("incremental ruleset boundary (%s)", (profile) => {
+  const limits = { maxInputBytes: 1024, maxBufferedBytes: 384, maxTokenBytes: 128, maxMultilineBytes: 256 };
+  const marker = "SYNTHETIC-RULESET-CONTENT";
+  const values = [
+    ["text", marker],
+    ["empty text", ""],
+    ["bytes", new TextEncoder().encode(marker)],
+    ["empty bytes", new Uint8Array(0)],
+    ["undefined", undefined],
+    ["null", null],
+  ] as const;
+
+  it.each(values)("rejects own and inherited %s without allocating or invoking callbacks", async (_label, ruleset) => {
+    const binding = createFakeBinding({ profile });
+    const runtime = createRedactSecretRuntime(async () => binding, profile);
+    await runtime.initialize();
+    let callbacks = 0;
+    const supported = {
+      limits,
+      policy: {
+        evaluate: () => {
+          callbacks += 1;
+          return "redact" as const;
+        },
+      },
+      placeholderFormatter: () => {
+        callbacks += 1;
+        return "<REDACTED>";
+      },
+    };
+    for (const options of [{ ...supported, ruleset }, Object.assign(Object.create({ ruleset }), supported)]) {
+      let thrown: unknown;
+      try {
+        runtime.createIncrementalSanitizer(options);
+      } catch (error) {
+        thrown = error;
+      }
+      expect(thrown).toBeInstanceOf(SecretScanError);
+      expect((thrown as SecretScanError).code).toBe("INVALID_OPTIONS");
+      expect((thrown as Error).message).not.toContain(marker);
+      expect(JSON.stringify(thrown)).not.toContain(marker);
+    }
+    expect(callbacks).toBe(0);
+    expect(binding.calls).toEqual(["initialize"]);
+    expect(binding.lastIncrementalOptions).toBeUndefined();
+  });
+
+  it("rejects deep, non-enumerable and class prototype keys", async () => {
+    const binding = createFakeBinding({ profile });
+    const runtime = createRedactSecretRuntime(async () => binding, profile);
+    await runtime.initialize();
+    class Options {
+      limits = limits;
+    }
+    Object.defineProperty(Options.prototype, "ruleset", { value: undefined });
+    const options = [
+      Object.assign(Object.create(Object.create({ ruleset: null })), { limits }),
+      Object.defineProperty({ limits }, "ruleset", { value: marker }),
+      Object.assign(Object.create(Object.defineProperty({}, "ruleset", { value: marker })), { limits }),
+      new Options(),
+    ];
+    for (const value of options) {
+      expect(() => runtime.createIncrementalSanitizer(value)).toThrowError(
+        expect.objectContaining({ code: "INVALID_OPTIONS" }),
+      );
+    }
+    expect(binding.calls).toEqual(["initialize"]);
+  });
+
+  it("never reads own, inherited or class getters, including other options", async () => {
+    const binding = createFakeBinding({ profile });
+    const runtime = createRedactSecretRuntime(async () => binding, profile);
+    await runtime.initialize();
+    let reads = 0;
+    const getter = () => {
+      reads += 1;
+      throw new Error(marker);
+    };
+    class Options {
+      get ruleset() {
+        return getter();
+      }
+    }
+    const options = [
+      Object.defineProperty({}, "ruleset", { get: getter }),
+      Object.create(Object.defineProperty({}, "ruleset", { get: getter })),
+      new Options(),
+    ];
+    for (const value of options) {
+      for (const key of ["limits", "policy", "placeholderFormatter", "actionPolicy"]) {
+        Object.defineProperty(value, key, { get: getter });
+      }
+      expect(() => runtime.createIncrementalSanitizer(value)).toThrowError(
+        expect.objectContaining({ code: "INVALID_OPTIONS" }),
+      );
+    }
+    expect(reads).toBe(0);
+    expect(binding.calls).toEqual(["initialize"]);
+  });
+
+  it("preserves NOT_INITIALIZED before inspecting a ruleset key or loading a binding", () => {
+    const binding = createFakeBinding({ profile });
+    let loads = 0,
+      reads = 0;
+    const runtime = createRedactSecretRuntime(async () => {
+      loads += 1;
+      return binding;
+    }, profile);
+    const prototype = Object.defineProperty({}, "ruleset", {
+      get: () => {
+        reads += 1;
+        throw new Error(marker);
+      },
+    });
+    for (const options of [{ limits, ruleset: undefined }, Object.assign(Object.create(prototype), { limits })]) {
+      expect(() => runtime.createIncrementalSanitizer(options)).toThrowError(
+        expect.objectContaining({ code: "NOT_INITIALIZED" }),
+      );
+    }
+    expect(loads).toBe(0);
+    expect(reads).toBe(0);
+    expect(binding.calls).toEqual([]);
+  });
+
+  it("accepts absent keys and inherited supported options without a plain-object restriction", async () => {
+    const binding = createFakeBinding({ profile });
+    const runtime = createRedactSecretRuntime(async () => binding, profile);
+    await runtime.initialize();
+    const actionPolicy = JSON.stringify({ actionPolicyRevision: 1, base: "default", rules: [] });
+    class Options {
+      get limits() {
+        return limits;
+      }
+      get actionPolicy() {
+        return actionPolicy;
+      }
+    }
+    for (const options of [
+      { limits },
+      Object.assign(Object.create({ limits, actionPolicy }), { ignored: true }),
+      new Options(),
+    ]) {
+      const session = runtime.createIncrementalSanitizer(options);
+      expect(session.append("synthetic control").text).toBe("synthetic control");
+      session.finalize();
+    }
+    expect(binding.calls.filter((call) => call.startsWith("createIncrementalSanitizer:"))).toHaveLength(3);
+    expect(new TextDecoder().decode(binding.lastIncrementalOptions?.actionPolicy)).toBe(actionPolicy);
   });
 });
