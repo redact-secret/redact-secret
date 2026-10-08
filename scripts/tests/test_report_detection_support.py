@@ -4,8 +4,8 @@ import copy
 import importlib.util
 import sys
 import unittest
-from unittest.mock import patch
 from pathlib import Path
+from unittest.mock import patch
 
 SCRIPT = Path(__file__).resolve().parents[1] / "report-detection-support.py"
 SPEC = importlib.util.spec_from_file_location("report_detection_support", SCRIPT)
@@ -64,15 +64,45 @@ class ReportInvariantTests(unittest.TestCase):
 
 
 class PublishedSourceTests(unittest.TestCase):
+    def test_native_view_markdown_uses_recorded_population_identity(self):
+        from test_support_matrix_source import canonical
+
+        original_load = REPORT.load
+
+        def load(path):
+            value = original_load(path)
+            if path == REPORT.MATRIX_PATH:
+                native = canonical()
+                native.update({key: value[key] for key in ("providerCount", "familyCount", "distribution", "families")})
+                return native
+            return value
+
+        with patch.object(REPORT, "load", load):
+            result = REPORT.build(REVISION)
+        rendered = REPORT.markdown(result)
+        self.assertIn("Canonical qualification view", rendered)
+        self.assertIn("policy-corpus", rendered)
+        self.assertIn("no measurement timestamp or product source commit", rendered)
+        self.assertNotIn("None fixtures", rendered)
+        self.assertIsNone(result["benchmarks"]["matrixMeasuredProductCommit"])
+
     def test_published_identity_does_not_invent_a_source_commit(self):
         original_load = REPORT.load
+
         def load(path):
             value = original_load(path)
             if path == REPORT.MATRIX_PATH:
                 value = copy.deepcopy(value)
-                value["sourceReport"]["product"] = None
-                value["sourceReport"]["publishedPackage"] = {"packageName": "@redact-secret/core", "version": "0.1.0-beta.synthetic"}
+                package = {"packageName": "@redact-secret/core", "version": "0.1.0-beta.synthetic"}
+                if value.get("schema") == "redact-secret/support-matrix-from-view/v1":
+                    value["source"]["publishedPackage"] = package
+                    for population in value["source"]["populations"]:
+                        population["scannerVersions"]["redact-secret"] = package["version"]
+                else:
+                    value["sourceReport"]["product"] = None
+                    value["sourceReport"]["publishedPackage"] = package
             return value
+
         with patch.object(REPORT, "load", load):
             result = REPORT.build(REVISION)
         self.assertIsNone(result["benchmarks"]["matrixMeasuredProductCommit"])

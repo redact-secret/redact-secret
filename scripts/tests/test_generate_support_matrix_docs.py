@@ -900,8 +900,13 @@ class UserFacingReasonTests(unittest.TestCase):
 
 class PublishedIdentityTests(unittest.TestCase):
     def test_published_package_identity_omits_unrecorded_commit(self):
-        sample = {"sourceReport": {"revision": "a" * 40, "product": None,
-                  "publishedPackage": {"packageName": "@redact-secret/core", "version": "0.1.0-beta.synthetic"}}}
+        sample = {
+            "sourceReport": {
+                "revision": "a" * 40,
+                "product": None,
+                "publishedPackage": {"packageName": "@redact-secret/core", "version": "0.1.0-beta.synthetic"},
+            }
+        }
         text = GEN.identity_sentence(sample)
         self.assertIn("@redact-secret/core@0.1.0-beta.synthetic", text)
         self.assertIn("source commit not recorded", text)

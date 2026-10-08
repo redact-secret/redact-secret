@@ -43,7 +43,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pii_current_qualification import current_qualification_errors, current_qualification_sentence
-from support_matrix_source import active_matrix_path, historical_pii_matrix, is_view_matrix, matrix_source, view_source_errors
+from support_matrix_source import (
+    active_matrix_path,
+    historical_pii_matrix,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 BINDING = ROOT / "docs" / "coverage" / "pii-family-status.json"

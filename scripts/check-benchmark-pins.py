@@ -529,7 +529,11 @@ def check_historical_matrix(root: Path) -> list[str]:
         actual = hashlib.sha256((root / HISTORICAL_MATRIX_PATH).read_bytes()).hexdigest()
     except OSError:
         return ["retained historical support matrix is missing"]
-    return [] if actual == HISTORICAL_MATRIX_SHA256 else ["historical support matrix differs from its retained immutable core snapshot"]
+    return (
+        []
+        if actual == HISTORICAL_MATRIX_SHA256
+        else ["historical support matrix differs from its retained immutable core snapshot"]
+    )
 
 
 def main(argv: list[str] | None = None) -> int:

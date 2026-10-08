@@ -339,7 +339,12 @@ class ManifestProvenanceTests(unittest.TestCase):
         share one drift rule, and `--sync` rewrites exactly those files."""
         self.assertEqual(
             [str(local) for local, _, _ in CHECK.VENDORED_FILES],
-            [str(CHECK.MANIFEST_PATH), "benchmarks/support-matrix-from-view.json", "benchmarks/support-matrix-view-schema.json", str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH)],
+            [
+                str(CHECK.MANIFEST_PATH),
+                "benchmarks/support-matrix-from-view.json",
+                "benchmarks/support-matrix-view-schema.json",
+                str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH),
+            ],
         )
         drift = CHECK.check_vendored_file_drift(CHECK.MANIFEST_PATH, "a", "b", live_source="x")
         self.assertEqual(len(drift), 1)

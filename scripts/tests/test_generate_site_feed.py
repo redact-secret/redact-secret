@@ -7,8 +7,8 @@ import shutil
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
 from pathlib import Path
+from unittest.mock import patch
 
 SCRIPT = Path(__file__).resolve().parents[1] / "generate-site-feed.py"
 SPEC = importlib.util.spec_from_file_location("generate_site_feed", SCRIPT)
@@ -116,6 +116,7 @@ class SiteFeedTest(unittest.TestCase):
 
     def test_v2_uses_canonical_identity_while_v1_keeps_historical_contract(self):
         from test_support_matrix_source import canonical
+
         historical = matrix()
         native = canonical()
         native.update({key: historical[key] for key in ("families", "familyCount", "providerCount", "distribution")})
@@ -131,7 +132,7 @@ class SiteFeedTest(unittest.TestCase):
             self.assertEqual(old["schemaVersion"], "redact-secret.site-feed/v1")
             self.assertIsInstance(old["supportMatrix"]["generatedAt"], str)
             self.assertNotIn("source", old["supportMatrix"])
-            self.assertEqual(old["sources"][1]["path"], GEN.HISTORICAL_PII.as_posix())
+            self.assertEqual(old["sources"][1]["path"], GEN.MATRIX_PATH.as_posix())
             self.assertEqual(new["schemaVersion"], "redact-secret.site-feed/v2")
             self.assertIsNone(new["supportMatrix"]["generatedAt"])
             self.assertIsNone(new["supportMatrix"]["measuredProductRevision"])

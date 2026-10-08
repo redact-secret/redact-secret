@@ -54,7 +54,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pii_current_qualification import current_qualification_errors, current_qualification_sentence
-from support_matrix_source import active_matrix_path, matrix_schema_errors, historical_pii_matrix, is_view_matrix, matrix_source, view_source_errors
+from support_matrix_source import (
+    active_matrix_path,
+    historical_pii_matrix,
+    is_view_matrix,
+    matrix_schema_errors,
+    matrix_source,
+    view_source_errors,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 MATRIX_PATH = active_matrix_path(ROOT)
@@ -473,7 +480,9 @@ def render_matrix_markdown(
 ) -> str:
     families = matrix["families"]
     revision = matrix_source(matrix)["revision"]
-    matrix_path = "benchmarks/support-matrix-from-view.json" if is_view_matrix(matrix) else "benchmarks/support-matrix.json"
+    matrix_path = (
+        "benchmarks/support-matrix-from-view.json" if is_view_matrix(matrix) else "benchmarks/support-matrix.json"
+    )
     lines = [
         "# Support matrix",
         "",
@@ -641,11 +650,17 @@ def _identity_lines(matrix: dict, pins: dict | None) -> list[str]:
     first produced the statuses."""
     if is_view_matrix(matrix):
         source = matrix_source(matrix)
-        lines = ["Identity of the counts above:", "", f"- Pinned benchmarks revision: `{source['revision']}`.",
-                 f"- Canonical policy revision: `{source['policyRevision']}`.",
-                 f"- Released npm product version: `{source['productVersion']}`; product source commit and measurement timestamp are not recorded."]
-        lines.extend(f"- {population['population']}: semantic `{population['semanticDigest']}`, artifact `{population['artifactDigest']}`."
-                     for population in source["populations"])
+        lines = [
+            "Identity of the counts above:",
+            "",
+            f"- Pinned benchmarks revision: `{source['revision']}`.",
+            f"- Canonical policy revision: `{source['policyRevision']}`.",
+            f"- Released npm product version: `{source['productVersion']}`; product source commit and measurement timestamp are not recorded.",
+        ]
+        lines.extend(
+            f"- {population['population']}: semantic `{population['semanticDigest']}`, artifact `{population['artifactDigest']}`."
+            for population in source["populations"]
+        )
         return [*lines, ""]
     report = matrix["sourceReport"]
     lines = [
@@ -677,12 +692,15 @@ def identity_sentence(matrix: dict, detector_count: int | None = None, unmeasure
     part the matrix does not record is omitted rather than invented."""
     if is_view_matrix(matrix):
         source = matrix_source(matrix)
-        return ("Counts are credential families and statuses, not detectors. "
-                f"Canonical public qualification view, released npm package `@redact-secret/core@{source['productVersion']}`, "
-                f"pinned benchmarks revision `{source['revision']}` and policy `{source['policyRevision']}`. "
-                "Product source commit and measurement timestamp are not recorded; these statuses do not qualify later source. "
-                + current_qualification_sentence(matrix.get("piiCurrentQualification")) + " "
-                "The historical Beta.11 PII disposition is separate from credential counts and the current-target section.")
+        return (
+            "Counts are credential families and statuses, not detectors. "
+            f"Canonical public qualification view, released npm package `@redact-secret/core@{source['productVersion']}`, "
+            f"pinned benchmarks revision `{source['revision']}` and policy `{source['policyRevision']}`. "
+            "Product source commit and measurement timestamp are not recorded; these statuses do not qualify later source. "
+            + current_qualification_sentence(matrix.get("piiCurrentQualification"))
+            + " "
+            "The historical Beta.11 PII disposition is separate from credential counts and the current-target section."
+        )
     report = matrix["sourceReport"]
     parts = [
         "Counts are families and statuses, not detectors: a family is one provider x credential-family "

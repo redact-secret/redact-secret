@@ -86,7 +86,15 @@ SUPPORTED = {
     "minItems",
     "maxItems",
     "minLength",
-    "if", "then", "else", "allOf", "anyOf", "oneOf", "definitions", "minProperties", "uniqueItems",
+    "if",
+    "then",
+    "else",
+    "allOf",
+    "anyOf",
+    "oneOf",
+    "definitions",
+    "minProperties",
+    "uniqueItems",
 }
 
 

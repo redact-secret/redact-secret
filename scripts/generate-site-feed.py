@@ -42,7 +42,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from support_matrix_source import matrix_schema_errors, CURRENT_MATRIX, HISTORICAL_PII, is_view_matrix, matrix_source
+from support_matrix_source import CURRENT_MATRIX, is_view_matrix, matrix_schema_errors, matrix_source
 
 ROOT = Path(__file__).resolve().parents[1]
 FEED_DIR = Path("docs/contracts/site-feed/v1")
@@ -252,17 +252,39 @@ def view_support_section(matrix: dict, root: Path) -> tuple[dict, None]:
     families = matrix.get("families")
     require(isinstance(families, list) and families, f"{MATRIX_PATH}: families is empty")
     distribution = {status: sum(row.get("status") == status for row in families) for status in STATUS_ORDER}
-    require(matrix.get("familyCount") == len(families) and matrix.get("distribution") == distribution,
-            f"{MATRIX_PATH}: canonical family counts disagree")
-    section = {"benchmarksRevision": identity["revision"], "generatedAt": None,
-               "measuredProductVersion": identity["productVersion"], "measuredProductRevision": None,
-               "gatedLatestRelease": False, "providerCount": matrix.get("providerCount"), "familyCount": len(families),
-               "distribution": distribution, "families": [{"provider": row.get("provider"), "family": row.get("family"),
-                   "name": row.get("familyName"), "status": row.get("status"), "evidenceTier": row.get("evidenceTier"),
-                   "qualificationProfile": row.get("qualificationProfile")} for row in families],
-               "source": {"kind": "qualification-view", "policyRevision": identity["policyRevision"],
-                          "populations": [{key: population[key] for key in ("population", "semanticDigest", "artifactDigest")}
-                                          for population in identity["populations"]]}}
+    require(
+        matrix.get("familyCount") == len(families) and matrix.get("distribution") == distribution,
+        f"{MATRIX_PATH}: canonical family counts disagree",
+    )
+    section = {
+        "benchmarksRevision": identity["revision"],
+        "generatedAt": None,
+        "measuredProductVersion": identity["productVersion"],
+        "measuredProductRevision": None,
+        "gatedLatestRelease": False,
+        "providerCount": matrix.get("providerCount"),
+        "familyCount": len(families),
+        "distribution": distribution,
+        "families": [
+            {
+                "provider": row.get("provider"),
+                "family": row.get("family"),
+                "name": row.get("familyName"),
+                "status": row.get("status"),
+                "evidenceTier": row.get("evidenceTier"),
+                "qualificationProfile": row.get("qualificationProfile"),
+            }
+            for row in families
+        ],
+        "source": {
+            "kind": "qualification-view",
+            "policyRevision": identity["policyRevision"],
+            "populations": [
+                {key: population[key] for key in ("population", "semanticDigest", "artifactDigest")}
+                for population in identity["populations"]
+            ],
+        },
+    }
     return section, None
 
 
@@ -325,7 +347,13 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n", 1)[0])
     parser.add_argument("--check", action="store_true", help="fail when the committed feed is stale or invalid")
     parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--version", type=int, choices=(1, 2), default=None, help="one contract; default generates/checks both once the canonical matrix is adopted")
+    parser.add_argument(
+        "--version",
+        type=int,
+        choices=(1, 2),
+        default=None,
+        help="one contract; default generates/checks both once the canonical matrix is adopted",
+    )
     args = parser.parse_args(argv)
     versions = [args.version] if args.version else ([1, 2] if (args.root / CURRENT_MATRIX).is_file() else [1])
     if args.check:
