@@ -178,6 +178,18 @@ evidence is linked from each published version.
   documentation publishes (T1). Keys created before the cutoff carry no prefix
   and stay unclaimed; the visible key prefix and any other length or separator
   are not keys.
+- `curl` credential argument (#1247,
+  `decision-read-the-curl-user-password-argument-as-a-contextual-secret`): the
+  password of a `curl -u`, `-U`, `--user` or `--proxy-user` argument (the text after
+  the first colon, as written) is a `contextual_secret` at high confidence, always
+  redacted, in `full` and `common`, with or without `--digest`; the user, an email,
+  Zendesk's `/token` and Atlas's public key stay unclaimed. It reads one `curl` command
+  (up to `;`, `&`, `|`, a newline without a backslash continuation, or 8,192 bytes), so
+  `docker run -u 1000:1000` is not read. References, masks, placeholders and
+  `password`-style documentation literals are silent; a weak real value such as `admin`
+  is redacted. The curl config file, argument arrays, an unterminated quote and a
+  password over 4,096 bytes stay false negatives. No new finding type or interface; a
+  command continued with a backslash is held by the incremental session until it ends.
 
 ### Fixed
 

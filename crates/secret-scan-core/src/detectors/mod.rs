@@ -32,6 +32,7 @@ mod confluent;
 mod connection_string;
 mod convex;
 mod crates_io;
+mod curl_user;
 mod databricks;
 mod datadog;
 mod daytona;
@@ -118,6 +119,9 @@ pub(crate) use prefilter::{LiteralMatcher, RequiredLiterals, ScanScope};
 pub(crate) use aws::{carries_aws_access_key_id, has_open_aws_secret_candidate_line_in};
 pub(crate) use bearer_token::has_open_bearer_authorization;
 pub(crate) use confluent::has_open_confluent_properties_in;
+#[cfg(test)]
+pub(crate) use curl_user::candidate_count as curl_user_candidate_count;
+pub(crate) use curl_user::has_open_curl_command;
 pub(crate) use generic_token::{
     RULESET_NAMES_DETECTOR_ID, generic_token_ruleset_names_detector,
     has_open_contextual_assignment, is_reserved_name, normalize_name,

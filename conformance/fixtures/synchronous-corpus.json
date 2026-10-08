@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 4278,
+  "fixtureCount": 4361,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -96581,6 +96581,1471 @@
       "resource": {
         "maxInputBytes": 12000,
         "maxFindings": 0,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "curl-user-positive-short-flag",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 12,
+          "end": 38
+        }
+      ],
+      "note": "Issue #1247: the password of a -u argument is the contextual secret; the user stays unclaimed."
+    },
+    {
+      "id": "curl-user-positive-upper-flag",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -U svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 12,
+          "end": 38
+        }
+      ],
+      "note": "Issue #1247: -U is the proxy user spelling and reads the same password."
+    },
+    {
+      "id": "curl-user-positive-long-flag",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --user svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 16,
+          "end": 42
+        }
+      ],
+      "note": "Issue #1247: --user takes the next word as user:password."
+    },
+    {
+      "id": "curl-user-positive-long-equals",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --user=svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 16,
+          "end": 42
+        }
+      ],
+      "note": "Issue #1247: --user=ARG attaches the argument."
+    },
+    {
+      "id": "curl-user-positive-proxy-user",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --proxy-user svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 22,
+          "end": 48
+        }
+      ],
+      "note": "Issue #1247: --proxy-user reads the same password."
+    },
+    {
+      "id": "curl-user-positive-attached-short",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -usvc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 11,
+          "end": 37
+        }
+      ],
+      "note": "Issue #1247: -uARG attaches the argument to the short option."
+    },
+    {
+      "id": "curl-user-positive-cluster",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -sSfLku svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 17,
+          "end": 43
+        }
+      ],
+      "note": "Issue #1247: -u may close a cluster of argument-less short options."
+    },
+    {
+      "id": "curl-user-positive-flag-after-url",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl https://api.example.test/v1/items -X GET -H 'Accept: a/b' -u svc:SyntheticRevokedCurlPw0001\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 70,
+          "end": 96
+        }
+      ],
+      "note": "Issue #1247: options after the URL belong to the same command."
+    },
+    {
+      "id": "curl-user-positive-empty-user",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u :SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 35
+        }
+      ],
+      "note": "Issue #1247: an empty user name still sends the password."
+    },
+    {
+      "id": "curl-user-positive-digest-before",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --digest -u pub:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 21,
+          "end": 47
+        }
+      ],
+      "note": "Issue #1247: --digest changes the wire scheme, not the argument; the public part stays unclaimed."
+    },
+    {
+      "id": "curl-user-positive-single-quoted",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u 'svc:SyntheticRevokedCurlPw0001' https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 13,
+          "end": 39
+        }
+      ],
+      "note": "Issue #1247: single quotes group the argument; the span excludes them."
+    },
+    {
+      "id": "curl-user-positive-double-quoted",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u \"svc:SyntheticRevokedCurlPw0001\" https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 13,
+          "end": 39
+        }
+      ],
+      "note": "Issue #1247: double quotes group the argument; the span excludes them."
+    },
+    {
+      "id": "curl-user-positive-quote-after-colon",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:\"SyntheticRevokedCurlPw0001\" https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 13,
+          "end": 39
+        }
+      ],
+      "note": "Issue #1247: a quote opened right after the colon is read inside the quotes."
+    },
+    {
+      "id": "curl-user-positive-quoted-space",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u \"svc:SyntheticRevokedCurlPw0001 SyntheticRevokedCurlPw0002\" https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 13,
+          "end": 66
+        }
+      ],
+      "note": "Issue #1247: inside quotes a space is a password byte."
+    },
+    {
+      "id": "curl-user-positive-quoted-other-quote",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u 'svc:SyntheticRevokedCurlPw0001\"SyntheticRevokedCurlPw0002' https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 13,
+          "end": 66
+        }
+      ],
+      "note": "Issue #1247: a double quote inside single quotes is a password byte."
+    },
+    {
+      "id": "curl-user-positive-unquoted-escapes",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:!SyntheticRevokedCurlPw0001\\$SyntheticRevokedCurlPw0002\\! https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 12,
+          "end": 69
+        }
+      ],
+      "note": "Issue #1247: a backslash escapes the next byte and stays in the span as written."
+    },
+    {
+      "id": "curl-user-positive-colon-at-percent",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:SyntheticRevokedCurlPw0001:SyntheticRevokedCurlPw0002@x%zz/y https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 12,
+          "end": 72
+        }
+      ],
+      "note": "Issue #1247: only the first colon splits; later colons, @, % and / are password bytes."
+    },
+    {
+      "id": "curl-user-positive-long-equals-quoted",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --user=\"svc:SyntheticRevokedCurlPw0001\" https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 17,
+          "end": 43
+        }
+      ],
+      "note": "Issue #1247: --user=\"ARG\" reads inside the quotes."
+    },
+    {
+      "id": "curl-user-positive-path-qualified",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "/usr/bin/curl -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 21,
+          "end": 47
+        }
+      ],
+      "note": "Issue #1247: a path-qualified curl word is curl."
+    },
+    {
+      "id": "curl-user-positive-exe-crlf",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl.exe -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\r\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 16,
+          "end": 42
+        }
+      ],
+      "note": "Issue #1247: curl.exe is curl; CRLF ends the command."
+    },
+    {
+      "id": "curl-user-positive-wrapper-sudo",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "sudo curl -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 17,
+          "end": 43
+        }
+      ],
+      "note": "Issue #1247: a wrapper word before curl changes nothing."
+    },
+    {
+      "id": "curl-user-positive-bash-c",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "bash -c \"curl -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\"\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 21,
+          "end": 47
+        }
+      ],
+      "note": "Issue #1247: the inner command line is read as written."
+    },
+    {
+      "id": "curl-user-positive-substitution",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "BODY=$(curl -s -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items)\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 22,
+          "end": 48
+        }
+      ],
+      "note": "Issue #1247: curl inside $( ) is curl; the argument ends at whitespace."
+    },
+    {
+      "id": "curl-user-positive-substitution-paren",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "X=$(curl -s -u svc:SyntheticRevokedCurlPw0001)\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 19,
+          "end": 46
+        }
+      ],
+      "note": "Issue #1247: an unquoted ) is a password byte: the span may include the closing parenthesis (accepted over-redaction)."
+    },
+    {
+      "id": "curl-user-positive-make-recipe",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "fetch:\n\t@curl -sS -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 25,
+          "end": 51
+        }
+      ],
+      "note": "Issue #1247: the @ that silences a Makefile recipe line may precede the command word."
+    },
+    {
+      "id": "curl-user-positive-two-commands",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u a:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items && curl --user b:SyntheticRevokedCurlPw0002 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 10,
+          "end": 36
+        },
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 88,
+          "end": 114
+        }
+      ],
+      "note": "Issue #1247: each curl command carries its own credential argument."
+    },
+    {
+      "id": "curl-user-positive-pipe-after",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -sS -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items | jq .items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 16,
+          "end": 42
+        }
+      ],
+      "note": "Issue #1247: the pipe ends the window after the argument."
+    },
+    {
+      "id": "curl-user-positive-continuation-lf",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -X GET \\\n  -H 'Accept: a/b' \\\n  -u svc:SyntheticRevokedCurlPw0001 \\\n  https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 44,
+          "end": 70
+        }
+      ],
+      "note": "Issue #1247: a backslash-newline continues the command line."
+    },
+    {
+      "id": "curl-user-positive-continuation-crlf",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -X GET \\\r\n  -u svc:SyntheticRevokedCurlPw0001 \\\r\n  https://api.example.test/v1/items\r\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 24,
+          "end": 50
+        }
+      ],
+      "note": "Issue #1247: backslash-CRLF continues the command line."
+    },
+    {
+      "id": "curl-user-positive-continuation-before-flag",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl \\\n-u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 14,
+          "end": 40
+        }
+      ],
+      "note": "Issue #1247: the option may start the continued line."
+    },
+    {
+      "id": "curl-user-positive-multibyte-before",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "# \uc11c\ube44\uc2a4 \ud638\ucd9c\ncurl -u \uc0ac\uc6a9\uc790:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 37,
+          "end": 63
+        }
+      ],
+      "note": "Issue #1247: UTF-8 byte offsets stay exact after multibyte text before the span."
+    },
+    {
+      "id": "curl-user-positive-weak-literal",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:admin https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 12,
+          "end": 17
+        }
+      ],
+      "note": "Issue #1247: a weak but real-shaped literal is the password slot and is redacted (accepted documentation false positive)."
+    },
+    {
+      "id": "curl-user-positive-zendesk-email-token",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl https://api.example.test/v1/items -u agent@example.test/token:SyntheticRevokedCurlPw0001\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 67,
+          "end": 93
+        }
+      ],
+      "note": "Issue #1247: the Zendesk token is the password after /token:; the literal /token: reading and this reader make one finding."
+    },
+    {
+      "id": "curl-user-positive-atlas-digest",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --user \"pub:SyntheticRevokedCurlPw0001\" --digest \\\n  --header \"Accept: a/b\" \\\n  --request GET https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 17,
+          "end": 43
+        }
+      ],
+      "note": "Issue #1247: the Atlas private key is the password; --digest and the continuation do not change the reading."
+    },
+    {
+      "id": "curl-user-positive-markdown-prompt",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "```sh\n$ curl -sS -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n```\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 24,
+          "end": 50
+        }
+      ],
+      "note": "Issue #1247: a documentation prompt line is the same command text."
+    },
+    {
+      "id": "curl-user-positive-yaml-run",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "steps:\n  - run: 'curl -sS -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items'\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 33,
+          "end": 59
+        }
+      ],
+      "note": "Issue #1247: a YAML run string is the same command text."
+    },
+    {
+      "id": "curl-user-overlap-flag-and-url-userinfo",
+      "detector": "generic-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:SyntheticRevokedCurlPw0001 https://other:SyntheticRevokedCurlPw0002@api.example.test/v1\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 12,
+          "end": 38
+        },
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 53,
+          "end": 79
+        }
+      ],
+      "note": "Issue #1247: the flag password and the URL userinfo password are each claimed once, with no overlap."
+    },
+    {
+      "id": "curl-user-negative-user-only",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: no colon: curl prompts for the password."
+    },
+    {
+      "id": "curl-user-negative-empty-password",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc: https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a colon with an empty remainder is an empty password."
+    },
+    {
+      "id": "curl-user-negative-negotiate-colon",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --negotiate -u : https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: the Kerberos idiom -u : carries no secret."
+    },
+    {
+      "id": "curl-user-negative-quoted-empty",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u 'svc:' https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a quoted empty password."
+    },
+    {
+      "id": "curl-user-negative-separate-colon-word",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc : https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: the colon is a separate word, not part of the argument."
+    },
+    {
+      "id": "curl-user-negative-user-equals-only",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --user=svc https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: no colon in the attached argument."
+    },
+    {
+      "id": "curl-user-negative-netrc",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --netrc https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: credentials come from ~/.netrc."
+    },
+    {
+      "id": "curl-user-negative-digest-alone",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --digest https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a scheme option alone carries no credential."
+    },
+    {
+      "id": "curl-user-negative-user-agent",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --user-agent \"svc/1.0:build\" https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: --user-agent is not --user."
+    },
+    {
+      "id": "curl-user-negative-short-user-agent",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -A \"svc/1.0:build\" https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: -A is --user-agent."
+    },
+    {
+      "id": "curl-user-boundary-abbreviated-long-option",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl --us svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a long-option abbreviation is not read (stated false negative)."
+    },
+    {
+      "id": "curl-user-negative-docker-uid",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "docker run --rm -u 1000:1000 alpine:3.20 id\n",
+      "expected": [],
+      "note": "Issue #1247: docker -u is user[:group]."
+    },
+    {
+      "id": "curl-user-negative-sudo-user",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "sudo -u postgres psql -c 'select 1'\n",
+      "expected": [],
+      "note": "Issue #1247: sudo -u runs as a user."
+    },
+    {
+      "id": "curl-user-negative-git-upstream",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "git push -u origin main\n",
+      "expected": [],
+      "note": "Issue #1247: git -u is --set-upstream."
+    },
+    {
+      "id": "curl-user-negative-image-name",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "docker run -u 1000:1000 curlimages/curl:8.10.1 --version\n",
+      "expected": [],
+      "note": "Issue #1247: the image name contains curl, but the -u belongs to docker."
+    },
+    {
+      "id": "curl-user-negative-after-semicolon",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -sS https://api.example.test/v1/items; docker run -u 1000:1000 alpine:3.20 id\n",
+      "expected": [],
+      "note": "Issue #1247: a semicolon ends the curl command."
+    },
+    {
+      "id": "curl-user-negative-after-and",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -sS https://api.example.test/v1/items && sudo -u postgres psql\n",
+      "expected": [],
+      "note": "Issue #1247: && ends the curl command."
+    },
+    {
+      "id": "curl-user-negative-after-pipe",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -sS https://api.example.test/v1/items | docker run -i -u 1000:1000 alpine:3.20 cat\n",
+      "expected": [],
+      "note": "Issue #1247: a pipe ends the curl command."
+    },
+    {
+      "id": "curl-user-negative-next-line",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -sS https://api.example.test/v1/items\ndocker run -u 1000:1000 alpine:3.20 id\n",
+      "expected": [],
+      "note": "Issue #1247: a newline without a continuation ends the command."
+    },
+    {
+      "id": "curl-user-negative-before-curl",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "echo -u 1000:1000 | curl -sS https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: the -u precedes curl and belongs to echo."
+    },
+    {
+      "id": "curl-user-negative-wrapper-name",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "mycurl -u 1000:1000 https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: mycurl is not the curl command word."
+    },
+    {
+      "id": "curl-user-negative-libcurl-name",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "libcurl -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: libcurl is not the curl command word."
+    },
+    {
+      "id": "curl-user-negative-config-name",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl-config -u svc:SyntheticRevokedCurlPw0001\n",
+      "expected": [],
+      "note": "Issue #1247: curl-config is not the curl command word."
+    },
+    {
+      "id": "curl-user-negative-reference-env-braced",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:${CURL_PASS} https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a whole-value environment reference."
+    },
+    {
+      "id": "curl-user-negative-reference-env-bare",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:$CURL_PASS https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a whole-value environment reference."
+    },
+    {
+      "id": "curl-user-negative-reference-env-windows",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:%CURL_PASS% https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a whole-value Windows environment reference."
+    },
+    {
+      "id": "curl-user-negative-reference-command-substitution",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u \"svc:$(cat /run/secrets/svc_pass)\" https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a whole-value command substitution."
+    },
+    {
+      "id": "curl-user-negative-reference-angle-placeholder",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u \"svc:<your password>\" https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: an angle-bracket fill-in marker."
+    },
+    {
+      "id": "curl-user-negative-reference-mask",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:******** https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a mask."
+    },
+    {
+      "id": "curl-user-negative-reference-vocabulary",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:YOUR_PASSWORD_HERE https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: fill-in prose."
+    },
+    {
+      "id": "curl-user-negative-reference-literal-password",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:password https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: the documented literal naming the slot."
+    },
+    {
+      "id": "curl-user-negative-reference-literal-changeit",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:changeit https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a documented default shipped with every JDK."
+    },
+    {
+      "id": "curl-user-negative-reference-template",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u \"svc:{{ secrets.SVC_PASS }}\" https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a template reference."
+    },
+    {
+      "id": "curl-user-negative-reference-workflow-expression",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u \"svc:${{ secrets.SVC_PASS }}\" https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a workflow expression resolved at run time."
+    },
+    {
+      "id": "curl-user-negative-reference-brace-placeholder",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:{api_token} https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a brace placeholder."
+    },
+    {
+      "id": "curl-user-negative-reference-both-parts",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u \"$CURL_USER:$CURL_PASS\" https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: both parts are variable references."
+    },
+    {
+      "id": "curl-user-boundary-unterminated-quote",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u \"svc:SyntheticRevokedCurlPw0001",
+      "expected": [],
+      "note": "Issue #1247: an unterminated quote leaves the argument end unknown; the reader stays silent (stated false negative)."
+    },
+    {
+      "id": "curl-user-boundary-unterminated-quote-newline",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u \"svc:SyntheticRevokedCurlPw0001\nnext https://api.example.test/v1/items\"\n",
+      "expected": [],
+      "note": "Issue #1247: a newline ends the window inside a quote, so the quote is unterminated (stated false negative)."
+    },
+    {
+      "id": "curl-user-boundary-nested-escaped-quote",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "curl"
+      ],
+      "input": "bash -c \"curl -u \\\"svc:SyntheticRevokedCurlPw0001\\\" https://api.example.test/v1/items\"\n",
+      "expected": [],
+      "note": "Issue #1247: a quote escaped inside a quoted command string needs a second shell pass (stated false negative)."
+    },
+    {
+      "id": "curl-user-boundary-argv-array",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "python"
+      ],
+      "input": "subprocess.run([\"curl\", \"-u\", \"svc:SyntheticRevokedCurlPw0001\", \"https://api.example.test/v1/items\"])\n",
+      "expected": [],
+      "note": "Issue #1247: an argument array is not a shell command line (stated false negative)."
+    },
+    {
+      "id": "curl-user-boundary-curlrc",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "curl"
+      ],
+      "input": "# ~/.curlrc\nuser = \"svc:SyntheticRevokedCurlPw0001\"\n",
+      "expected": [],
+      "note": "Issue #1247: the curl config file is another grammar (stated false negative)."
+    },
+    {
+      "id": "curl-user-boundary-window-past-bound",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H 'a: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: an option past 8,192 bytes of arguments is outside the window (stated false negative)."
+    },
+    {
+      "id": "curl-user-boundary-over-bound-password",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd https://api.example.test/v1/items\n",
+      "expected": [],
+      "note": "Issue #1247: a password over 4,096 bytes is outside the reader (stated false negative)."
+    },
+    {
+      "id": "curl-user-boundary-password-at-bound",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -u svc:Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1Cd2Ab1C https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 12,
+          "end": 4108
+        }
+      ],
+      "note": "Issue #1247: a password of exactly 4,096 bytes is read."
+    },
+    {
+      "id": "curl-user-adversarial-curl-word-run",
+      "detector": "generic-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl curl -u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 100007,
+          "end": 100033
+        }
+      ],
+      "note": "Issue #1247: a run of curl words shares windows; the scan reads each once and the one credential is claimed.",
+      "resource": {
+        "maxInputBytes": 100200,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      }
+    },
+    {
+      "id": "curl-user-adversarial-continuation-run",
+      "detector": "generic-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\ncurl \\\n-u svc:SyntheticRevokedCurlPw0001 https://api.example.test/v1/items\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 21007,
+          "end": 21033
+        }
+      ],
+      "note": "Issue #1247: a long chain of continued curl lines is one window bounded at 8,192 bytes; the incremental session holds it and releases the same findings.",
+      "resource": {
+        "maxInputBytes": 21200,
+        "maxFindings": 1,
         "maxRuntimeMs": 250
       }
     }
