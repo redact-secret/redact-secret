@@ -415,3 +415,35 @@ sanitized output, concurrency, and memory before downstream use. See
 To report a missed detection or false positive, provide a minimal synthetic
 reproducer, the runtime and product version, and expected safe metadata. Never
 include an active credential in an issue, test, log, or screenshot.
+
+## Current-target PII qualification
+
+The pinned benchmark matrix may additionally carry `piiCurrentQualification`, a separate exact-source
+record for a later candidate. Its public/synthetic comparison can be recorded while all current families
+remain pending: public measurement does not satisfy validator, qualification, runtime/package cost,
+size budget, profile cost or protected execution gates. The historical Beta.11 table above remains its
+own measured disposition. A matrix without the optional current record makes no qualification claim
+about a later source. `scripts/check-pii-family-status.py` validates both sections independently;
+the generated [support matrix](../support-matrix.md) states the current target when it is pinned.
+
+A pending gate is not an owner-approved deferral. Product #1003 remains open for a new custodian epoch
+or a precise final reason under the benchmark's protected-execution prerequisites.
+
+## Canonical credential evidence and historical PII
+
+The canonical credential matrix is vendored as
+`benchmarks/support-matrix-from-view.json` with
+`benchmarks/support-matrix-view-schema.json`, both bound to the exact
+`benchmarks/pin-source.json` revision. It records the qualification-view policy,
+three populations and four released scanner versions. No legacy `sourceReport`,
+product source commit or measurement timestamp is inferred from that view.
+
+`benchmarks/support-matrix.json` retains its exact bytes from core
+`5696d7e1a2950bdf54fa21244f351e1c4b171f25`, checked by SHA-256. Its legacy
+schema remains pinned to benchmarks `573e128863e0543133e5ccbd513216d19513b7da`.
+Together they remain the historical source for the existing PII qualification and site feed v1.
+The optional current PII section comes from the canonical matrix and names its
+exact target and unmet gates; it never changes the historical five provisional
+and one pending family. A public comparison remains insufficient for protected
+qualification. Site feed v2 exposes canonical credential provenance with an
+explicitly nullable measurement timestamp; v1 keeps its original contract.

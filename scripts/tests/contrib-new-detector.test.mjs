@@ -109,6 +109,24 @@ test("dry run prints the plan and writes nothing", () => {
   });
 });
 
+test("scaffolding accepts empty and populated unmeasured allowlists", () => {
+  for (const unmeasured of [{}, { "alpha-token": "Existing pending arrival" }]) {
+    withSandbox((root) => {
+      const path = join(root, "docs/coverage/detector-family-coverage-allowlist.json");
+      const before = JSON.parse(readFileSync(path, "utf8"));
+      before.unmeasured = unmeasured;
+      writeFileSync(path, `${JSON.stringify(before, null, 2)}\n`);
+      const { code, err } = run(root, ["demo-token", "--issue", "4242"]);
+      assert.equal(code, 0, err);
+      const after = JSON.parse(readFileSync(path, "utf8"));
+      assert.match(after.unmeasured["demo-token"], /#4242/);
+      assert.deepEqual(after.stale, before.stale);
+      for (const [id, reason] of Object.entries(unmeasured)) assert.equal(after.unmeasured[id], reason);
+      assert.deepEqual(Object.keys(after.unmeasured), Object.keys(after.unmeasured).sort());
+    });
+  }
+});
+
 test("scaffolding writes the module and keeps every edited table consistent", () => {
   withSandbox((root) => {
     const { code, out } = run(root, [

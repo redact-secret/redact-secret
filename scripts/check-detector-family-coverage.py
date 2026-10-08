@@ -30,11 +30,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from support_matrix_source import active_matrix_path
 
 ROOT = Path(__file__).resolve().parents[1]
 INVENTORY_PATH = ROOT / "docs" / "coverage" / "detector-inventory.json"
-MATRIX_PATH = ROOT / "benchmarks" / "support-matrix.json"
+MATRIX_PATH = active_matrix_path(ROOT)
 ALLOWLIST_PATH = ROOT / "docs" / "coverage" / "detector-family-coverage-allowlist.json"
 
 

@@ -11,6 +11,11 @@ Rules governing what ships, in what shape, from which registry, and under what i
 > one more instance is a row here plus its supporting evidence, not a new
 > ADR.
 
+The [site feed v2 contract](../contracts/site-feed/v2/README.md) adds canonical
+qualification-view provenance with nullable measurement time and product source
+commit. It is generated beside v1. The current public-site consumer continues to
+read the historical v1 contract until it explicitly adopts v2.
+
 ## Rules
 
 | Rule | Governing ADR |
