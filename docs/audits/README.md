@@ -37,7 +37,7 @@ shrinks when a unit is retired; it keeps no row for a retired unit.
 | --- | --- | --- | --- |
 | [#1003 us-ssn identity-only mismatch, public investigation](evidence/1003/README.md) | [#1003](https://github.com/redact-secret/redact-secret/issues/1003) | `deferred`: the protected half of the issue is open | after #1003 |
 | [#1110 Ory siblings, evidence reconciliation and adoption ruling](evidence/1110/README.md) | [#1110](https://github.com/redact-secret/redact-secret/issues/1110) | `in-progress` | after #1110 |
-| [#1111 Baseten API key structure evidence](evidence/1111/README.md) | [#1111](https://github.com/redact-secret/redact-secret/issues/1111) | `final`: conclusions are in the detector-families spec | before qualification |
+| [#1111 Baseten API key structure evidence](evidence/1111/README.md) | [#1111](https://github.com/redact-secret/redact-secret/issues/1111) | `in-progress` | after #1111 |
 
 ## History
 

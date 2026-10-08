@@ -1,9 +1,8 @@
 ---
 owner: #1111
 reviewed_source: f6f481b168b000ac27e8d60598cd2cb5c0265d59
-status: final
-record: docs/specs/detector-families.md#beta15-credential-families-1111
-retire_on: before-qualification
+status: in-progress
+retire_on: after-issue:#1111
 ---
 
 # #1111 evidence: `baseten:api-key` structure
