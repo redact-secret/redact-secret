@@ -6,6 +6,8 @@
  * already-qualified binaries, into one candidate directory that
  * `scripts/qualify-clean-install.mjs --candidate-dir` installs from.
  *
+ * Omit `--addon-dir` for WASM-only edge qualification.
+ *
  * Nothing is compiled here. The addon and both WebAssembly builds are the
  * artifacts the `node-addon` and `browser` jobs of
  * `.github/workflows/artifact-qualification.yml` uploaded (the same ones
@@ -43,13 +45,15 @@ function parseArgs(argv) {
     if (!key?.startsWith("--") || value === undefined) values.invalid = true;
     else values[key.slice(2)] = value;
   }
-  const required = ["addon-dir", "wasm-dir", "wasm-common-dir", "out-dir"];
+  const required = ["wasm-dir", "wasm-common-dir", "out-dir"];
   if (values.invalid || required.some((key) => values[key] === undefined)) {
     throw new Error(
-      "usage: pack-npm-candidate.mjs --addon-dir <dir> --wasm-dir <dir> " + "--wasm-common-dir <dir> --out-dir <dir>",
+      "usage: pack-npm-candidate.mjs [--addon-dir <dir>] --wasm-dir <dir> " + "--wasm-common-dir <dir> --out-dir <dir>",
     );
   }
-  return Object.fromEntries(required.map((key) => [key, resolve(values[key])]));
+  return Object.fromEntries(
+    [...required, ...(values["addon-dir"] ? ["addon-dir"] : [])].map((key) => [key, resolve(values[key])]),
+  );
 }
 
 function npmPack(packageDir, outDir) {
@@ -73,13 +77,16 @@ async function stage(sourceDir, packageDir, files) {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
-  const { resolveAddonSpecifier } = await import(pathToFileURL(join(JS_PACKAGE_ROOT, "dist/runtime/node.js")).href);
-  const specifier = resolveAddonSpecifier();
-  if (specifier === undefined) {
-    throw new Error(`no platform package is mapped for ${process.platform}/${process.arch}`);
+  let platformDir;
+  let platformManifest;
+  if (options["addon-dir"]) {
+    const { resolveAddonSpecifier } = await import(pathToFileURL(join(JS_PACKAGE_ROOT, "dist/runtime/node.js")).href);
+    const specifier = resolveAddonSpecifier();
+    if (specifier === undefined)
+      throw new Error(`no platform package is mapped for ${process.platform}/${process.arch}`);
+    platformDir = join(NODE_PLATFORM_ROOT, specifier.split("/")[1].replace("node-", ""));
+    platformManifest = JSON.parse(await readFile(join(platformDir, "package.json"), "utf8"));
   }
-  const platformDir = join(NODE_PLATFORM_ROOT, specifier.split("/")[1].replace("node-", ""));
-  const platformManifest = JSON.parse(await readFile(join(platformDir, "package.json"), "utf8"));
   const wasmManifest = JSON.parse(await readFile(join(WASM_PACKAGE_ROOT, "package.json"), "utf8"));
   const wasmFiles = wasmManifest.files.filter((file) => file !== "package.json");
   const fullFiles = wasmFiles.filter((file) => !file.includes("_common"));
@@ -87,17 +94,17 @@ async function main() {
 
   await mkdir(options["out-dir"], { recursive: true });
   const staged = [
-    ...platformManifest.files.map((file) => join(platformDir, file)),
+    ...(platformManifest?.files ?? []).map((file) => join(platformDir, file)),
     ...wasmFiles.map((file) => join(WASM_PACKAGE_ROOT, file)),
   ];
   try {
-    await stage(options["addon-dir"], platformDir, platformManifest.files);
+    if (platformDir) await stage(options["addon-dir"], platformDir, platformManifest.files);
     await stage(options["wasm-dir"], WASM_PACKAGE_ROOT, fullFiles);
     await stage(options["wasm-common-dir"], WASM_PACKAGE_ROOT, commonFiles);
     const packed = [
       npmPack(JS_PACKAGE_ROOT, options["out-dir"]),
       npmPack(WASM_PACKAGE_ROOT, options["out-dir"]),
-      npmPack(platformDir, options["out-dir"]),
+      ...(platformDir ? [npmPack(platformDir, options["out-dir"])] : []),
     ];
     console.log(`Packed npm candidate into ${options["out-dir"]}: ${packed.join(", ")}`);
   } finally {

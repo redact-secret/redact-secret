@@ -17,10 +17,8 @@
  * `runtime/workerd.ts` hands straight to the real generated glue. Nothing
  * here stubs the loader, the bundler's module rule, or the artifact.
  *
- * This does not re-qualify `createBindingFromWasmModule`'s normalization —
- * already exercised against the real artifact by
- * `qualify-browser-artifact.mjs` — or the Web `TransformStream` adapter,
- * which runs unmodified over the same binding that pass already qualifies.
+ * Shared binding normalization is covered by `qualify-browser-artifact.mjs`.
+ * This pass also exercises Web Streams over the selected Workers binding.
  * What this script exists to prove is specific to this loader: that it
  * actually loads, from this exact package-resolution and bundling shape, on
  * the real `workerd` engine.
@@ -37,17 +35,31 @@
  *     node scripts/qualify-workerd-artifact.mjs --wasm-dir bindings/wasm/pkg-common --detector-profile common
  *     node scripts/qualify-workerd-artifact.mjs --wasm-dir bindings/wasm/pkg --pii
  *
+ * For immutable consumer qualification use `--candidate-dir` and `--report`;
+ * the directory must contain the packed core and complete wasm package only.
+ * Legacy `--wasm-dir` runs loader smoke without a durable receipt.
+ *
  * `--pii` (issue #937) initializes with a PII selection, so the worker
  * instantiates the profile's `pii` build instead of the default one, and
  * checks the activation identity and a synthetic phone finding.
  */
 
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { existsSync, rmSync, symlinkSync } from "node:fs";
 import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-
+import { pathToFileURL } from "node:url";
+import { gzipSync } from "node:zlib";
+import {
+  cleanEnvironment,
+  fileDigests,
+  loadNpmCandidate,
+  runShell,
+  sha256,
+  sourceCommit,
+  startCandidateRegistry,
+} from "./lib/candidate-install.mjs";
 import {
   assertMatchesFixture,
   CANONICAL_FIXTURE_ID,
@@ -56,6 +68,9 @@ import {
   REPO_ROOT_PATH,
 } from "./qualify-runtime-fixture.mjs";
 
+const COMPATIBILITY_DATE = "2026-10-01";
+const WRANGLER_BIN =
+  process.env.REDACT_SECRET_WRANGLER_BIN ?? join(REPO_ROOT_PATH, "node_modules/wrangler/bin/wrangler.js");
 const JS_PACKAGE_DIR = join(REPO_ROOT_PATH, "packages", "javascript");
 const WASM_PACKAGE_ROOT = join(REPO_ROOT_PATH, "bindings", "wasm", "npm");
 /** A fixture whose default policy resolves to `redact`, for the `common`
@@ -72,11 +87,15 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function parseArguments(argv) {
+export function parseArguments(argv) {
   const options = { wasmDir: undefined, detectorProfile: "full", pii: false };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
-    if (argument === "--wasm-dir") {
+    if (argument === "--candidate-dir" || argument === "--report") {
+      options[argument === "--candidate-dir" ? "candidateDir" : "report"] = argv[++index];
+      if (!options[argument === "--candidate-dir" ? "candidateDir" : "report"])
+        throw new Error(`missing value for ${argument}`);
+    } else if (argument === "--wasm-dir") {
       index += 1;
       options.wasmDir = argv[index];
     } else if (argument === "--detector-profile") {
@@ -88,8 +107,10 @@ function parseArguments(argv) {
       throw new Error(`unknown argument: ${argument}`);
     }
   }
-  if (options.wasmDir === undefined) {
-    throw new Error("usage: qualify-workerd-artifact.mjs --wasm-dir <dir> [--detector-profile full|common] [--pii]");
+  if ((options.wasmDir === undefined) === (options.candidateDir === undefined)) {
+    throw new Error(
+      "usage: qualify-workerd-artifact.mjs (--wasm-dir <dir> | --candidate-dir <dir>) [--detector-profile full|common] [--pii] [--report <path>]",
+    );
   }
   if (options.detectorProfile !== "full" && options.detectorProfile !== "common") {
     throw new Error("--detector-profile must be full or common");
@@ -129,7 +150,8 @@ async function linkWasmPackage(wasmDir) {
 function renderWorkerSource(detectorProfile, fixture, expectedVersion, pii) {
   const entry = detectorProfile === "common" ? "@redact-secret/core/common" : "@redact-secret/core";
   return `
-    import { initialize, artifact, piiActivation, scan, redact, scanAndRedact, compareActionPolicies, createIncrementalSanitizer, VERSION, PROFILE } from ${JSON.stringify(entry)};
+    import { createWebStreamSanitizer } from ${JSON.stringify(`${entry}/web-stream`)};
+    import { initialize, artifact, piiActivation, artifactManifest, scan, redact, scanAndRedact, compareActionPolicies, createIncrementalSanitizer, VERSION, PROFILE } from ${JSON.stringify(entry)};
 
     const FIXTURE = ${JSON.stringify(fixture.input)};
     const EXPECTED_FINDING_COUNT = ${fixture.expected.length};
@@ -157,12 +179,15 @@ function renderWorkerSource(detectorProfile, fixture, expectedVersion, pii) {
       }
     }
 
+    let initializationMs;
     export default {
       async fetch(request) {
         const checks = [];
         let findings = [];
         try {
+          const initStart = performance.now();
           await initialize(INITIALIZE_OPTIONS);
+          if (initializationMs === undefined) initializationMs = performance.now() - initStart;
           checks.push(check("artifact() reports wasm", () => {
             if (artifact() !== "wasm") throw new Error("artifact() was " + artifact());
           }));
@@ -221,12 +246,42 @@ function renderWorkerSource(detectorProfile, fixture, expectedVersion, pii) {
         } catch (error) {
           checks.push({ name: "initialize", ok: false, detail: error instanceof Error ? error.stack : String(error) });
         }
+        try {
+          const whole = scanAndRedact(FIXTURE);
+          const bytes = new TextEncoder().encode(FIXTURE);
+          const source = new ReadableStream({ start(controller) {
+            const half = Math.floor(bytes.length / 2);
+            controller.enqueue(bytes.slice(0, half));
+            controller.enqueue(bytes.slice(half));
+            controller.close();
+          }});
+          const reader = source.pipeThrough(createWebStreamSanitizer({ limits: GENEROUS_LIMITS })).getReader();
+          let actual = "";
+          for (;;) {
+            const part = await reader.read();
+            if (part.done) break;
+            actual += part.value;
+          }
+          if (actual !== whole.text) throw new Error("Web Streams result diverged");
+          checks.push({ name: "Web Streams matches whole-input result", ok: true });
+        } catch { checks.push({ name: "Web Streams matches whole-input result", ok: false }); }
+        const scanTimes = [];
+        const scanBatchTimes = [];
+        for (let index = 0; index < 21; index++) {
+          const start = performance.now();
+          for (let call = 0; call < 100; call++) scanAndRedact(FIXTURE);
+          const batchMs = performance.now() - start;
+          scanBatchTimes.push(batchMs);
+          scanTimes.push(batchMs / 100);
+        }
         const ok = checks.every((entry) => entry.ok);
         return new Response(
           JSON.stringify(
             {
               ok,
               checks,
+              measurements: { initializeMs: initializationMs, scanAndRedactMs: scanTimes, scanBatchMs: scanBatchTimes, callsPerSample: 100, repetitions: 21, inputBytes: new TextEncoder().encode(FIXTURE).length, inputCodeUnits: FIXTURE.length, memory: { status: "unavailable", reason: "workerd does not expose process or isolate memory counters to the worker" } },
+              artifactSourceRevision: artifactManifest().sourceRevision,
               findings: findings.map((finding) => ({
                 detector: finding.detector,
                 type: finding.type,
@@ -248,46 +303,79 @@ function renderWorkerSource(detectorProfile, fixture, expectedVersion, pii) {
   `;
 }
 
-async function stageWorkerProject(detectorProfile, fixture, expectedVersion, pii) {
+export async function stageWorkerProject(detectorProfile, fixture, expectedVersion, pii, candidateDir) {
   const directory = await mkdtemp(join(tmpdir(), "redact-secret-workerd-"));
-  const scope = join(directory, "node_modules", "@redact-secret");
-  await mkdir(scope, { recursive: true });
-  symlinkSync(JS_PACKAGE_DIR, join(scope, "core"), "junction");
-  await writeFile(join(directory, "worker.mjs"), renderWorkerSource(detectorProfile, fixture, expectedVersion, pii));
-  await writeFile(
-    join(directory, "wrangler.toml"),
-    [
-      'name = "redact-secret-workerd-qualification"',
-      'main = "worker.mjs"',
-      `compatibility_date = "${new Date().toISOString().slice(0, 10)}"`,
-      "",
-      "[[rules]]",
-      'type = "CompiledWasm"',
-      'globs = ["**/*.wasm"]',
-      "fallthrough = true",
-      "",
-    ].join("\n"),
-  );
-  return directory;
+  try {
+    const scope = join(directory, "node_modules", "@redact-secret");
+    await mkdir(scope, { recursive: true });
+    let packages;
+    if (candidateDir) {
+      packages = await loadNpmCandidate(resolve(candidateDir), directory, "workerd candidate");
+      assert(
+        packages.size === 2 && packages.has("@redact-secret/wasm"),
+        "edge candidate must contain exactly core and wasm tarballs",
+      );
+      const registry = await startCandidateRegistry(packages);
+      try {
+        await writeFile(
+          join(directory, "package.json"),
+          JSON.stringify({ private: true, type: "module", dependencies: { "@redact-secret/core": expectedVersion } }),
+        );
+        await writeFile(join(directory, ".npmrc"), `@redact-secret:registry=${registry.url}\n`);
+        const install = await runShell(
+          "npm install --ignore-scripts --omit=optional --no-audit --no-fund",
+          directory,
+          cleanEnvironment(),
+        );
+        assert(install.code === 0, "edge candidate install failed");
+        for (const [name, candidate] of packages) {
+          assert(candidate.manifest.version === expectedVersion, "edge candidate version differs");
+          const installed = await fileDigests(join(scope, name.split("/")[1]));
+          assert(
+            installed.size === candidate.contents.size &&
+              [...candidate.contents].every(([file, digest]) => installed.get(file) === digest),
+            "installed edge package differs from tarball",
+          );
+        }
+      } finally {
+        await registry.close();
+      }
+    } else symlinkSync(JS_PACKAGE_DIR, join(scope, "core"), "junction");
+    await writeFile(join(directory, "worker.mjs"), renderWorkerSource(detectorProfile, fixture, expectedVersion, pii));
+    await writeFile(
+      join(directory, "wrangler.toml"),
+      [
+        'name = "redact-secret-workerd-qualification"',
+        'main = "worker.mjs"',
+        `compatibility_date = "${COMPATIBILITY_DATE}"`,
+        "",
+        "[[rules]]",
+        'type = "CompiledWasm"',
+        'globs = ["**/*.wasm"]',
+        "fallthrough = true",
+        "",
+      ].join("\n"),
+    );
+    return { directory, packages };
+  } catch (error) {
+    await rm(directory, { recursive: true, force: true });
+    throw error;
+  }
 }
 
 /** Starts `wrangler dev` in `directory` and resolves once it answers requests,
  * polling rather than parsing its stdout so this does not depend on the
  * exact banner text of whatever `wrangler` version is installed. */
 async function startWrangler(directory, port) {
-  const child = spawn(
-    process.platform === "win32" ? "npx.cmd" : "npx",
-    ["wrangler", "dev", "--port", String(port), "--local", "--ip", "127.0.0.1"],
-    {
-      cwd: directory,
-      stdio: ["ignore", "pipe", "pipe"],
-      // `npx` does not forward signals to the `wrangler` it spawns, and
-      // `wrangler` starts `workerd` in turn, so signalling the direct child
-      // alone leaves both running. A detached child leads its own process
-      // group, which `stopWrangler` can signal as a whole.
-      detached: process.platform !== "win32",
-    },
-  );
+  const child = spawn(process.execPath, [WRANGLER_BIN, "dev", "--port", String(port), "--local", "--ip", "127.0.0.1"], {
+    cwd: directory,
+    stdio: ["ignore", "pipe", "pipe"],
+    env: cleanEnvironment({ WRANGLER_SEND_METRICS: "false" }),
+    // Wrangler starts workerd, so signalling only the direct child can
+    // leave its runtime running. A detached child leads its own process
+    // group, which `stopWrangler` can signal as a whole.
+    detached: process.platform !== "win32",
+  });
   let output = "";
   child.stdout.on("data", (chunk) => (output += chunk));
   child.stderr.on("data", (chunk) => (output += chunk));
@@ -313,7 +401,7 @@ async function startWrangler(directory, port) {
   throw new Error(`wrangler dev did not become ready within ${READY_TIMEOUT_MS}ms:\n${output}`);
 }
 
-/** Stops the whole `npx` → `wrangler` → `workerd` group and releases its
+/** Stops the whole `wrangler` → `workerd` group and releases its
  * pipes. A surviving grandchild holds the write end of this child's `stdout`
  * and `stderr`, which keeps this process's event loop alive after the last
  * check has already passed: the script hangs until CI cancels the job at its
@@ -343,10 +431,18 @@ async function stopWrangler(child) {
 }
 
 async function main() {
-  const { wasmDir, detectorProfile, pii: piiMode } = parseArguments(process.argv.slice(2));
+  const { wasmDir, candidateDir, report, detectorProfile, pii: piiMode } = parseArguments(process.argv.slice(2));
   const packageEntry = join(JS_PACKAGE_DIR, "dist", detectorProfile === "common" ? "common.js" : "index.js");
-  assert(existsSync(packageEntry), `${packageEntry}: missing; build the package with \`npm run js:build\``);
+  assert(
+    candidateDir || existsSync(packageEntry),
+    `${packageEntry}: missing; build the package with \`npm run js:build\``,
+  );
 
+  const lock = JSON.parse(await readFile(join(REPO_ROOT_PATH, "package-lock.json"), "utf8"));
+  const wrangler = JSON.parse(await readFile(resolve(WRANGLER_BIN, "../../package.json"), "utf8"));
+  assert(wrangler.version === lock.packages["node_modules/wrangler"].version, "Wrangler differs from lockfile");
+  const workerd = JSON.parse(await readFile(resolve(WRANGLER_BIN, "../../../workerd/package.json"), "utf8"));
+  assert(workerd.version === lock.packages["node_modules/workerd"].version, "workerd differs from lockfile");
   const fixtureId = detectorProfile === "common" ? COMMON_REDACT_FIXTURE_ID : CANONICAL_FIXTURE_ID;
   const expectedVersion = await packageVersion();
   // With `--pii`, a synthetic phone fixture replaces the canonical one: its
@@ -365,10 +461,12 @@ async function main() {
   }
   const label = piiMode ? `${detectorProfile}, pii` : detectorProfile;
 
-  const link = await linkWasmPackage(wasmDir);
+  assert(!report || candidateDir, "a durable report requires packed candidate artifacts");
+  const link = candidateDir ? undefined : await linkWasmPackage(wasmDir);
   let directory;
   try {
-    directory = await stageWorkerProject(detectorProfile, fixture, expectedVersion, pii);
+    const staged = await stageWorkerProject(detectorProfile, fixture, expectedVersion, pii, candidateDir);
+    directory = staged.directory;
     const port = 8700 + Math.floor(Math.random() * 300);
     const child = await startWrangler(directory, port);
     try {
@@ -388,17 +486,124 @@ async function main() {
         assert(body.findings.length === 1, `expected exactly one finding, got ${body.findings.length}`);
         assertMatchesFixture(body.findings[0], fixture);
       }
+      if (report) {
+        assert(
+          body.artifactSourceRevision === null || body.artifactSourceRevision === sourceCommit(),
+          "loaded artifact source revision differs",
+        );
+        const binary = `redact_secret_wasm${detectorProfile === "common" ? "_common" : ""}${piiMode ? "_pii" : ""}_bg.wasm`;
+        const digest = staged.packages.get("@redact-secret/wasm").contents.get(binary);
+        const wasmBytes = await readFile(join(directory, "node_modules/@redact-secret/wasm", binary));
+        assert(digest, "candidate has no selected WASM binary");
+        let bundle;
+        const bundleDir = join(directory, "deployment-bundle");
+        try {
+          execFileSync(process.execPath, [WRANGLER_BIN, "deploy", "--dry-run", "--outdir", bundleDir], {
+            cwd: directory,
+            env: cleanEnvironment({ WRANGLER_SEND_METRICS: "false" }),
+            timeout: 30000,
+            stdio: "pipe",
+          });
+          const modules = [];
+          for (const [file, moduleSha256] of await fileDigests(bundleDir)) {
+            if (!/\.(?:m?js|wasm)$/.test(file)) continue;
+            const bytes = await readFile(join(bundleDir, file));
+            modules.push({ file, sha256: moduleSha256, bytes: bytes.length, gzipBytes: gzipSync(bytes).length });
+          }
+          assert(
+            modules.some(({ file }) => file.endsWith(".wasm")),
+            "dry-run bundle has no WASM module",
+          );
+          bundle = {
+            status: "measured",
+            kind: "Wrangler deploy --dry-run qualification worker JS/WASM modules, including smoke checks; sum of independent per-module gzip, no transport overhead",
+            modules,
+            bytes: modules.reduce((sum, module) => sum + module.bytes, 0),
+            gzipBytes: modules.reduce((sum, module) => sum + module.gzipBytes, 0),
+          };
+        } catch {
+          bundle = {
+            status: "unavailable",
+            reason: "Wrangler offline deployment dry-run did not produce qualified bundle modules",
+          };
+        }
+        await mkdir(resolve(report, ".."), { recursive: true });
+        await writeFile(
+          report,
+          `${JSON.stringify(
+            {
+              schemaVersion: 1,
+              sourceCommit: sourceCommit(),
+              artifactSourceRevision: body.artifactSourceRevision,
+              productVersion: expectedVersion,
+              published: false,
+              runtime: {
+                name: "cloudflare-workers",
+                engine: "workerd",
+                wranglerVersion: wrangler.version,
+                workerdVersion: lock.packages["node_modules/workerd"].version,
+                compatibilityDate: COMPATIBILITY_DATE,
+              },
+              detectorProfile,
+              pii: piiMode,
+              status: "qualified",
+              checks: body.checks.map(({ name, ok }) => ({ name, ok })),
+              fixture: {
+                id: piiMode ? "phone-sensitive-national-hyphen-exact-selector" : fixtureId,
+                path: `conformance/fixtures/${piiMode ? "pii-phone-v1.json" : "synchronous-corpus.json"}`,
+                sha256: sha256(
+                  await readFile(
+                    join(
+                      REPO_ROOT_PATH,
+                      "conformance/fixtures",
+                      piiMode ? "pii-phone-v1.json" : "synchronous-corpus.json",
+                    ),
+                  ),
+                ),
+              },
+              packageArtifacts: [...staged.packages].map(([name, pkg]) => ({
+                name,
+                version: pkg.manifest.version,
+                file: pkg.file,
+                sha256: pkg.sha256,
+                packedBytes: pkg.bytes.length,
+              })),
+              binaries: [{ package: "@redact-secret/wasm", file: binary, sha256: digest }],
+              measurements: {
+                ...body.measurements,
+                wasmBytes: wasmBytes.length,
+                wasmGzipBytes: gzipSync(wasmBytes).length,
+                timingKind:
+                  "first worker initialization and 21 warm batches of 100 scanAndRedact calls; per-call samples divide batch by 100; excludes bundler and process startup",
+                clock: "performance.now wall clock; quantized zero samples are below clock resolution, not zero cost",
+                bundle,
+              },
+              limits: {
+                qualification: "local workerd, not an account deployment",
+                maxInputCodeUnits: 1000000,
+                maxBufferedCodeUnits: 16512,
+                maxTokenCodeUnits: 8192,
+                maxMultilineCodeUnits: 16384,
+              },
+            },
+            null,
+            2,
+          )}\n`,
+        );
+      }
       console.log(`qualified the Cloudflare Workers runtime path (${label} profile) against a real workerd sandbox.`);
     } finally {
       await stopWrangler(child);
     }
   } finally {
     if (directory !== undefined) await rm(directory, { recursive: true, force: true });
-    await rm(link, { recursive: true, force: true });
+    if (link) await rm(link, { recursive: true, force: true });
   }
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.stack : error);
-  process.exitCode = 1;
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.stack : error);
+    process.exitCode = 1;
+  });
+}

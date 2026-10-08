@@ -953,21 +953,25 @@ jobs:
           node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web --phone-selector global
           node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web --phone-selector off
 
-      # One step per profile: each starts its own `wrangler dev`, so a hang
-      # names the profile that caused it instead of the pair.
-      - name: Qualify the Cloudflare Workers runtime path
-        run: node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web
+      - name: Pack WASM-only edge candidate artifacts
+        run: |
+          node scripts/pack-npm-candidate.mjs --wasm-dir dist/wasm-web --wasm-common-dir dist/wasm-web-common --out-dir edge-candidate
 
-      - name: Qualify the Cloudflare Workers runtime path (common profile)
-        run: node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web-common --detector-profile common
+      # Reuse the four existing starts, installing immutable package artifacts.
+      - name: Qualify installed Cloudflare Workers artifacts
+        run: |
+          node scripts/qualify-workerd-artifact.mjs --candidate-dir edge-candidate --report edge-reports/full-off.json
+          node scripts/qualify-workerd-artifact.mjs --candidate-dir edge-candidate --pii --report edge-reports/full-on.json
+          node scripts/qualify-workerd-artifact.mjs --candidate-dir edge-candidate --detector-profile common --report edge-reports/common-off.json
+          node scripts/qualify-workerd-artifact.mjs --candidate-dir edge-candidate --detector-profile common --pii --report edge-reports/common-on.json
 
-      # Issue #937: `initialize({ pii })` instantiates the profile's `pii`
-      # build, bundled next to the default one.
-      - name: Qualify the Cloudflare Workers runtime path (PII)
-        run: node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web --pii
-
-      - name: Qualify the Cloudflare Workers runtime path (common profile, PII)
-        run: node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web-common --detector-profile common --pii
+      - name: Record installed Cloudflare Workers qualification
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: edge-runtime-cloudflare-workers
+          path: edge-reports/*.json
+          if-no-files-found: error
+          retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
   # Issue #586: the five-minute quickstart (`docs/quickstart.md`), run from an
   # empty directory outside the checkout with the page's own commands and

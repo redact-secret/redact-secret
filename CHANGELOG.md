@@ -7,6 +7,13 @@ evidence is linked from each published version.
 
 ### Added
 
+- Cloudflare Workers exact-artifact receipts (#1000): the existing qualification
+  lane installs packed core/WASM packages for full/common and PII off/on,
+  verifies file and selected-binary hashes, checks Web Streams, and records
+  pinned runtime identity plus scoped raw timing/size observations. A generated
+  edge matrix names Vercel's unsupported path and unevaluated runtime candidates;
+  local workerd does not qualify production account deployment or memory cost.
+
 - Artifact manifest, `artifact-manifest/v1` (#1250, epic #1246,
   `decision-define-the-artifact-manifest-and-configuration-data-contracts`):
   a consumer can read what the exact loaded artifact contains without scanning
