@@ -637,40 +637,40 @@
       "line": 30,
       "rationale": "OpenGrep 1.30.0's TypeScript parser does not yet support the `unique symbol` type annotation; this is a parser limitation in the pinned tool version, not a defect in this file. Tracked for re-check on the next reviewed OpenGrep version bump."
     },
-    "dd41e68346c5e608": {
-      "line": 511,
+    "ab9b335f732cd7f7": {
+      "line": 514,
       "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
+      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected. PR #1291 adds three lines in the earlier canonical/legacy baseline lookup; line 511 moved to 514. The error line and surrounding five-line fragment are unchanged from main 502eaab6771529130b7f9ca2ac77cd7203ff55ba.",
       "type": "PartialParsing"
     },
-    "870cb1e2388edf11": {
-      "line": 520,
+    "772756b0a965a574": {
+      "line": 523,
       "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
+      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected. PR #1291 adds three lines in the earlier canonical/legacy baseline lookup; line 520 moved to 523. The error line and surrounding five-line fragment are unchanged from main 502eaab6771529130b7f9ca2ac77cd7203ff55ba.",
       "type": "PartialParsing"
     },
-    "f071e8780e14982e": {
-      "line": 814,
+    "0c66696fb9488f86": {
+      "line": 817,
       "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
+      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected. PR #1291 adds three lines in the earlier canonical/legacy baseline lookup; line 814 moved to 817. The error line and surrounding five-line fragment are unchanged from main 502eaab6771529130b7f9ca2ac77cd7203ff55ba.",
       "type": "PartialParsing"
     },
-    "670610e8442e879a": {
-      "line": 884,
+    "4cb238a2b6a2ee12": {
+      "line": 887,
       "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
+      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected. PR #1291 adds three lines in the earlier canonical/legacy baseline lookup; line 884 moved to 887. The error line and surrounding five-line fragment are unchanged from main 502eaab6771529130b7f9ca2ac77cd7203ff55ba.",
       "type": "PartialParsing"
     },
-    "39b900781f64c75e": {
-      "line": 1067,
+    "7c46cf897ab945f4": {
+      "line": 1070,
       "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
+      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected. PR #1291 adds three lines in the earlier canonical/legacy baseline lookup; line 1067 moved to 1070. The error line and surrounding five-line fragment are unchanged from main 502eaab6771529130b7f9ca2ac77cd7203ff55ba.",
       "type": "PartialParsing"
     },
-    "7bd8d78ced424275": {
-      "line": 1157,
+    "bd53c4c758308ecd": {
+      "line": 1160,
       "path": ".github/workflows/artifact-qualification.yml",
-      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
+      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected. PR #1291 adds three lines in the earlier canonical/legacy baseline lookup; line 1157 moved to 1160. The error line and surrounding five-line fragment are unchanged from main 502eaab6771529130b7f9ca2ac77cd7203ff55ba.",
       "type": "PartialParsing"
     },
     "7f8221079264ee68": {
