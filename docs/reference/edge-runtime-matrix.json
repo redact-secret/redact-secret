@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "initialTargets": [
+    "cloudflare-workers"
+  ],
+  "statuses": {
+    "qualified": "A named artifact revision passed the documented real-runtime qualification scope. This does not imply deployment-account, cost, or every-platform qualification.",
+    "experimentally-working": "A runtime smoke worked but the exact-artifact qualification record is incomplete.",
+    "unsupported": "A verified blocker exists and no qualified consumer loading path ships.",
+    "not-evaluated": "No runtime-specific exact-artifact result is available."
+  },
+  "runtimes": [
+    {
+      "name": "Cloudflare Workers",
+      "id": "cloudflare-workers",
+      "status": "qualified",
+      "scope": "Local workerd, full/common profiles, PII off/on; installed package receipts are required by new full qualification runs.",
+      "evidence": "[baseline qualification run](https://github.com/redact-secret/redact-secret/actions/runs/37765743383)",
+      "sourceCommit": "5fddf1a60d0297f0914e4b15c42a33c90a3d8fdf",
+      "limits": "Local engine evidence, no Cloudflare account deployment or measured isolate memory. Fresh receipts live in each artifact inventory."
+    },
+    {
+      "name": "Vercel Edge",
+      "id": "vercel-edge",
+      "status": "unsupported",
+      "scope": "Reference engine requires an import-free consumer build transform.",
+      "evidence": "[accepted investigation](decisions/2026-09-19-verify-edge-runtimes.md)",
+      "limits": "Production consumer build output remains unqualified; no edge-light loader."
+    },
+    {
+      "name": "Deno Deploy / Bun / Fastly",
+      "id": "other-candidates",
+      "status": "not-evaluated",
+      "scope": "Candidate workstreams outside the initial target.",
+      "evidence": "[scope #1000](https://github.com/redact-secret/redact-secret/issues/1000)",
+      "limits": "No support claim or runtime-specific artifact evidence."
+    }
+  ]
+}

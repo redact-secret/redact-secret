@@ -798,5 +798,125 @@ class RequireCratesTests(unittest.TestCase):
         )
 
 
+class EdgeRuntimeQualificationTests(unittest.TestCase):
+    def setUp(self):
+        import copy
+
+        self.copy = copy.deepcopy
+        self.reports = []
+        self.artifacts = []
+        lock = json.loads((RECORD.ROOT / "package-lock.json").read_text())["packages"]
+        checks = [
+            "compareActionPolicies compares sides over one detection pass (#1220)",
+            "artifact() reports wasm",
+            "piiActivation() reports the requested activation",
+            "VERSION/PROFILE match the built package",
+            "scan matches the canonical fixture's finding count",
+            "scanAndRedact agrees with scan then redact",
+            "an incremental session matches the whole-input result",
+            "Web Streams matches whole-input result",
+        ]
+        for profile in ("full", "common"):
+            for pii in (False, True):
+                file = f"redact_secret_wasm{'_common' if profile == 'common' else ''}{'_pii' if pii else ''}_bg.wasm"
+                self.artifacts.append(
+                    {"family": "browser" if profile == "full" else "browser-common", "file": file, "sha256": "b" * 64}
+                )
+                self.reports.append(
+                    {
+                        "schemaVersion": 1,
+                        "status": "qualified",
+                        "sourceCommit": SOURCE_COMMIT,
+                        "artifactSourceRevision": SOURCE_COMMIT,
+                        "productVersion": PRODUCT_VERSION,
+                        "published": False,
+                        "detectorProfile": profile,
+                        "pii": pii,
+                        "runtime": {
+                            "name": "cloudflare-workers",
+                            "engine": "workerd",
+                            "wranglerVersion": lock["node_modules/wrangler"]["version"],
+                            "workerdVersion": lock["node_modules/workerd"]["version"],
+                            "compatibilityDate": "2026-10-01",
+                        },
+                        "checks": [{"name": name, "ok": True} for name in checks],
+                        "packageArtifacts": [
+                            {"name": name, "version": PRODUCT_VERSION, "file": "candidate.tgz", "sha256": "c" * 64}
+                            for name in ("@redact-secret/core", "@redact-secret/wasm")
+                        ],
+                        "binaries": [{"file": file, "sha256": "b" * 64}],
+                    }
+                )
+
+        for report in self.reports:
+            path = (
+                "conformance/fixtures/pii-phone-v1.json"
+                if report["pii"]
+                else "conformance/fixtures/synchronous-corpus.json"
+            )
+            fixture_id = (
+                "phone-sensitive-national-hyphen-exact-selector"
+                if report["pii"]
+                else "jwt-positive-structured"
+                if report["detectorProfile"] == "common"
+                else "host-dotenv-github"
+            )
+            report["fixture"] = {"id": fixture_id, "path": path, "sha256": RECORD.digest(RECORD.ROOT / path)}
+
+    def validate(self, reports):
+        return RECORD.require_edge_runtime_qualification(reports, self.artifacts, SOURCE_COMMIT, PRODUCT_VERSION)
+
+    def test_four_exact_artifact_rows_pass(self):
+        self.assertEqual(self.validate(self.reports), [])
+
+    def test_missing_duplicate_and_invalid_selection_fail(self):
+        for reports in (self.reports[:3], self.reports + self.reports[:1]):
+            self.assertTrue(self.validate(reports))
+        for field, value in (
+            ("pii", 1),
+            ("detectorProfile", "custom"),
+            ("sourceCommit", "d" * 40),
+            ("artifactSourceRevision", "d" * 40),
+        ):
+            reports = self.copy(self.reports)
+            reports[0][field] = value
+            self.assertTrue(self.validate(reports))
+
+    def test_different_package_sets_and_wrong_fixture_evidence_fail(self):
+        for field, value in (("sha256", "d" * 64), ("file", "other.tgz")):
+            reports = self.copy(self.reports)
+            reports[1]["packageArtifacts"][0][field] = value
+            self.assertTrue(self.validate(reports))
+        for field, value in (
+            ("id", "not-the-tested-fixture"),
+            ("sha256", "not-a-hash"),
+            ("path", "conformance/fixtures/wrong.json"),
+        ):
+            reports = self.copy(self.reports)
+            reports[0]["fixture"][field] = value
+            self.assertTrue(self.validate(reports))
+        reports = self.copy(self.reports)
+        reports[0]["fixture"] = None
+        self.assertTrue(self.validate(reports))
+
+    def test_malformed_records_return_errors(self):
+        for field, value in (("runtime", []), ("checks", [None]), ("packageArtifacts", [None]), ("binaries", [None])):
+            reports = self.copy(self.reports)
+            reports[0][field] = value
+            self.assertTrue(self.validate(reports))
+        self.assertTrue(self.validate([None]))
+
+    def test_failed_check_duplicate_package_wrong_binary_and_tool_fail(self):
+        for mutation in (
+            lambda r: r["checks"][0].update(ok=False),
+            lambda r: r["packageArtifacts"].append(r["packageArtifacts"][0]),
+            lambda r: r["binaries"][0].update(sha256="d" * 64),
+            lambda r: r["runtime"].update(wranglerVersion="unlocked"),
+        ):
+            reports = self.copy(self.reports)
+            mutation(reports[0])
+            self.assertTrue(self.validate(reports))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -127,7 +127,7 @@ def collect(artifacts: Path) -> list[dict]:
     collected: list[dict] = []
     for directory in sorted(p for p in artifacts.iterdir() if p.is_dir()):
         name = directory.name
-        if name.startswith(("installed-javascript-", "clean-install-", "golden-path-")):
+        if name.startswith(("installed-javascript-", "clean-install-", "golden-path-", "edge-runtime-")):
             continue
         if name == "configuration-journeys":
             # Issue #1255: the report of the installed-candidate configuration
@@ -291,6 +291,137 @@ def require_installed_javascript_qualification(
             errors.append(f"installed JavaScript {lane}: no qualification for {missing}")
         for extra in sorted(found[lane] - declared):
             errors.append(f"installed JavaScript {lane}: qualified {extra}, which Cargo.toml does not declare")
+    return errors
+
+
+def collect_edge_runtime_qualification(artifacts: Path) -> tuple[list[dict], list[str]]:
+    results, errors = [], []
+    for path in sorted((artifacts / "edge-runtime-cloudflare-workers").glob("*.json")):
+        try:
+            report = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(report, dict):
+                raise ValueError("not an object")
+            report["reportSha256"] = digest(path)
+            results.append(report)
+        except (ValueError, OSError):
+            errors.append("edge runtime: invalid JSON report")
+    return results, errors
+
+
+def require_edge_runtime_qualification(
+    results: list[dict], artifacts: list[dict], revision: str, version: str
+) -> list[str]:
+    errors = []
+    expected = {(profile, pii) for profile in ("full", "common") for pii in (False, True)}
+    found = []
+    package_identity = None
+    binaries = {
+        (entry["file"], entry["sha256"]) for entry in artifacts if entry["family"] in ("browser", "browser-common")
+    }
+    lock = json.loads((ROOT / "package-lock.json").read_text(encoding="utf-8"))["packages"]
+    for result in results:
+        if not isinstance(result, dict):
+            errors.append("edge runtime: report must be an object")
+            continue
+        if result.get("detectorProfile") not in ("full", "common") or type(result.get("pii")) is not bool:
+            errors.append("edge runtime: profile/PII selection is invalid")
+            continue
+        pair = (result.get("detectorProfile"), result.get("pii"))
+        found.append(pair)
+        label = f"edge runtime {pair}"
+        runtime = result.get("runtime")
+        if not isinstance(runtime, dict):
+            errors.append(f"{label}: runtime must be an object")
+            runtime = {}
+        if result.get("schemaVersion") != 1 or result.get("status") != "qualified":
+            errors.append(f"{label}: invalid qualification schema/status")
+        if (
+            result.get("sourceCommit") != revision
+            or result.get("productVersion") != version
+            or result.get("published") is not False
+        ):
+            errors.append(f"{label}: source/version identity differs from inventory")
+        if result.get("artifactSourceRevision") not in (None, revision):
+            errors.append(f"{label}: embedded source identity differs")
+        if runtime.get("name") != "cloudflare-workers" or runtime.get("engine") != "workerd":
+            errors.append(f"{label}: invalid runtime")
+        for tool in ("wrangler", "workerd"):
+            if runtime.get(f"{tool}Version") != lock[f"node_modules/{tool}"]["version"]:
+                errors.append(f"{label}: {tool} differs from lockfile")
+        if runtime.get("compatibilityDate") != "2026-10-01":
+            errors.append(f"{label}: compatibility date differs")
+        checks = result.get("checks")
+        if not isinstance(checks, list) or any(not isinstance(check, dict) for check in checks):
+            errors.append(f"{label}: checks must be objects")
+            checks = []
+        required = {
+            "compareActionPolicies compares sides over one detection pass (#1220)",
+            "artifact() reports wasm",
+            "piiActivation() reports the requested activation",
+            "VERSION/PROFILE match the built package",
+            "scan matches the canonical fixture's finding count",
+            "scanAndRedact agrees with scan then redact",
+            "an incremental session matches the whole-input result",
+            "Web Streams matches whole-input result",
+        }
+        if not required.issubset({str(check.get("name")) for check in checks}) or any(
+            check.get("ok") is not True for check in checks
+        ):
+            errors.append(f"{label}: required conformance checks did not pass")
+        packages = result.get("packageArtifacts")
+        if not isinstance(packages, list) or any(not isinstance(package, dict) for package in packages):
+            errors.append(f"{label}: package artifacts must be objects")
+            packages = []
+        if len(packages) != 2 or {str(package.get("name")) for package in packages} != {
+            "@redact-secret/core",
+            "@redact-secret/wasm",
+        }:
+            errors.append(f"{label}: packed package identity incomplete")
+        if any(
+            package.get("version") != version or re.fullmatch(r"[0-9a-f]{64}", str(package.get("sha256", ""))) is None
+            for package in packages
+        ):
+            errors.append(f"{label}: packed package digest/version invalid")
+        current_packages = sorted(
+            tuple(str(package.get(key, "")) for key in ("name", "version", "file", "sha256")) for package in packages
+        )
+        if package_identity is None:
+            package_identity = current_packages
+        elif current_packages != package_identity:
+            errors.append(f"{label}: packed package set differs across edge receipts")
+        if any(not isinstance(package.get("file"), str) or not package["file"] for package in packages):
+            errors.append(f"{label}: packed package filename is missing")
+        fixture = result.get("fixture")
+        corpus_path = (
+            "conformance/fixtures/pii-phone-v1.json" if pair[1] else "conformance/fixtures/synchronous-corpus.json"
+        )
+        fixture_id = (
+            "phone-sensitive-national-hyphen-exact-selector"
+            if pair[1]
+            else "jwt-positive-structured"
+            if pair[0] == "common"
+            else "host-dotenv-github"
+        )
+        if (
+            not isinstance(fixture, dict)
+            or fixture.get("id") != fixture_id
+            or fixture.get("path") != corpus_path
+            or fixture.get("sha256") != digest(ROOT / corpus_path)
+        ):
+            errors.append(f"{label}: fixture identity differs from the canonical source")
+        selected = result.get("binaries")
+        if not isinstance(selected, list) or any(not isinstance(binary, dict) for binary in selected):
+            errors.append(f"{label}: selected binaries must be objects")
+            selected = []
+        filename = f"redact_secret_wasm{'_common' if pair[0] == 'common' else ''}{'_pii' if pair[1] else ''}_bg.wasm"
+        if (
+            len(selected) != 1
+            or selected[0].get("file") != filename
+            or (filename, str(selected[0].get("sha256"))) not in binaries
+        ):
+            errors.append(f"{label}: selected WASM differs from built artifact")
+    if set(found) != expected or len(found) != len(expected):
+        errors.append("edge runtime: require exactly full/common x PII off/on")
     return errors
 
 
@@ -808,6 +939,10 @@ def main() -> int:
     errors.extend(golden_path_errors)
     errors.extend(require_golden_path_qualification(golden_path, collected, revision, product_version))
 
+    edge_runtime, edge_errors = collect_edge_runtime_qualification(arguments.artifacts)
+    errors.extend(edge_errors)
+    errors.extend(require_edge_runtime_qualification(edge_runtime, collected, revision, product_version))
+
     reviewed_version, rehearsal = review_version(product_version)
     try:
         release_readiness = release_readiness_record(reviewed_version, revision, rehearsal=rehearsal)
@@ -842,6 +977,7 @@ def main() -> int:
         "installedJavaScriptQualification": qualification,
         "cleanInstallQualification": clean_install,
         "goldenPathQualification": golden_path,
+        "edgeRuntimeQualification": edge_runtime,
         "releaseReadiness": release_readiness,
     }
 

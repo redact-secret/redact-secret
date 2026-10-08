@@ -392,6 +392,49 @@ and one incremental session. The same `package-consumer-wasm-runtimes` job
 runs it on every full qualification run, for both profiles, in a real local
 `workerd` through `wrangler dev`. It is not part of `npm run ci`.
 
+
+The generated [edge runtime matrix](edge-runtime-matrix.md) scopes the initial
+#1000 target to Cloudflare Workers. New full qualification runs pack and install
+both npm artifacts in an empty temporary consumer, compare every installed file
+to its tarball, and record the source revision, locked Wrangler/workerd versions,
+compatibility date `2026-10-01`, tarball hashes/sizes and selected WASM hash.
+An embedded manifest source revision must agree when present; legacy binaries
+may report `null`, so source provenance then rests on the same-run artifact
+inventory and matching binary digest rather than a claimed embedded SHA. The existing
+lane runs all four combinations of full/common and PII off/on, adding a real
+Web Streams check to the canonical scan and incremental smoke. Each run's
+artifact inventory requires these four receipts; there is no new CI lane.
+
+To reproduce against already built artifacts, without rebuilding Rust:
+
+```sh
+node scripts/pack-npm-candidate.mjs --wasm-dir <full-dir> --wasm-common-dir <common-dir> --out-dir <candidate-dir>
+node scripts/qualify-workerd-artifact.mjs --candidate-dir <candidate-dir> --report <full-off.json>
+node scripts/qualify-workerd-artifact.mjs --candidate-dir <candidate-dir> --pii --report <full-on.json>
+node scripts/qualify-workerd-artifact.mjs --candidate-dir <candidate-dir> --detector-profile common --report <common-off.json>
+node scripts/qualify-workerd-artifact.mjs --candidate-dir <candidate-dir> --detector-profile common --pii --report <common-on.json>
+```
+
+Run `npm ci` and `npm run js:build` first. The qualifier uses the checkout's
+locked Wrangler binary, never an implicit `npx` download. Reports record safe
+outcomes and identities, never matched values. The single canonical fixture
+checks loading and representative behavior; it is not an exhaustive detector
+qualification. Cloudflare account deployment, network configuration, production
+CPU limits, deployment bundle limits and peak isolate memory are outside this
+local-workerd scope. The core performs no runtime network access. PII remains
+opt-in; its detector-family qualification is independent of edge loading.
+
+Raw selected WASM and gzip sizes, first initialization wall time and 21 warm batches of 100 scans, with per-call
+wall times reuse the already-started worker. Input size and fixture identity are
+explicit; quantized zero samples mean below clock resolution, not free scans.
+Wrangler's offline `deploy --dry-run` records raw and independent per-module gzip
+sizes and hashes of emitted JS/WASM modules, including the qualification checks.
+This is the qualification worker's bundle, not every consumer's bundle. It does
+not measure cold process startup or deployed CPU time; local Wrangler timers work while deployed Workers timers advance after I/O
+([Cloudflare timing API](https://developers.cloudflare.com/workers/runtime-apis/performance/)).
+Worker memory counters are unavailable. Retained cost evidence and budget decisions belong in
+`redact-secret-benchmarks`, not this repository.
+
 **Vercel Edge remains unsupported.** `@edge-runtime/vm` — the reference
 engine Vercel publishes and that `next dev`/`vercel dev` use locally to run
 Edge Functions and Middleware — executes code as a plain classic script with
