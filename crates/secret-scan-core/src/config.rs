@@ -250,8 +250,9 @@ impl<'a> ConfigRequest<'a> {
         }
     }
 
-    /// The `runtime-config/v1` document: at most 262,144 bytes, with the
-    /// members `schema`, `detection`, `pii` and `limits`.
+    /// A `runtime-config/v1` or explicitly tagged `runtime-config/v2` document:
+    /// at most 262,144 bytes. Version 2 also accepts `closedTypes` and
+    /// `closedDetectors` for strict policy diagnostics.
     #[must_use]
     pub const fn runtime_config(mut self, json: &'a str) -> Self {
         self.runtime_config = Some(json);
@@ -496,6 +497,19 @@ pub fn resolve_config(
         .ruleset
         .and_then(|bytes| resolve_ruleset(bytes, &mut diagnostics));
     let (policy, policy_given) = resolve_policy(request, &mut diagnostics);
+    let closed_types =
+        read_closed_vocabulary(member("closedTypes"), "closedTypes", &mut diagnostics);
+    let closed_detectors = read_closed_vocabulary(
+        member("closedDetectors"),
+        "closedDetectors",
+        &mut diagnostics,
+    );
+    // A binding must not silently replace a Rust caller's declaration.
+    if (closed_types.is_some() && request.closed_types.is_some())
+        || (closed_detectors.is_some() && request.closed_detectors.is_some())
+    {
+        diagnostics.error("INVALID_OPTIONS", "$");
+    }
 
     if diagnostics.has_error() {
         let (items, truncated) = diagnostics.finish();
@@ -519,7 +533,14 @@ pub fn resolve_config(
         enabled,
     };
 
-    advise(manifest, &effective, request, &mut diagnostics);
+    let mut diagnostic_request = *request;
+    if let Some(types) = &closed_types {
+        diagnostic_request.closed_types = Some(types);
+    }
+    if let Some(detectors) = &closed_detectors {
+        diagnostic_request.closed_detectors = Some(detectors);
+    }
+    advise(manifest, &effective, &diagnostic_request, &mut diagnostics);
     // A declared closed vocabulary turns an unknown policy name into an error.
     if diagnostics.has_error() {
         let (items, truncated) = diagnostics.finish();
@@ -530,7 +551,7 @@ pub fn resolve_config(
     envelope(Some(snapshot), items, truncated)
 }
 
-/// Parses the `runtime-config/v1` text and judges its top level: size, shape,
+/// Parses the runtime-config text and judges its top level: size, shape,
 /// member names and `schema`. Returns the document when it is an object.
 #[inline(never)]
 fn read_document(request: &ConfigRequest<'_>, diagnostics: &mut Diagnostics) -> Option<Value> {
@@ -547,18 +568,44 @@ fn read_document(request: &ConfigRequest<'_>, diagnostics: &mut Diagnostics) -> 
         diagnostics.error(CLASS_WRONG_TYPE, "$");
         return None;
     };
+    let v2 =
+        matches!(document.member("schema"), Some(Value::Str(name)) if name == "runtime-config/v2");
     for (position, (name, _)) in members.iter().enumerate() {
-        if !matches!(name.as_str(), "schema" | "detection" | "pii" | "limits") {
+        if !(matches!(name.as_str(), "schema" | "detection" | "pii" | "limits")
+            || (v2 && matches!(name.as_str(), "closedTypes" | "closedDetectors")))
+        {
             diagnostics.error(CLASS_UNKNOWN_FIELD, &format!("@{position}"));
         }
     }
     match document.member("schema") {
         None => {}
-        Some(Value::Str(name)) if name == "runtime-config/v1" => {}
+        Some(Value::Str(name))
+            if matches!(name.as_str(), "runtime-config/v1" | "runtime-config/v2") => {}
         Some(Value::Str(_)) => diagnostics.error("UNKNOWN_SCHEMA", "schema"),
         Some(_) => diagnostics.error(CLASS_WRONG_TYPE, "schema"),
     }
     Some(document)
+}
+
+fn read_closed_vocabulary<'a>(
+    value: Option<&'a Value>,
+    path: &str,
+    diagnostics: &mut Diagnostics,
+) -> Option<Vec<&'a str>> {
+    let value = value?;
+    let Value::Array(values) = value else {
+        diagnostics.error(CLASS_WRONG_TYPE, path);
+        return None;
+    };
+    let mut names = Vec::with_capacity(values.len());
+    for (index, value) in values.iter().enumerate() {
+        if let Value::Str(name) = value {
+            names.push(name.as_str());
+        } else {
+            diagnostics.error(CLASS_WRONG_TYPE, &format!("{path}[{index}]"));
+        }
+    }
+    Some(names)
 }
 
 /// The `detection` row of the truth table: absent inherits every included

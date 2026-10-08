@@ -136,8 +136,27 @@ Only a vocabulary you declare closed makes an unknown name an error. In Rust,
 `ConfigRequest::closed_types` and `closed_detectors` turn
 `ACTION_POLICY_UNKNOWN_TYPE` and `ACTION_POLICY_UNKNOWN_DETECTOR` into errors
 (`ok` is then false) for names outside the catalog, the supplied ruleset and
-your list. JavaScript has no such option, because `runtime-config/v1` carries no
-vocabulary member.
+your list. JavaScript supports the same declarations in an explicitly tagged
+`runtime-config/v2` preview:
+
+```ts
+const preview = resolveConfig({
+  schema: "runtime-config/v2",
+  actionPolicy: myPolicy,
+  closedTypes: [],
+  closedDetectors: [],
+});
+if (!preview.ok) throw new Error("Invalid action policy configuration");
+```
+
+An absent list preserves open-vocabulary diagnostics; `[]` declares no additional
+names, while a string array declares your additional types or detector ids. Known
+artifact names and supplied ruleset detector ids remain recognized. These lists
+are validation declarations, not detector registrations. `runtime-config/v1`
+and an omitted schema reject either new field, so use the explicit v2 tag.
+Malformed lists are `WRONG_TYPE`; no invalid name is echoed. A successful preview
+changes no owner or future scan: pass the reviewed `actionPolicy` separately to
+the operation that will use it. `SampleRuleHits` remains Rust-only.
 
 ## Explain and compare
 

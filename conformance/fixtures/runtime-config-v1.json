@@ -1,6 +1,6 @@
 {
   "schema": "runtime-config-conformance/v1",
-  "note": "The shared truth table for resolveConfig (issue #1251). Each case gives the runtime-config/v1 members that are data as `config` (an object, serialized compactly) or `configText` (raw, for malformed input), the exact `ruleset` and `actionPolicy` text a binding receives as bytes, whether a callback policy is present, and the expected resolution on the artifacts named in `profiles`. A case marked `rawOnly` is text no JavaScript object can produce (malformed JSON, a repeated member), so only the binding-level run, which passes the text through, executes it. `codes` and `paths` list every diagnostic in order (errors first). The Rust core and every JavaScript runtime that loads a binding run these cases against the artifact manifest they report; no surface keeps its own copy of the table. No case carries a scan input or a secret-shaped value.",
+  "note": "The shared truth table for resolveConfig (issue #1251). Each case gives the runtime-config/v1 or explicitly tagged runtime-config/v2 members that are data as `config` (an object, serialized compactly) or `configText` (raw, for malformed input), the exact `ruleset` and `actionPolicy` text a binding receives as bytes, whether a callback policy is present, and the expected resolution on the artifacts named in `profiles`. A case marked `rawOnly` is text no JavaScript object can produce (malformed JSON, a repeated member), so only the binding-level run, which passes the text through, executes it. `codes` and `paths` list every diagnostic in order (errors first). The Rust core and every JavaScript runtime that loads a binding run these cases against the artifact manifest they report; no surface keeps its own copy of the table. No case carries a scan input or a secret-shaped value.",
   "cases": [
     {
       "name": "absent-inherits-every-default",
@@ -672,7 +672,7 @@
         "common"
       ],
       "config": {
-        "schema": "runtime-config/v2"
+        "schema": "runtime-config/v3"
       },
       "expect": {
         "ok": false,
@@ -1166,6 +1166,323 @@
           "actionPolicy.rules[4]"
         ]
       }
+    },
+    {
+      "name": "v2-without-closure-preserves-open-type-warning",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "schema": "runtime-config/v2"
+      },
+      "expect": {
+        "ok": true,
+        "codes": [
+          "ACTION_POLICY_UNKNOWN_TYPE"
+        ],
+        "paths": [
+          "actionPolicy.rules[0].match.type[0]"
+        ]
+      },
+      "actionPolicy": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "check-name",
+            "match": {
+              "type": [
+                "synthetic_internal_type"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      }
+    },
+    {
+      "name": "v2-closed-types-reject-unknown-policy-type",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "schema": "runtime-config/v2",
+        "closedTypes": []
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "ACTION_POLICY_UNKNOWN_TYPE"
+        ],
+        "paths": [
+          "actionPolicy.rules[0].match.type[0]"
+        ]
+      },
+      "actionPolicy": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "check-name",
+            "match": {
+              "type": [
+                "synthetic_internal_type"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      }
+    },
+    {
+      "name": "v2-closed-detectors-reject-unknown-policy-detector",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "schema": "runtime-config/v2",
+        "closedDetectors": []
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "ACTION_POLICY_UNKNOWN_DETECTOR"
+        ],
+        "paths": [
+          "actionPolicy.rules[0].match.detector[0]"
+        ]
+      },
+      "actionPolicy": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "check-name",
+            "match": {
+              "detector": [
+                "synthetic-detector"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      }
+    },
+    {
+      "name": "v2-explicit-additional-type-and-detector-are-known",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "schema": "runtime-config/v2",
+        "closedTypes": [
+          "synthetic_internal_type"
+        ],
+        "closedDetectors": [
+          "synthetic-detector"
+        ]
+      },
+      "expect": {
+        "ok": true,
+        "codes": []
+      },
+      "actionPolicy": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "known-name",
+            "match": {
+              "type": [
+                "synthetic_internal_type"
+              ],
+              "detector": [
+                "synthetic-detector"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      }
+    },
+    {
+      "name": "v2-empty-closures-preserve-artifact-known-names",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "schema": "runtime-config/v2",
+        "closedTypes": [],
+        "closedDetectors": []
+      },
+      "expect": {
+        "ok": true,
+        "codes": []
+      },
+      "actionPolicy": {
+        "actionPolicyRevision": 1,
+        "base": "default",
+        "rules": [
+          {
+            "id": "known-jwt",
+            "match": {
+              "type": [
+                "jwt"
+              ],
+              "detector": [
+                "jwt"
+              ]
+            },
+            "action": "block"
+          }
+        ]
+      }
+    },
+    {
+      "name": "v2-closedTypes-wrong-shape-49",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "schema": "runtime-config/v2",
+        "closedTypes": null
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "WRONG_TYPE"
+        ],
+        "paths": [
+          "closedTypes"
+        ]
+      }
+    },
+    {
+      "name": "v2-closedDetectors-wrong-shape-50",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "schema": "runtime-config/v2",
+        "closedDetectors": "synthetic-detector"
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "WRONG_TYPE"
+        ],
+        "paths": [
+          "closedDetectors"
+        ]
+      }
+    },
+    {
+      "name": "v2-closedTypes-wrong-shape-51",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "schema": "runtime-config/v2",
+        "closedTypes": [
+          7
+        ]
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "WRONG_TYPE"
+        ],
+        "paths": [
+          "closedTypes[0]"
+        ]
+      }
+    },
+    {
+      "name": "v2-closedDetectors-wrong-shape-52",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "schema": "runtime-config/v2",
+        "closedDetectors": [
+          {}
+        ]
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "WRONG_TYPE"
+        ],
+        "paths": [
+          "closedDetectors[0]"
+        ]
+      }
+    },
+    {
+      "name": "closure-without-v2-tag-is-unknown-field",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "closedTypes": []
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "UNKNOWN_FIELD"
+        ],
+        "paths": [
+          "@0"
+        ]
+      }
+    },
+    {
+      "name": "v1-closure-remains-an-unknown-field",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "config": {
+        "closedDetectors": [],
+        "schema": "runtime-config/v1"
+      },
+      "expect": {
+        "ok": false,
+        "codes": [
+          "UNKNOWN_FIELD"
+        ],
+        "paths": [
+          "@0"
+        ]
+      }
+    },
+    {
+      "name": "v2-duplicate-closed-vocabulary-member-is-refused",
+      "profiles": [
+        "full",
+        "common"
+      ],
+      "expect": {
+        "ok": false,
+        "codes": [
+          "WRONG_TYPE"
+        ],
+        "paths": [
+          "$"
+        ]
+      },
+      "rawOnly": true,
+      "configText": "{\"schema\":\"runtime-config/v2\",\"closedTypes\":[],\"closedTypes\":[\"synthetic_internal_type\"]}"
     }
   ]
 }

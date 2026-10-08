@@ -19,6 +19,7 @@
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { qualifyClosedVocabulary } from "./custom-runtime-probes.mjs";
 
 /** Obviously synthetic values, all taken from the repository's own corpora. */
 export const SYNTHETIC = Object.freeze({
@@ -508,6 +509,11 @@ export const JOURNEYS = {
   },
 
   /** What the adapters (redact-secret-adapters #217/#213/#215) depend on is unchanged by the epic. */
+  async closedVocabulary({ api }) {
+    await api.initialize();
+    return qualifyClosedVocabulary(api);
+  },
+
   async adapterSurface({ api, known }) {
     await api.initialize();
     const names = ["initialize", "scan", "scanAndRedact", "redact", "createIncrementalSanitizer", "status"];

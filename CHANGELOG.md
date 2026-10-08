@@ -7,6 +7,19 @@ evidence is linked from each published version.
 
 ### Added
 
+- Strict policy previews in JavaScript (#1283): `runtime-config/v2` adds
+  `closedTypes` and `closedDetectors`, reusing Rust policy diagnostics. Unknown
+  policy names become errors only for a declared closed vocabulary. The v2 tag
+  is required; v1 and ordinary scans keep their existing behavior. `RuntimeConfig`
+  is a discriminated union so TypeScript requires that tag for the new members.
+
+- Custom composition qualification (#1283): the generated custom WebAssembly
+  artifact is exercised in Chromium and local Cloudflare Workers/workerd, with
+  artifact identities, selected and excluded detector behavior, declarative policy
+  and incremental output checked against the installed candidate. The qualification
+  artifact retains the exact custom files for independent footprint and timing
+  measurements; this does not qualify other browsers or deployed Workers accounts.
+
 - Cloudflare Workers exact-artifact receipts (#1000): the existing qualification
   lane installs packed core/WASM packages for full/common and PII off/on,
   verifies file and selected-binary hashes, checks Web Streams, and records

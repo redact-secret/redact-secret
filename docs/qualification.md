@@ -583,8 +583,12 @@ manifest file, the build report's file digests and the recorded default snapshot
 are used only to assert `detectorSelection: false` and the absence of a configuration surface, and a custom Node
 addon or Python wheel is asserted refused by the build tooling. The journeys, their rows and what they emit are listed in the
 [configuration quickstart](guides/configuration-quickstart.md#what-is-qualified); the job runs the
-quickstart file itself. It uploads a `configuration-journeys` report and is not part of `inventory`'s lane
-list. To reproduce locally, build the candidate as in [clean-install qualification](#clean-install-qualification) and run
+quickstart file itself. Its generated custom composition also executes in Chromium and local Wrangler/workerd,
+using the same manifest, wrapper, glue and WASM bytes. The `configuration-journeys` artifact contains the
+report and emitted files under `configuration-custom-artifact/`; the inventory binds their source and
+digests to both runtime receipts. It remains outside the shipped artifact matrix.
+To reproduce locally, build the candidate as in [clean-install qualification](#clean-install-qualification),
+install Playwright's Chromium, and run
 `node scripts/qualify-configuration.mjs --candidate-dir <dir> --build-custom [--cli-binary <path>] [--python <path>] --report <path>`
 (`--require-unsupported` makes a missing CLI or wheel a failure, as in CI).
 

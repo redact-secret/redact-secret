@@ -197,6 +197,9 @@ and 12-character windows):
   a ruleset on a session is `INVALID_OPTIONS`;
 - esbuild bundles of the installed standard package and of a generated custom artifact run and report the
   same manifest digest as the unbundled artifact (see [bundling](custom-composition.md#bundling-with-esbuild)).
+- the same generated custom WASM executes in Chromium and local Cloudflare `workerd`: selected,
+  excluded and benign oracle probes, policy override, incremental partitions and ceiling rejection.
+  These checks cover this composition and Chromium, not every subset or browser engine.
 
 The report records the source commit, package integrity, binary digests and manifest digests. It is
 evidence for a reviewer, not a published claim.

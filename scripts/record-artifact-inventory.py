@@ -130,9 +130,8 @@ def collect(artifacts: Path) -> list[dict]:
         if name.startswith(("installed-javascript-", "clean-install-", "golden-path-", "edge-runtime-")):
             continue
         if name == "configuration-journeys":
-            # Issue #1255: the report of the installed-candidate configuration
-            # journeys, which the `configuration` job already judged. A
-            # qualification record, not a shipped artifact.
+            # Collected separately with its downloadable custom composition.
+            # Neither belongs to the published artifact matrix.
             continue
         if name.startswith("shadow-determinism-"):
             # Issue #772: the CI workflow's per-host shadow evaluations and
@@ -170,6 +169,125 @@ def collect(artifacts: Path) -> list[dict]:
                 }
             )
     return collected
+
+
+def collect_configuration_qualification(artifacts: Path, revision: str, version: str) -> tuple[dict, list[str]]:
+    """Bind custom runtime receipts to the emitted composition a consumer can download."""
+    directory = artifacts / "configuration-journeys"
+    custom = directory / "configuration-custom-artifact"
+    errors: list[str] = []
+
+    def require(condition: bool, message: str) -> None:
+        if not condition:
+            errors.append(f"configuration: {message}")
+
+    try:
+        report_path = directory / "configuration-journeys.json"
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        build = json.loads((custom / "build-report.json").read_text(encoding="utf-8"))
+        manifest = json.loads((custom / "artifact-manifest.custom.json").read_text(encoding="utf-8"))
+        require(report["schema"] == "configuration-qualification/v1", "report schema differs")
+        require(report["sourceCommit"] == revision, "report source differs")
+        require(report["productVersion"] == version and report["published"] is False, "candidate identity differs")
+        core_rows = [package for package in report["packages"] if package["name"] == "@redact-secret/core"]
+        require(len(core_rows) == 1, "expected exactly one core package receipt")
+        if len(core_rows) != 1:
+            raise ValueError("missing core package receipt")
+        core = core_rows[0]
+        if not isinstance(core["file"], str) or Path(core["file"]).name != core["file"]:
+            raise ValueError("invalid core package file")
+        core_path = directory / "candidate" / core["file"]
+        require(
+            core["version"] == version and digest(core_path) == core["sha256"],
+            "core tarball differs from installed candidate",
+        )
+        require(
+            build["engine"]["sourceRevision"] == revision and build["engine"]["sourceTreeDirty"] is False,
+            "custom build source is not the clean candidate",
+        )
+        require(
+            manifest["sourceRevision"] == revision and manifest["version"] == version, "custom manifest source differs"
+        )
+        require(manifest["artifact"]["variant"] == "custom", "custom manifest variant differs")
+        require(build["manifest"]["digest"] == manifest["digest"], "build manifest digest differs")
+        require(build["composition"]["id"] == manifest["composition"]["id"], "build composition differs")
+        files = []
+        for name, expected in build["files"].items():
+            if not isinstance(name, str) or Path(name).name != name or name in (".", ".."):
+                raise ValueError("invalid custom file name")
+            path = custom / name
+            require(digest(path) == expected, "custom file differs from the build receipt")
+            files.append({"file": name, "sha256": digest(path), "bytes": path.stat().st_size})
+        required_files = {"index.js", "redact_secret_wasm_custom.js", "redact_secret_wasm_custom_bg.wasm"}
+        require(required_files.issubset(build["files"]), "custom executable file identity is missing")
+        rows = [row for row in report["rows"] if row["id"] == "wasm/custom"]
+        require(
+            len(report["rows"]) == 5
+            and {row["id"] for row in report["rows"]}
+            == {"node-addon/full", "node-addon/common", "wasm/full", "wasm/common", "wasm/custom"},
+            "configuration runtime row set differs",
+        )
+        for row in report["rows"]:
+            require(
+                row["checks"]["closedVocabulary"] == {"cases": 9, "ownerUnchanged": True, "comparison": True},
+                "configuration closed vocabulary journey is missing",
+            )
+        require(len(rows) == 1, "expected exactly one custom row")
+        if len(rows) != 1:
+            raise ValueError("missing custom row")
+        binary = rows[0]["binary"]
+        require(binary["file"] == "redact_secret_wasm_custom_bg.wasm", "custom binary name differs")
+        require(binary["sha256"] == build["files"][binary["file"]], "qualified custom binary differs")
+        exact = rows[0]["exact"]
+        require(exact["packagedManifestDigest"] == manifest["digest"], "qualified custom manifest differs")
+        require(exact["compositionId"] == manifest["composition"]["id"], "qualified custom composition differs")
+        required_checks = {
+            "exact manifest and enabled set",
+            "selected, excluded and benign oracle probes",
+            "redaction and declarative policy override",
+            "incremental partition equivalence",
+            "excluded detector capability ceiling",
+            "v1 open and v2 closed policy vocabulary preview",
+        }
+        require(set(report["customRuntimes"]) == {"chromium", "workerd"}, "custom runtime set differs")
+        for key, runtime_name in (("chromium", "chromium"), ("workerd", "cloudflare-workers")):
+            runtime = report["customRuntimes"][key]
+            require(
+                runtime["runtime"] == runtime_name and runtime["executed"] is True, "custom runtime was not executed"
+            )
+            require(
+                isinstance(runtime["checks"], list)
+                and len(runtime["checks"]) == len(required_checks)
+                and set(runtime["checks"]) == required_checks,
+                "custom runtime check set differs",
+            )
+            require(
+                type(runtime["partitions"]) is int and runtime["partitions"] > 1,
+                "custom runtime partitions are vacuous",
+            )
+            require(runtime["binarySha256"] == binary["sha256"], "custom runtime binary differs")
+            require(runtime["manifestDigest"] == manifest["digest"], "custom runtime manifest differs")
+            require(runtime["compositionId"] == manifest["composition"]["id"], "custom runtime composition differs")
+        return {
+            "sourceCommit": report["sourceCommit"],
+            "reportSha256": digest(report_path),
+            "artifact": "configuration-journeys",
+            "customPath": "configuration-custom-artifact",
+            "manifestDigest": manifest["digest"],
+            "compositionId": manifest["composition"]["id"],
+            "files": files,
+            "customRuntimes": report["customRuntimes"],
+            "corePackage": {
+                "name": "@redact-secret/core",
+                "version": version,
+                "file": f"candidate/{core['file']}",
+                "sha256": digest(core_path),
+                "bytes": core_path.stat().st_size,
+            },
+        }, errors
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        errors.append("configuration: missing or malformed custom qualification evidence")
+        return {}, errors
 
 
 def collect_installed_javascript_qualification(
@@ -943,6 +1061,11 @@ def main() -> int:
     errors.extend(edge_errors)
     errors.extend(require_edge_runtime_qualification(edge_runtime, collected, revision, product_version))
 
+    configuration, configuration_errors = collect_configuration_qualification(
+        arguments.artifacts, revision, product_version
+    )
+    errors.extend(configuration_errors)
+
     reviewed_version, rehearsal = review_version(product_version)
     try:
         release_readiness = release_readiness_record(reviewed_version, revision, rehearsal=rehearsal)
@@ -978,6 +1101,7 @@ def main() -> int:
         "cleanInstallQualification": clean_install,
         "goldenPathQualification": golden_path,
         "edgeRuntimeQualification": edge_runtime,
+        "configurationQualification": configuration,
         "releaseReadiness": release_readiness,
     }
 

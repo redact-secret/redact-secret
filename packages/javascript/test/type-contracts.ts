@@ -158,6 +158,15 @@ type DetectionIsOneOfTwoLists = Expect<Equal<keyof DetectionSelection, "include"
 /** A callback is not configuration data. */
 type RuntimeConfigHasNoCallback = Expect<"policy" extends keyof RuntimeConfig ? false : true>;
 
+const strictConfig: RuntimeConfig = { schema: "runtime-config/v2", closedTypes: [], closedDetectors: [] };
+// @ts-expect-error closed vocabularies require an explicit v2 schema.
+const unversionedClosure: RuntimeConfig = { closedTypes: [] };
+// @ts-expect-error v1 has no closed vocabulary members.
+const v1Closure: RuntimeConfig = { schema: "runtime-config/v1", closedDetectors: [] };
+// @ts-expect-error closed vocabulary entries are strings.
+const malformedClosure: RuntimeConfig = { schema: "runtime-config/v2", closedTypes: [1] };
+void [strictConfig, unversionedClosure, v1Closure, malformedClosure];
+
 const policy: SecretPolicy = {
   evaluate(finding: DetectedSecretFinding, context: PolicyContext): SecretAction {
     const confidence: SecretConfidence = finding.confidence;

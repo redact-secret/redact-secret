@@ -366,7 +366,7 @@ export async function stageWorkerProject(detectorProfile, fixture, expectedVersi
 /** Starts `wrangler dev` in `directory` and resolves once it answers requests,
  * polling rather than parsing its stdout so this does not depend on the
  * exact banner text of whatever `wrangler` version is installed. */
-async function startWrangler(directory, port) {
+export async function startWrangler(directory, port) {
   const child = spawn(process.execPath, [WRANGLER_BIN, "dev", "--port", String(port), "--local", "--ip", "127.0.0.1"], {
     cwd: directory,
     stdio: ["ignore", "pipe", "pipe"],
@@ -406,7 +406,7 @@ async function startWrangler(directory, port) {
  * and `stderr`, which keeps this process's event loop alive after the last
  * check has already passed: the script hangs until CI cancels the job at its
  * timeout, leaving orphan `workerd` processes behind. */
-async function stopWrangler(child) {
+export async function stopWrangler(child) {
   const exited = new Promise((resolveExit) => child.once("exit", resolveExit));
   const signal = (name) => {
     try {

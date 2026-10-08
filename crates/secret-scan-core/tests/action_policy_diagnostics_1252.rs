@@ -4,8 +4,8 @@
 //!
 //! The shared cases (typo, unavailable versus unknown, shadowing, partial
 //! overlap, callback) live in `conformance/fixtures/runtime-config-v1.json` and
-//! run on every surface. This file covers what only Rust offers (the closed
-//! vocabulary and sample hits) and the bounds. Every document is synthetic.
+//! run on every surface. This file also covers the Rust builder vocabulary,
+//! sample hits and the bounds. Every document is synthetic.
 
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
@@ -278,6 +278,25 @@ fn strict_validation_exists_only_with_a_declared_closed_vocabulary() {
     assert!(!strict_detector.is_ok());
     // The parser itself is not strict.
     assert!(load_action_policy(document.as_bytes()).is_ok());
+}
+
+#[test]
+fn a_v2_document_cannot_replace_a_rust_builder_vocabulary() {
+    for (config, request) in [
+        (
+            r#"{"schema":"runtime-config/v2","closedTypes":[]}"#,
+            ConfigRequest::new().closed_types(&["synthetic_internal_type"]),
+        ),
+        (
+            r#"{"schema":"runtime-config/v2","closedDetectors":[]}"#,
+            ConfigRequest::new().closed_detectors(&["synthetic-detector"]),
+        ),
+    ] {
+        let resolution = resolve_config(&manifest("full"), &request.runtime_config(config));
+        assert!(!resolution.is_ok());
+        assert!(resolution.snapshot().is_none());
+        assert_eq!(codes(&resolution), ["INVALID_OPTIONS"]);
+    }
 }
 
 #[test]

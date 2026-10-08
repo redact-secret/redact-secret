@@ -192,12 +192,41 @@ await build({
 });
 ```
 
-`npm run configuration:qualify` bundles the installed standard package and a generated custom artifact
-this way, runs both bundles and requires the same manifest digest as the unbundled artifact; the `browser`
-build is checked for the binary reference and the copied bytes, and is not executed in a browser by that
-step. The clean-install browser lane already bundles the *standard* package with Vite; webpack is not a
+`npm run configuration:qualify` runs the Node bundles and executes the generated custom artifact's
+browser bundle in Chromium, requiring the same manifest and WASM bytes as the unbundled artifact.
+The same generated composition runs in local Cloudflare `workerd` through Wrangler. These checks cover
+selected and excluded detector probes against `full` narrowed to the same ids, redaction, a declarative
+policy override, incremental partitions and capability-ceiling rejection. They qualify that exact
+composition, not every possible detector subset or every browser engine.
+The clean-install browser lane already bundles the *standard* package with Vite; webpack is not a
 dependency of this repository and neither is qualified for a *custom* artifact here, so no recipe for them is
 claimed; the same constraint (the binary beside the emitted glue) applies.
+
+### Cloudflare Workers loading
+
+Workers supplies a compiled WASM module instead of compiling bytes fetched at runtime. Before calling
+the generated wrapper's `initialize`, initialize its adjacent generated glue with that module:
+
+```js
+import { initSync } from "./vendor/redact/redact_secret_wasm_custom.js";
+import module from "./vendor/redact/redact_secret_wasm_custom_bg.wasm";
+import { initialize, scanAndRedact } from "./vendor/redact/index.js";
+
+initSync({ module });
+export default {
+  async fetch() {
+    await initialize();
+    return Response.json(scanAndRedact("API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"));
+  },
+};
+```
+
+Configure Wrangler's `CompiledWasm` rule for `**/*.wasm`; the qualification uses compatibility date
+`2026-10-01`. The glue caches this module, so the unchanged wrapper does not fetch or compile it again.
+The `configuration-journeys` CI artifact retains the exact emitted files under
+`configuration-custom-artifact/`, with their source revision and file digests in `build-report.json`.
+Performance measurements belong to `redact-secret-benchmarks`; successful runtime checks make no speed
+or memory claim. This custom composition is generated for consumers and is not a published package.
 
 ## How it works: the generation seam
 

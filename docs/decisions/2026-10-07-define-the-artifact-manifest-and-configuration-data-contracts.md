@@ -228,7 +228,18 @@ tests are authoritative; the decision of each section is unchanged.
   `ACTION_POLICY_RULE_ON_UNENABLED_DETECTOR`) and `ACTION_POLICY_ANALYSIS_UNCERTAIN`
   (`info`: a callback, or a name an open source could emit). An item may carry a
   `related` pointer, and `id` may be a rule id. A declared closed vocabulary
-  (Rust only) makes an unknown name an error. See the [action policy guide](../guides/action-policy.md#diagnose-a-policy-before-use).
+   makes an unknown name an error. Rust declares it through `ConfigRequest`;
+   #1283 exposes the same declarations as `closedTypes` and `closedDetectors`
+   in an explicitly tagged `runtime-config/v2`, following the input evolution
+   rule above. Each is an optional string array: absent stays open, empty closes
+   with no additional names, and nonempty adds caller-declared names to those
+   already recognized. Version 1 remains unchanged and rejects these members.
+   Malformed lists produce input-free `WRONG_TYPE` diagnostics; both a JSON list
+   and the corresponding Rust builder list produce `INVALID_OPTIONS`. The
+   document and diagnostic bounds, policy parser, scan behavior and output
+   schemas are unchanged. Vocabulary declarations validate a preview only and
+   are not included in the effective scan snapshot. See the
+   [action policy guide](../guides/action-policy.md#diagnose-a-policy-before-use).
 - **#1254.** `compareConfigurations` is implemented with the placement the Size
   paragraph allows. The Rust core has `compare_configurations` (sides are
   registries the caller builds, from `ConfigSnapshot::detection_selection`,
