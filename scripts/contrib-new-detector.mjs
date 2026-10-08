@@ -354,14 +354,16 @@ function inventoryEdit(n, types, policyClass) {
 function allowlistEdit(n, issue, benchmarkIssue) {
   return (text) => {
     if (text.includes(`"${n.id}":`)) throw new Refusal(`${FILES.allowlist}: ${n.id} is already listed`);
-    const block = blockEnd(text, /\n {2}"unmeasured": \{\n/, /\n {2}\}/, "the unmeasured allowlist");
-    const lines = text.slice(block.start, block.end).split("\n");
-    const keyOf = (line) => /^ {4}"([^"]+)"/.exec(line)?.[1] ?? "";
     const counterpart = benchmarkIssue
       ? `its redact-secret-benchmarks arrival counterpart (${benchmarkIssue})`
       : `its redact-secret-benchmarks arrival counterpart (${MARKER}: issue)`;
     const reason = `Shipped by ${issue} (${MARKER}: one-line family description) before its benchmarks arrival evidence: the family joins the pinned support matrix with ${counterpart} and the next matrix refresh, which removes this entry. Listed as not yet measured; no support-status claim.`;
     const entry = `    ${JSON.stringify(n.id)}: ${JSON.stringify(reason)}`;
+    const empty = /\n {2}"unmeasured": \{\}/;
+    if (empty.test(text)) return text.replace(empty, `\n  "unmeasured": {\n${entry}\n  }`);
+    const block = blockEnd(text, /\n {2}"unmeasured": \{\n/, /\n {2}\}/, "the unmeasured allowlist");
+    const lines = text.slice(block.start, block.end).split("\n");
+    const keyOf = (line) => /^ {4}"([^"]+)"/.exec(line)?.[1] ?? "";
     const at = lines.findIndex((line) => keyOf(line) > n.id);
     if (at === -1) {
       lines[lines.length - 1] = `${lines[lines.length - 1]},`;

@@ -574,25 +574,25 @@
       "rationale": "The pattern comes from the checked-in handoff JSON Schema (`docs/contracts/contribution/implementation-ready-handoff-v1.schema.json`), which is reviewed repository content, not request data. The script is a local contributor tool that reads a local file and sends nothing over a network, so there is no attacker-controlled pattern or input to cause ReDoS.",
       "rule_id": "sast.rules.javascript.lang.security.audit.detect-non-literal-regexp"
     },
-    "d27291320a54fbdd": {
+    "00d37eba7e3d7d52": {
       "classification": "false_positive",
-      "line": 479,
+      "line": 481,
       "path": "scripts/contrib-new-detector.mjs",
-      "rationale": "The interpolated detector id is validated by `ID_PATTERN` (`^[a-z0-9][a-z0-9-]*$`) before any edit runs, so it holds no regular-expression metacharacters (a `-` outside a character class is literal). The script is a local contributor tool, not a service.",
+      "rationale": "The interpolated detector id is validated by `ID_PATTERN` (`^[a-z0-9][a-z0-9-]*$`) before any edit runs, so it holds no regular-expression metacharacters (a `-` outside a character class is literal). The script is a local contributor tool, not a service. PR #1291's empty-allowlist handling adds two earlier source lines; line 479 moved to 481. The full finding span and five surrounding lines are byte-identical to reviewed head 9716a98eb2bf6c10765218e468d9a1cbf51b85f2; the validation and output behavior supporting this disposition are unchanged.",
       "rule_id": "sast.rules.javascript.lang.security.audit.detect-non-literal-regexp"
     },
-    "f8d19894a7ed57b5": {
+    "7845cf819f698a54": {
       "classification": "false_positive",
-      "line": 486,
+      "line": 488,
       "path": "scripts/contrib-new-detector.mjs",
-      "rationale": "The interpolated group is checked against the fixed `GROUPS` list (`ai`, `cloud`, `devtools`, `pkg-registry`, `saas`) before use, so it holds no regular-expression metacharacters. The script is a local contributor tool, not a service.",
+      "rationale": "The interpolated group is checked against the fixed `GROUPS` list (`ai`, `cloud`, `devtools`, `pkg-registry`, `saas`) before use, so it holds no regular-expression metacharacters. The script is a local contributor tool, not a service. PR #1291's empty-allowlist handling adds two earlier source lines; line 486 moved to 488. The full finding span and five surrounding lines are byte-identical to reviewed head 9716a98eb2bf6c10765218e468d9a1cbf51b85f2; the validation and output behavior supporting this disposition are unchanged.",
       "rule_id": "sast.rules.javascript.lang.security.audit.detect-non-literal-regexp"
     },
-    "5ee1ef66780ff9ec": {
+    "234982f1a80bd81c": {
       "classification": "false_positive",
-      "line": 706,
+      "line": 708,
       "path": "scripts/contrib-new-detector.mjs",
-      "rationale": "The template string is the CLI `--help` usage text, containing `<detector-id>`-style placeholders for the terminal. It is printed to stdout, never assigned to `innerHTML`, rendered into a DOM, or interpreted as markup.",
+      "rationale": "The template string is the CLI `--help` usage text, containing `<detector-id>`-style placeholders for the terminal. It is printed to stdout, never assigned to `innerHTML`, rendered into a DOM, or interpreted as markup. PR #1291's empty-allowlist handling adds two earlier source lines; line 706 moved to 708. The full finding span and five surrounding lines are byte-identical to reviewed head 9716a98eb2bf6c10765218e468d9a1cbf51b85f2; the validation and output behavior supporting this disposition are unchanged.",
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string"
     },
     "a636f03dad798cac": {
