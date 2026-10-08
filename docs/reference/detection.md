@@ -415,3 +415,16 @@ sanitized output, concurrency, and memory before downstream use. See
 To report a missed detection or false positive, provide a minimal synthetic
 reproducer, the runtime and product version, and expected safe metadata. Never
 include an active credential in an issue, test, log, or screenshot.
+
+## Current-target PII qualification
+
+The pinned benchmark matrix may additionally carry `piiCurrentQualification`, a separate exact-source
+record for a later candidate. Its public/synthetic comparison can be recorded while all current families
+remain pending: public measurement does not satisfy validator, qualification, runtime/package cost,
+size budget, profile cost or protected execution gates. The historical Beta.11 table above remains its
+own measured disposition. A matrix without the optional current record makes no qualification claim
+about a later source. `scripts/check-pii-family-status.py` validates both sections independently;
+the generated [support matrix](../support-matrix.md) states the current target when it is pinned.
+
+A pending gate is not an owner-approved deferral. Product #1003 remains open for a new custodian epoch
+or a precise final reason under the benchmark's protected-execution prerequisites.

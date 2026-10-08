@@ -483,7 +483,7 @@ class IdentitySentenceTests(unittest.TestCase):
             self.assertIn("`aaaaaaaaaaaa` (`0.1.0-beta.99`)", text)
             self.assertIn("benchmarks revision `000000000000`", text)
             self.assertIn("77 fixtures", text)
-            self.assertIn("PII families are outside this count", text)
+            self.assertIn("PII families are outside the credential count", text)
         self.assertIn("`" + "1" * 40 + "`", doc)
         self.assertIn("did not produce these statuses", doc)
 
@@ -896,6 +896,15 @@ class UserFacingReasonTests(unittest.TestCase):
         for status, copy in GEN.STATUS_COPY.items():
             for code in ("T0", "T1", "T2", "T3"):
                 self.assertNotIn(code, copy, status)
+
+
+class PublishedIdentityTests(unittest.TestCase):
+    def test_published_package_identity_omits_unrecorded_commit(self):
+        sample = {"sourceReport": {"revision": "a" * 40, "product": None,
+                  "publishedPackage": {"packageName": "@redact-secret/core", "version": "0.1.0-beta.synthetic"}}}
+        text = GEN.identity_sentence(sample)
+        self.assertIn("@redact-secret/core@0.1.0-beta.synthetic", text)
+        self.assertIn("source commit not recorded", text)
 
 
 if __name__ == "__main__":

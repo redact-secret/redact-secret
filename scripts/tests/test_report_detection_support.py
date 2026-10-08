@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import copy
 import importlib.util
 import sys
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parents[1] / "report-detection-support.py"
@@ -59,6 +61,24 @@ class ReportInvariantTests(unittest.TestCase):
     def test_output_is_deterministic(self) -> None:
         self.assertEqual(REPORT.markdown(REPORT.build(REVISION)), REPORT.markdown(self.report))
         self.assertIn(REVISION, REPORT.markdown(self.report))
+
+
+class PublishedSourceTests(unittest.TestCase):
+    def test_published_identity_does_not_invent_a_source_commit(self):
+        original_load = REPORT.load
+        def load(path):
+            value = original_load(path)
+            if path == REPORT.MATRIX_PATH:
+                value = copy.deepcopy(value)
+                value["sourceReport"]["product"] = None
+                value["sourceReport"]["publishedPackage"] = {"packageName": "@redact-secret/core", "version": "0.1.0-beta.synthetic"}
+            return value
+        with patch.object(REPORT, "load", load):
+            result = REPORT.build(REVISION)
+        self.assertIsNone(result["benchmarks"]["matrixMeasuredProductCommit"])
+        self.assertFalse(result["measuredProductIsSourceRevision"])
+        self.assertIn("@redact-secret/core@0.1.0-beta.synthetic", REPORT.markdown(result))
+        self.assertIn("source commit not recorded", REPORT.markdown(result))
 
 
 if __name__ == "__main__":

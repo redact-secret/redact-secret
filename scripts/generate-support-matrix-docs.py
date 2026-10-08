@@ -52,6 +52,9 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pii_current_qualification import current_qualification_errors, current_qualification_sentence
+
 ROOT = Path(__file__).resolve().parents[1]
 MATRIX_PATH = ROOT / "benchmarks" / "support-matrix.json"
 SCHEMA_PATH = ROOT / "benchmarks" / "support-matrix-schema.json"
@@ -340,6 +343,10 @@ def validate_matrix(matrix: dict, schema: dict) -> list[str]:
     guarantees: this is the second line of defense against a pinned copy that
     was hand-edited or copied from a stale/broken generator run."""
     errors: list[str] = []
+    current = matrix.get("piiCurrentQualification")
+    if current is not None:
+        expected = {row["family"] for row in matrix.get("piiFamilies", [])}
+        errors.extend(current_qualification_errors(current, expected))
     family_properties = schema["properties"]["families"]["items"]["properties"]
     vocabulary = family_properties["status"]["enum"]
     evidence_tiers = family_properties["evidenceTier"]["enum"]
@@ -634,7 +641,7 @@ def _identity_lines(matrix: dict, pins: dict | None) -> list[str]:
         "",
         f"- Benchmarks revision that generated this matrix: `{report['revision']}`.",
     ]
-    product = report.get("product", {})
+    product = report.get("product") or {}
     if product.get("sourceCommit"):
         lines.append(f"- Product commit it measured: `{product['sourceCommit']}`.")
     index = report.get("fixtureIndex", {})
@@ -662,10 +669,14 @@ def identity_sentence(matrix: dict, detector_count: int | None = None, unmeasure
         "entry, one detector can back several families, and some families have no shipped detector."
     ]
     measured = []
-    product = report.get("product", {})
+    product = report.get("product") or {}
     if product.get("sourceCommit"):
         version = f" (`{product['declaredVersion']}`)" if product.get("declaredVersion") else ""
         measured.append(f"product commit `{product['sourceCommit'][:12]}`{version}")
+    elif report.get("publishedPackage", {}).get("version"):
+        published = report["publishedPackage"]
+        name = published.get("packageName", "@redact-secret/core")
+        measured.append(f"published npm package `{name}@{published['version']}` (source commit not recorded)")
     measured.append(f"benchmarks revision `{report['revision'][:12]}`")
     sentence = "Measured on " + " with ".join(measured)
     fixture_count = report.get("fixtureIndex", {}).get("fixtureCount")
@@ -678,8 +689,9 @@ def identity_sentence(matrix: dict, detector_count: int | None = None, unmeasure
         parts.append(
             f"This source ships {detector_count} credential detectors, {which} of them mapped to at least one family."
         )
+    parts.append(current_qualification_sentence(matrix.get("piiCurrentQualification")))
     parts.append(
-        "The opt-in PII families are outside this count and outside the matrix; their statuses are in "
+        "The opt-in PII families are outside the credential count; their historical statuses are in "
         "[the detection reference](docs/reference/detection.md#opt-in-pii-availability-is-not-support)."
     )
     return " ".join(parts)
