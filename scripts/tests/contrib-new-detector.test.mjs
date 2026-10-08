@@ -81,6 +81,14 @@ function writeHandoff(root, mutate) {
   return file;
 }
 
+// The published example describes `ory-token`, which now exists in the tree and
+// is refused as an overwrite. The scaffold tests use it under a demo identity.
+const DEMO_IDENTITY = (handoff) => {
+  handoff.identity.detector = "ory-demo";
+  handoff.identity.findingTypes = ["ory_demo_session", "ory_demo_oauth2"];
+  handoff.identity.family = "ory-demo:network-api-key";
+};
+
 test("the published handoff schema and example validate with no errors", () => {
   assert.deepEqual(validateHandoff(example, schema), []);
 });
@@ -226,19 +234,19 @@ test("a confidence-gated detector skips the always-redact list", () => {
 
 test("a handoff supplies id, finding types, policy, family, issue and benchmark counterpart", () => {
   withSandbox((root) => {
-    const { code, out } = run(root, ["--handoff", join(root, EXAMPLE)]);
+    const { code, out } = run(root, ["--handoff", writeHandoff(root, DEMO_IDENTITY)]);
     assert.equal(code, 0, out);
-    assert.match(out, /ory_session_token, ory_oauth2_token/);
+    assert.match(out, /ory_demo_session, ory_demo_oauth2/);
     assert.match(out, /npm run check:detector ; npm run check:rust ; npm run check:js/);
     const inventory = JSON.parse(readFileSync(join(root, "docs/coverage/detector-inventory.json"), "utf8"));
     assert.deepEqual(
-      inventory.types.filter((entry) => entry.detector === "ory-token").map((entry) => entry.type),
-      ["ory_session_token", "ory_oauth2_token"],
+      inventory.types.filter((entry) => entry.detector === "ory-demo").map((entry) => entry.type),
+      ["ory_demo_session", "ory_demo_oauth2"],
     );
     const allowlist = readFileSync(join(root, "docs/coverage/detector-family-coverage-allowlist.json"), "utf8");
     assert.match(allowlist, /#1110/);
     assert.match(allowlist, /redact-secret-benchmarks#583/);
-    assert.match(readFileSync(join(root, "docs/specs/detector-families.md"), "utf8"), /`ory:network-api-key`/);
+    assert.match(readFileSync(join(root, "docs/specs/detector-families.md"), "utf8"), /`ory-demo:network-api-key`/);
   });
 });
 
@@ -306,9 +314,9 @@ test("usage errors exit 2 and --help exits 0", () => {
 test("generated text carries only the synthetic placeholder, never a secret-shaped literal", () => {
   withSandbox((root) => {
     const before = snapshot(root);
-    assert.equal(run(root, ["--handoff", join(root, EXAMPLE)]).code, 0);
+    assert.equal(run(root, ["--handoff", writeHandoff(root, DEMO_IDENTITY)]).code, 0);
     const after = snapshot(root);
-    const added = [readFileSync(join(root, "crates/secret-scan-core/src/detectors/ory_token.rs"), "utf8")];
+    const added = [readFileSync(join(root, "crates/secret-scan-core/src/detectors/ory_demo.rs"), "utf8")];
     for (const [path, text] of after) {
       const old = before.get(path);
       if (old === undefined) continue;
@@ -327,8 +335,8 @@ test("generated text carries only the synthetic placeholder, never a secret-shap
       }
       assert.doesNotMatch(rest, /\b(?:sk|pk)[-_][A-Za-z0-9]{16,}|ghp_|AKIA[0-9A-Z]{16}|xox[abp]-|eyJ[A-Za-z0-9]{10}/);
     }
-    const names_ = names("ory-token");
-    for (const fixture of fixtureStubs(names_, ["ory_session_token"])) {
+    const names_ = names("ory-demo");
+    for (const fixture of fixtureStubs(names_, ["ory_demo_session"])) {
       assert.ok(
         fixture.input.startsWith(PLACEHOLDER_PREFIX) || fixture.input.startsWith(`secret_key=${PLACEHOLDER_PREFIX}`),
       );
