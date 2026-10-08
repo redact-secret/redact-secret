@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   BuildError,
   buildCustomArtifact,
+  bundleEntry,
   ENGINE_FLOOR,
   planCustomArtifact,
   UNSUPPORTED_TARGETS,
@@ -26,6 +27,53 @@ import {
 import { containsLiteral, measureElimination, printableRuns, sizes, words } from "../lib/wasm-inspect.mjs";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
+
+test("the emitted loader keeps Workers' Node process shim out of the file loader", async () => {
+  const root = mkdtempSync(join(tmpdir(), "custom-loader-"));
+  const globals = Object.fromEntries(
+    ["navigator", "window", "document"].map((name) => [name, Object.getOwnPropertyDescriptor(globalThis, name)]),
+  );
+  try {
+    const dist = join(root, "dist");
+    mkdirSync(join(dist, "runtime"), { recursive: true });
+    writeFileSync(join(root, "package.json"), '{"type":"module"}');
+    writeFileSync(join(dist, "runtime.js"), "export const createRedactSecretRuntime = load => ({initialize: load});");
+    writeFileSync(join(dist, "entry-core.js"), "export {};");
+    writeFileSync(
+      join(dist, "runtime", "wasm-binding.js"),
+      "export const assertWasmModuleShape = () => {}; export const createBindingFromWasmModule = module => module;",
+    );
+    writeFileSync(
+      join(root, "redact_secret_wasm_custom.js"),
+      'let mode; export default async function initialize(options) { mode = options?.module_or_path instanceof Uint8Array ? "file" : "default"; } export const observedMode = () => mode;',
+    );
+    writeFileSync(join(root, "redact_secret_wasm_custom_bg.wasm"), new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0]));
+    const entry = join(root, "index.js");
+    writeFileSync(entry, bundleEntry({ distDir: dist }));
+    // The real Node process has every property of the Workers compatibility
+    // shim that originally selected the wrong branch.
+    assert.equal(typeof process.versions.node, "string");
+    for (const [name, userAgent, browser, expected] of [
+      ["workers", "Cloudflare-Workers", false, "default"],
+      ["node", "Node.js/22", false, "file"],
+      ["browser", "synthetic-browser", true, "default"],
+    ]) {
+      Object.defineProperty(globalThis, "navigator", { configurable: true, value: { userAgent } });
+      for (const property of ["window", "document"]) {
+        Object.defineProperty(globalThis, property, { configurable: true, value: browser ? {} : undefined });
+      }
+      const api = await import(`${pathToFileURL(entry).href}?${name}`);
+      const module = await api.initialize();
+      assert.equal(module.observedMode(), expected, name);
+    }
+  } finally {
+    for (const [name, descriptor] of Object.entries(globals)) {
+      if (descriptor) Object.defineProperty(globalThis, name, descriptor);
+      else delete globalThis[name];
+    }
+    rmSync(root, { recursive: true, force: true });
+  }
+});
 
 /** The catalog, read from the core source the way the CLI manifest is generated from it. */
 function catalog() {

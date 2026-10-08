@@ -19,6 +19,8 @@ evidence is linked from each published version.
   and incremental output checked against the installed candidate. The qualification
   artifact retains the exact custom files for independent footprint and timing
   measurements; this does not qualify other browsers or deployed Workers accounts.
+  Its loader keeps Workers' Node-compatible `process` out of Node's file-loading
+  branch, so the precompiled WebAssembly module remains usable in workerd.
 
 - Cloudflare Workers exact-artifact receipts (#1000): the existing qualification
   lane installs packed core/WASM packages for full/common and PII off/on,
