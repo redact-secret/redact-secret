@@ -262,7 +262,8 @@ def view_support_section(matrix: dict, root: Path) -> tuple[dict, None]:
         "measuredProductVersion": identity["productVersion"],
         "measuredProductRevision": None,
         "gatedLatestRelease": False,
-        "providerCount": matrix.get("providerCount"),
+        "providerCount": len({row["provider"] for row in families if row.get("provider")}),
+        "sourceReportedProviderCount": matrix.get("providerCount"),
         "familyCount": len(families),
         "distribution": distribution,
         "families": [
@@ -361,7 +362,8 @@ def main(argv: list[str] | None = None) -> int:
         for error in errors:
             print(f"site-feed: {error}", file=sys.stderr)
         if not errors:
-            print(f"site-feed: {FEED_PATH} is current and valid")
+            for version in versions:
+                print(f"site-feed: docs/contracts/site-feed/v{version}/feed.json is current and valid")
         return 1 if errors else 0
     for version in versions:
         try:

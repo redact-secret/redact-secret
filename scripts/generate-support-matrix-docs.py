@@ -185,11 +185,19 @@ REASON_GATE_GROUPS = {
     "positiveContractTier": "no-contract",
     # Gates the beta.8 evidence contract (benchmarks cfaeac4) never emitted;
     # the current contract emits them for families measured since.
+    "benign.minimumCases": "controls",
+    "benign.minimumAxes": "controls",
     "benign.falseAlarms": "false-alarms",
     "twinFailures": "twin-misses",
     "metamorphic.criticalFailures": "robustness",
     "mutation.unresolvedCritical": "review",
     "differential.unresolvedContractDisagreements": "peer-disagreements",
+    "policy.positive-cases": "positives",
+    "policy.positive-axes": "positives",
+    "policy.benign-cases": "controls",
+    "policy.benign-axes": "controls",
+    "policy.twin-pairs": "twins",
+    "policy.critical-failure": "policy-critical",
     "policy.protected-holdout": "holdout",
     "policy.exact-span": "span-accuracy",
     "policy.leaked-span": "span-accuracy",
@@ -232,6 +240,7 @@ REASON_GROUP_COPY = (
     ("peer-disagreements", "its disagreements with other scanners about the format settled"),
     ("span-accuracy", "exact match spans that leave no part of the value exposed"),
     ("holdout", "a passing protected holdout run on the frozen candidate"),
+    ("policy-critical", "no unresolved critical policy behavior failures"),
 )
 
 # A raw reason segment that names an evaluator gate: `profile.gate: ...`
@@ -430,7 +439,13 @@ def validate_matrix(matrix: dict, schema: dict) -> list[str]:
         )
 
     actual_providers = {family["provider"] for family in families if family.get("provider")}
-    if matrix.get("providerCount") != len(actual_providers):
+    registered = matrix.get("providerCount")
+    invalid_count = (
+        (not isinstance(registered, int) or isinstance(registered, bool) or registered < len(actual_providers))
+        if is_view_matrix(matrix)
+        else registered != len(actual_providers)
+    )
+    if invalid_count:
         errors.append(f"providerCount {matrix.get('providerCount')} != {len(actual_providers)} distinct providers")
 
     return errors
@@ -500,7 +515,11 @@ def render_matrix_markdown(
         "([source revision](https://github.com/redact-secret/redact-secret-benchmarks/commit/"
         f"{revision})); see the module docstring for how to refresh it.",
         "",
-        f"{matrix['providerCount']} providers, {matrix['familyCount']} credential families.",
+        (
+            f"{matrix['providerCount']} source-reported provider identities (including the null generic-family bucket), {len({f['provider'] for f in families if f.get('provider')})} named providers, {matrix['familyCount']} credential families."
+            if is_view_matrix(matrix)
+            else f"{matrix['providerCount']} providers, {matrix['familyCount']} credential families."
+        ),
         "",
         identity_sentence(matrix, detector_count, len(unmeasured)).replace(
             "(docs/reference/detection.md", "(reference/detection.md"
@@ -764,7 +783,7 @@ def render_readme_fragment(
     )
     lines = [
         README_START,
-        f"**Support status** ({matrix['providerCount']} providers, {matrix['familyCount']} credential "
+        f"**Support status** ({len({f['provider'] for f in matrix['families'] if f.get('provider')}) if is_view_matrix(matrix) else matrix['providerCount']} providers, {matrix['familyCount']} credential "
         f"families; {counts}; stable qualification: {profile_counts}; evidence tiers: {evidence_counts}) "
         "-- generated from evaluation evidence, never hand-written. Stable families are labeled "
         "`Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. "
@@ -838,7 +857,7 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
     lines = [
         "### Support status",
         "",
-        f"{matrix['providerCount']} providers, {matrix['familyCount']} credential families: "
+        f"{len({f['provider'] for f in matrix['families'] if f.get('provider')}) if is_view_matrix(matrix) else matrix['providerCount']} providers, {matrix['familyCount']} credential families: "
         + ", ".join(f"{status} {distribution.get(status, 0)}" for status in STATUS_ORDER)
         + ". See the [support matrix](/docs/support-matrix.md).",
         "",

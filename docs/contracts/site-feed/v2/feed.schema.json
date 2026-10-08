@@ -124,7 +124,8 @@
         "familyCount",
         "distribution",
         "families",
-        "source"
+        "source",
+        "sourceReportedProviderCount"
       ],
       "properties": {
         "benchmarksRevision": {
@@ -294,6 +295,11 @@
               }
             }
           }
+        },
+        "sourceReportedProviderCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Source-reported distinct family provider identities, including the null generic-family bucket; providerCount counts providers represented by the listed families."
         }
       },
       "if": {

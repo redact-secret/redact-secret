@@ -195,7 +195,16 @@ def build(source_revision: str) -> dict:
             "piiFamilies": len(pii_ids),
         },
         "matrix": {
-            "providers": matrix["providerCount"],
+            "providers": (
+                len({row["provider"] for row in matrix["families"] if row.get("provider")})
+                if source["kind"] == "qualification-view"
+                else matrix["providerCount"]
+            ),
+            **(
+                {"sourceReportedProviderCount": matrix["providerCount"]}
+                if source["kind"] == "qualification-view"
+                else {}
+            ),
             "families": matrix["familyCount"],
             "familiesByStatus": family_counts,
             "familiesWithoutShippedDetector": families_without_detector,

@@ -18,3 +18,8 @@ Run `python3 -B scripts/generate-site-feed.py --version 2` to regenerate this
 contract, or omit `--version` to generate both contracts after canonical adoption.
 Public consumers must explicitly select v2 and handle the nullable timestamp.
 The v1 contract and compatibility policy remain unchanged.
+
+`sourceReportedProviderCount` preserves the upstream count of distinct family
+provider identities, including the null bucket for generic families.
+`providerCount` recounts distinct non-null named providers represented by the
+listed families. Neither field counts registered taxonomy providers.

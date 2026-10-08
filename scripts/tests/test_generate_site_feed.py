@@ -120,6 +120,7 @@ class SiteFeedTest(unittest.TestCase):
         historical = matrix()
         native = canonical()
         native.update({key: historical[key] for key in ("families", "familyCount", "providerCount", "distribution")})
+        native["providerCount"] = 3
         (self.fixture.root / GEN.CURRENT_MATRIX).write_text(json.dumps(native))
         (self.fixture.root / "benchmarks/pin-source.json").write_text(json.dumps({"benchmarkCommit": BENCH}))
         directory = Path("docs/contracts/site-feed/v2")
@@ -134,6 +135,8 @@ class SiteFeedTest(unittest.TestCase):
             self.assertNotIn("source", old["supportMatrix"])
             self.assertEqual(old["sources"][1]["path"], GEN.MATRIX_PATH.as_posix())
             self.assertEqual(new["schemaVersion"], "redact-secret.site-feed/v2")
+            self.assertEqual(new["supportMatrix"]["providerCount"], 2)
+            self.assertEqual(new["supportMatrix"]["sourceReportedProviderCount"], 3)
             self.assertIsNone(new["supportMatrix"]["generatedAt"])
             self.assertIsNone(new["supportMatrix"]["measuredProductRevision"])
             self.assertFalse(new["supportMatrix"]["gatedLatestRelease"])
