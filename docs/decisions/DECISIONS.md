@@ -29,6 +29,7 @@ Current rules: `docs/specs/contextual-detection.md`.
 - [Define the versioned English and Korean PII context vocabulary contract](2026-09-26-define-the-pii-context-vocabulary-contract.md)
 - [Version the PII context vocabulary as pii-context/v2 with forward-only field labels and ASCII case folding in every language](2026-09-28-version-the-pii-context-vocabulary-as-v2.md)
 - [Keep credential role and confidentiality facts out of detection, attribution and default action](2026-10-06-keep-credential-role-facts-out-of-detection-attribution-and-default-action.md)
+- [Read the password of a curl -u / --user argument as a contextual secret](2026-10-07-read-the-curl-user-password-argument-as-a-contextual-secret.md)
 
 ## Engine
 

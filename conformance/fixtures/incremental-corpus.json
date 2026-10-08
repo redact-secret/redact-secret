@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 99,
+  "fixtureCount": 105,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1582,6 +1582,109 @@
         }
       ],
       "note": "Issues #1040 and #1044: an AKIA line is released when it closes and the secret below it is still claimed through the session's copy of it; the next secret, directly above an ASIA line, is held for exactly one line. Whole-input results at every partition."
+    },
+    {
+      "id": "ory-token-incremental-session-and-oauth2-partitions",
+      "input": "ORY_SESSION_TOKEN=\u006fry_st_SyntheticRevokedOryFixture000000\nrefresh_token=\u006fry_rt_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000\n\u006fry_st_SyntheticRevokedOryFixture00000\n",
+      "text": "ORY_SESSION_TOKEN=<SECRET_1>\nrefresh_token=<SECRET_2>\n\u006fry_st_SyntheticRevokedOryFixture00000\n",
+      "expected": [
+        {
+          "detector": "ory-token",
+          "type": "ory_session_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 57
+        },
+        {
+          "detector": "ory-token",
+          "type": "ory_oauth2_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 72,
+          "end": 166
+        }
+      ],
+      "note": "Issue #1110: the 39-byte \u006fry_st_ session token and the dotted \u006fry_rt_ OAuth2 token (43-byte key, dot, 43-byte signature) stay whole at every UTF-8 byte and char partition, including splits inside the prefix, at the dot and in the signature, while the 31-byte session twin on the last line never emits a finding."
+    },
+    {
+      "id": "baseten-api-key-incremental-exact-width-partitions",
+      "input": "BASETEN_API_KEY=b10_Synth000.FixtureFixtureFixtureFixture0000\nb10_Synth000.FixtureFixtureFixtureFixture000\n",
+      "text": "BASETEN_API_KEY=<SECRET_1>\nb10_Synth000.FixtureFixtureFixtureFixture000\n",
+      "expected": [
+        {
+          "detector": "baseten-api-key",
+          "type": "baseten_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 61
+        }
+      ],
+      "note": "Issue #1111: the documented b10_ key stays one whole finding at every UTF-8 byte and char partition, including splits inside the prefix, at the separator and at the last secret byte, while the one-byte-short twin on the next line never emits one."
+    },
+    {
+      "id": "curl-user-incremental-continued-commands",
+      "input": "# \uc11c\ube44\uc2a4\ncurl -X GET \\\n  -u svc:SyntheticRevokedCurlPw0001 \\\r\n  https://api.example.test/v1/items\r\ncurl --user=\"svc:SyntheticRevokedCurlPw0002\" https://api.example.test/v1/items\nafter\n",
+      "text": "# \uc11c\ube44\uc2a4\ncurl -X GET \\\n  -u svc:<SECRET_1> \\\r\n  https://api.example.test/v1/items\r\ncurl --user=\"svc:<SECRET_2>\" https://api.example.test/v1/items\nafter\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 35,
+          "end": 61
+        },
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 119,
+          "end": 145
+        }
+      ],
+      "note": "Issue #1247: a curl credential argument on a backslash-continued line (LF and CRLF) and on a quoted attached argument is released only once its command ends, never emitted and retracted, at every UTF-8 byte and char partition from the curl word to the span end plus one, including a split between the CR and LF of a continuation."
+    },
+    {
+      "id": "curl-user-incremental-quoted-and-bounded",
+      "input": "bash -c \"curl -u 'svc:SyntheticRevokedCurlPw0001 SyntheticRevokedCurlPw0002' https://api.example.test/v1/items\"\ndocker run -u 1000:1000 alpine:3.20 id\ncurl -sS https://api.example.test/v1/items\n -u svc:SyntheticRevokedCurlPw0001\n",
+      "text": "bash -c \"curl -u 'svc:<SECRET_1>' https://api.example.test/v1/items\"\ndocker run -u 1000:1000 alpine:3.20 id\ncurl -sS https://api.example.test/v1/items\n -u svc:SyntheticRevokedCurlPw0001\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 22,
+          "end": 75
+        }
+      ],
+      "note": "Issue #1247: a quoted argument with a space is one span; the -u of the next command (docker, and a line after a command that ended) is not curl's, so the session releases the first line without waiting for more input."
+    },
+    {
+      "id": "curl-user-incremental-silent-open-quote",
+      "input": "curl -u \"svc:SyntheticRevokedCurlPw0001\nnext line\ncurl https://api.example.test/v1/items -u \"svc:SyntheticRevokedCurlPw0002",
+      "text": "curl -u \"svc:SyntheticRevokedCurlPw0001\nnext line\ncurl https://api.example.test/v1/items -u \"svc:SyntheticRevokedCurlPw0002",
+      "expected": [],
+      "note": "Issue #1247: an unterminated quote is silent whether the newline or the end of the stream ends it, at every partition."
+    },
+    {
+      "id": "curl-user-incremental-pending-continuation-cr",
+      "input": "curl -u svc:SyntheticRevokedCurlPw0001 \\\r\n  --digest \\\r\n  https://api.example.test/v1/items\r\n",
+      "text": "curl -u svc:<SECRET_1> \\\r\n  --digest \\\r\n  https://api.example.test/v1/items\r\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 12,
+          "end": 38
+        }
+      ],
+      "note": "Issue #1247: a backslash and CR at the end of a chunk hold the command until the next byte shows whether an LF continues it."
     }
   ]
 }

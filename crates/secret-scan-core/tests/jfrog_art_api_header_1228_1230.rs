@@ -5,7 +5,8 @@
 //! credential-evidence Cases `jfrog-reference-token-header-and-basic-password-value`
 //! and `jfrog-api-key-header-and-basic-password-value` flag the value of the
 //! `X-JFrog-Art-API` header by its position, not its shape. The `curl -u
-//! user:<secret>` password slot is deliberately not read here (issue #1247).
+//! user:<secret>` password slot is read by the curl credential-argument
+//! reader (issue #1247), not by the header reader.
 //! Every value is synthetic and assembled at run time.
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
@@ -181,14 +182,15 @@ fn only_the_whole_header_name_is_read() {
 }
 
 #[test]
-fn the_basic_password_slot_is_a_stated_false_negative_until_1247() {
-    // `curl -u user:<secret>` is not read (issue #1247). The user part and
-    // the password stay out of the output of this reader.
+fn the_basic_password_slot_is_read_by_the_curl_argument_reader() {
+    // `curl -u user:<secret>` is read by the curl credential-argument reader
+    // (issue #1247): the password only, whatever its shape.
     let secret = value(ALNUM, 64, 40);
     // The flag and the user are joined at run time so no `-u user:value` text
     // is committed.
     let flag = ["-", "u"].concat();
-    assert_clean(&format!(
-        "curl {flag} alice:{secret} https://acme.jfrog.io/artifactory/api/system/ping\n"
-    ));
+    assert_value(
+        &format!("curl {flag} alice:{secret} https://acme.jfrog.io/artifactory/api/system/ping\n"),
+        &secret,
+    );
 }

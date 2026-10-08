@@ -17,6 +17,7 @@ mod aws;
 mod aws_bedrock;
 mod axiom;
 mod azure_devops;
+mod baseten_api_key;
 mod bearer_token;
 mod bitwarden;
 mod browserbase;
@@ -31,6 +32,7 @@ mod confluent;
 mod connection_string;
 mod convex;
 mod crates_io;
+mod curl_user;
 mod databricks;
 mod datadog;
 mod daytona;
@@ -68,6 +70,7 @@ mod nvidia;
 mod okta;
 mod onepassword;
 mod openai;
+mod ory_token;
 mod otpauth;
 mod paddle;
 mod pattern;
@@ -116,6 +119,9 @@ pub(crate) use prefilter::{LiteralMatcher, RequiredLiterals, ScanScope};
 pub(crate) use aws::{carries_aws_access_key_id, has_open_aws_secret_candidate_line_in};
 pub(crate) use bearer_token::has_open_bearer_authorization;
 pub(crate) use confluent::has_open_confluent_properties_in;
+#[cfg(test)]
+pub(crate) use curl_user::candidate_count as curl_user_candidate_count;
+pub(crate) use curl_user::has_open_curl_command;
 pub(crate) use generic_token::{
     RULESET_NAMES_DETECTOR_ID, generic_token_ruleset_names_detector,
     has_open_contextual_assignment, is_reserved_name, normalize_name,
@@ -426,6 +432,8 @@ pub(crate) fn built_in_detectors() -> &'static [BuiltInRow] {
         row("square-token", &square::SQUARE),
         row("mapbox-token", &mapbox::MAPBOX),
         row("fly-token", &fly::FLY),
+        row("ory-token", &ory_token::ORY_TOKEN),
+        row("baseten-api-key", &baseten_api_key::BASETEN_API_KEY),
         row("jwt", &jwt::JwtDetector),
         row("bearer-token", &bearer_token::BearerTokenDetector),
         row("connection-string", &ConnectionStringDetector),
@@ -816,6 +824,11 @@ const DECLARED_LITERALS: &[(&str, &[Literals])] = &[
             postman::POSTMAN_COLLECTION_ACCESS_KEY.shapes(),
         )],
     ),
+    (ory_token::ID, &[Literals::Shapes(ory_token::SHAPES)]),
+    (
+        baseten_api_key::ID,
+        &[Literals::Shapes(baseten_api_key::SHAPES)],
+    ),
 ];
 
 /// The prefilter declaration groups of the declared built-in `id`, resolved
@@ -993,6 +1006,8 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("square-token", Pack::Provider),
     ("mapbox-token", Pack::Provider),
     ("fly-token", Pack::Provider),
+    ("ory-token", Pack::Provider),
+    ("baseten-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -1158,6 +1173,8 @@ mod tests {
                 "square-token",
                 "mapbox-token",
                 "fly-token",
+                "ory-token",
+                "baseten-api-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -1543,6 +1560,7 @@ mod tests {
         let pydantic_logfire_token_input = format!("pylf_v1_us_{}", "5e7c0ded".repeat(5));
         let square_token_input = format!("EAAA{}{}", "5e7c0ded".repeat(7), "5e7c");
         let fly_token_input = format!("fm2_{}", "5e7c0ded".repeat(8));
+        let ory_token_input = format!("ory_st_{}", "5e7c0ded".repeat(4));
         let mapbox_token_input = format!(
             "sk.eyJ{}.{}{}",
             "5e7c0ded".repeat(3),
@@ -1698,6 +1716,7 @@ mod tests {
             ("square-token", square_token_input.as_str()),
             ("mapbox-token", mapbox_token_input.as_str()),
             ("fly-token", fly_token_input.as_str()),
+            ("ory-token", ory_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

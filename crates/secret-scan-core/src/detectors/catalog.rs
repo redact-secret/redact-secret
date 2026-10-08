@@ -290,6 +290,8 @@ pub(crate) const PROVIDER_TYPES: &[(&str, &[&str])] = &[
     ),
     ("mapbox-token", &["mapbox_secret_access_token"]),
     ("fly-token", &["fly_access_token"]),
+    ("ory-token", &["ory_oauth2_token", "ory_session_token"]),
+    ("baseten-api-key", &["baseten_api_key"]),
 ];
 
 /// The declared emitted types of the built-in detector `id`, or `None` for an

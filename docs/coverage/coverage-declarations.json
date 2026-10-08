@@ -5805,6 +5805,42 @@
             "contextual-positive-template-embedded-still-detected",
             "contextual-positive-template-prefix-only-still-detected",
             "contextual-positive-vals-scheme-prefix-still-detected",
+            "curl-user-positive-atlas-digest",
+            "curl-user-positive-attached-short",
+            "curl-user-positive-bash-c",
+            "curl-user-positive-cluster",
+            "curl-user-positive-colon-at-percent",
+            "curl-user-positive-continuation-before-flag",
+            "curl-user-positive-continuation-crlf",
+            "curl-user-positive-continuation-lf",
+            "curl-user-positive-digest-before",
+            "curl-user-positive-double-quoted",
+            "curl-user-positive-empty-user",
+            "curl-user-positive-exe-crlf",
+            "curl-user-positive-flag-after-url",
+            "curl-user-positive-long-equals",
+            "curl-user-positive-long-equals-quoted",
+            "curl-user-positive-long-flag",
+            "curl-user-positive-make-recipe",
+            "curl-user-positive-markdown-prompt",
+            "curl-user-positive-multibyte-before",
+            "curl-user-positive-path-qualified",
+            "curl-user-positive-pipe-after",
+            "curl-user-positive-proxy-user",
+            "curl-user-positive-quote-after-colon",
+            "curl-user-positive-quoted-other-quote",
+            "curl-user-positive-quoted-space",
+            "curl-user-positive-short-flag",
+            "curl-user-positive-single-quoted",
+            "curl-user-positive-substitution",
+            "curl-user-positive-substitution-paren",
+            "curl-user-positive-two-commands",
+            "curl-user-positive-unquoted-escapes",
+            "curl-user-positive-upper-flag",
+            "curl-user-positive-weak-literal",
+            "curl-user-positive-wrapper-sudo",
+            "curl-user-positive-yaml-run",
+            "curl-user-positive-zendesk-email-token",
             "generic-token-positive-convex-deploy-key-dotenv",
             "generic-token-positive-convex-lead-literal-body",
             "generic-token-positive-convex-self-hosted-admin-key-compose",
@@ -5867,7 +5903,8 @@
         {
           "dimension": "overlap",
           "evidenceFixtureIds": [
-            "contextual-overlap-nested-assignment"
+            "contextual-overlap-nested-assignment",
+            "curl-user-overlap-flag-and-url-userinfo"
           ],
           "state": "supported"
         },
@@ -5875,6 +5912,8 @@
           "dimension": "adversarial",
           "evidenceFixtureIds": [
             "contextual-adversarial-overlong",
+            "curl-user-adversarial-continuation-run",
+            "curl-user-adversarial-curl-word-run",
             "invisible-contextual-keyword-zwsp",
             "invisible-contextual-value-zwsp"
           ],
@@ -5884,6 +5923,7 @@
           "dimension": "boundary",
           "evidenceFixtureIds": [
             "contextual-boundary-short",
+            "curl-user-boundary-password-at-bound",
             "generic-token-positive-colon-scope-shaped-value-after-a-space",
             "generic-token-positive-keychain-reference-embedded-in-a-value",
             "generic-token-positive-mask-with-one-visible-side"
@@ -5967,7 +6007,8 @@
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
-            "contextual-boundary-short"
+            "contextual-boundary-short",
+            "curl-user-boundary-password-at-bound"
           ],
           "state": "supported"
         },
@@ -6086,6 +6127,46 @@
             "contextual-positive-template-embedded-still-detected",
             "contextual-positive-template-prefix-only-still-detected",
             "contextual-positive-vals-scheme-prefix-still-detected",
+            "curl-user-adversarial-continuation-run",
+            "curl-user-adversarial-curl-word-run",
+            "curl-user-boundary-password-at-bound",
+            "curl-user-overlap-flag-and-url-userinfo",
+            "curl-user-positive-atlas-digest",
+            "curl-user-positive-attached-short",
+            "curl-user-positive-bash-c",
+            "curl-user-positive-cluster",
+            "curl-user-positive-colon-at-percent",
+            "curl-user-positive-continuation-before-flag",
+            "curl-user-positive-continuation-crlf",
+            "curl-user-positive-continuation-lf",
+            "curl-user-positive-digest-before",
+            "curl-user-positive-double-quoted",
+            "curl-user-positive-empty-user",
+            "curl-user-positive-exe-crlf",
+            "curl-user-positive-flag-after-url",
+            "curl-user-positive-long-equals",
+            "curl-user-positive-long-equals-quoted",
+            "curl-user-positive-long-flag",
+            "curl-user-positive-make-recipe",
+            "curl-user-positive-markdown-prompt",
+            "curl-user-positive-multibyte-before",
+            "curl-user-positive-path-qualified",
+            "curl-user-positive-pipe-after",
+            "curl-user-positive-proxy-user",
+            "curl-user-positive-quote-after-colon",
+            "curl-user-positive-quoted-other-quote",
+            "curl-user-positive-quoted-space",
+            "curl-user-positive-short-flag",
+            "curl-user-positive-single-quoted",
+            "curl-user-positive-substitution",
+            "curl-user-positive-substitution-paren",
+            "curl-user-positive-two-commands",
+            "curl-user-positive-unquoted-escapes",
+            "curl-user-positive-upper-flag",
+            "curl-user-positive-weak-literal",
+            "curl-user-positive-wrapper-sudo",
+            "curl-user-positive-yaml-run",
+            "curl-user-positive-zendesk-email-token",
             "generic-token-positive-colon-scope-shaped-value-after-a-space",
             "generic-token-positive-convex-deploy-key-dotenv",
             "generic-token-positive-convex-lead-literal-body",
@@ -17474,6 +17555,359 @@
       "type": "fly_access_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "ory-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "ory-token-positive-session-bare",
+            "ory-token-positive-session-dotenv",
+            "ory-token-positive-session-sdk-call",
+            "ory-token-positive-session-sentence-dot",
+            "ory-token-positive-session-x-session-token-header"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "ory-token-overlap-session-contextual-secret"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "ory-token-adversarial-long-key-run-without-dot",
+            "ory-token-adversarial-repeated-prefixes"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "ory-token-boundary-oauth2-key-42",
+            "ory-token-boundary-oauth2-no-dot",
+            "ory-token-boundary-oauth2-plus-in-body",
+            "ory-token-boundary-oauth2-signature-42",
+            "ory-token-boundary-oauth2-signature-44",
+            "ory-token-boundary-oauth2-slash-in-signature",
+            "ory-token-boundary-oauth2-two-dots",
+            "ory-token-boundary-oauth2-uppercase-prefix",
+            "ory-token-boundary-session-31",
+            "ory-token-boundary-session-33",
+            "ory-token-boundary-session-dash-in-body",
+            "ory-token-boundary-session-glued-prefix",
+            "ory-token-boundary-session-glued-suffix",
+            "ory-token-boundary-session-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "ory-token-negative-admin-key-prefixes",
+            "ory-token-negative-cookie-and-flow-names",
+            "ory-token-negative-jwt-mentioning-prefix",
+            "ory-token-negative-placeholders"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "ory-token-boundary-oauth2-key-42",
+            "ory-token-boundary-oauth2-no-dot",
+            "ory-token-boundary-oauth2-plus-in-body",
+            "ory-token-boundary-oauth2-signature-42",
+            "ory-token-boundary-oauth2-signature-44",
+            "ory-token-boundary-oauth2-slash-in-signature",
+            "ory-token-boundary-oauth2-two-dots",
+            "ory-token-boundary-oauth2-uppercase-prefix",
+            "ory-token-boundary-session-31",
+            "ory-token-boundary-session-33",
+            "ory-token-boundary-session-dash-in-body",
+            "ory-token-boundary-session-glued-prefix",
+            "ory-token-boundary-session-glued-suffix",
+            "ory-token-boundary-session-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for ory_session_token (ory-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "ory_session_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "ory-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "ory-token-positive-oauth2-access-bare",
+            "ory-token-positive-oauth2-authorization-code-bare",
+            "ory-token-positive-oauth2-bearer-header",
+            "ory-token-positive-oauth2-dotenv",
+            "ory-token-positive-oauth2-refresh-bare",
+            "ory-token-positive-oauth2-sdk-call",
+            "ory-token-positive-oauth2-sentence-dot",
+            "ory-token-positive-oauth2-token-response-json",
+            "ory-token-positive-oauth2-wider-key-48"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "ory-token-overlap-oauth2-bearer-scheme"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "ory-token-adversarial-long-key-run-without-dot",
+            "ory-token-adversarial-repeated-prefixes"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "ory-token-boundary-oauth2-key-42",
+            "ory-token-boundary-oauth2-no-dot",
+            "ory-token-boundary-oauth2-plus-in-body",
+            "ory-token-boundary-oauth2-signature-42",
+            "ory-token-boundary-oauth2-signature-44",
+            "ory-token-boundary-oauth2-slash-in-signature",
+            "ory-token-boundary-oauth2-two-dots",
+            "ory-token-boundary-oauth2-uppercase-prefix",
+            "ory-token-boundary-session-31",
+            "ory-token-boundary-session-33",
+            "ory-token-boundary-session-dash-in-body",
+            "ory-token-boundary-session-glued-prefix",
+            "ory-token-boundary-session-glued-suffix",
+            "ory-token-boundary-session-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "ory-token-negative-admin-key-prefixes",
+            "ory-token-negative-cookie-and-flow-names",
+            "ory-token-negative-jwt-mentioning-prefix",
+            "ory-token-negative-placeholders"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "ory-token-boundary-oauth2-key-42",
+            "ory-token-boundary-oauth2-no-dot",
+            "ory-token-boundary-oauth2-plus-in-body",
+            "ory-token-boundary-oauth2-signature-42",
+            "ory-token-boundary-oauth2-signature-44",
+            "ory-token-boundary-oauth2-slash-in-signature",
+            "ory-token-boundary-oauth2-two-dots",
+            "ory-token-boundary-oauth2-uppercase-prefix",
+            "ory-token-boundary-session-31",
+            "ory-token-boundary-session-33",
+            "ory-token-boundary-session-dash-in-body",
+            "ory-token-boundary-session-glued-prefix",
+            "ory-token-boundary-session-glued-suffix",
+            "ory-token-boundary-session-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for ory_oauth2_token (ory-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "ory_oauth2_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "baseten-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "baseten-api-key-positive-authorization-api-key-header",
+            "baseten-api-key-positive-bare",
+            "baseten-api-key-positive-chat-sentence",
+            "baseten-api-key-positive-cli-argument",
+            "baseten-api-key-positive-crlf-unicode-prefix",
+            "baseten-api-key-positive-curl",
+            "baseten-api-key-positive-dotenv",
+            "baseten-api-key-positive-json-api-key",
+            "baseten-api-key-positive-log",
+            "baseten-api-key-positive-punctuation-adjacent",
+            "baseten-api-key-positive-repeated-value",
+            "baseten-api-key-positive-second-key",
+            "baseten-api-key-positive-shell-export",
+            "baseten-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "baseten-api-key-overlap-bearer-header",
+            "baseten-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "baseten-api-key-adversarial-glued-keys",
+            "baseten-api-key-adversarial-prefix-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "baseten-api-key-boundary-dash-in-secret",
+            "baseten-api-key-boundary-double-dot",
+            "baseten-api-key-boundary-glued-trailing-dash",
+            "baseten-api-key-boundary-glued-trailing-underscore",
+            "baseten-api-key-boundary-hyphen-separator",
+            "baseten-api-key-boundary-id-7",
+            "baseten-api-key-boundary-id-9",
+            "baseten-api-key-boundary-lookalike-b100",
+            "baseten-api-key-boundary-lookalike-b1o",
+            "baseten-api-key-boundary-lookalike-bt10",
+            "baseten-api-key-boundary-lookalike-hyphen",
+            "baseten-api-key-boundary-missing-separator",
+            "baseten-api-key-boundary-pre-cutoff-unprefixed",
+            "baseten-api-key-boundary-secret-31",
+            "baseten-api-key-boundary-secret-33",
+            "baseten-api-key-boundary-underscore-in-id",
+            "baseten-api-key-boundary-underscore-separator",
+            "baseten-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "baseten-api-key-negative-env-reference",
+            "baseten-api-key-negative-masked",
+            "baseten-api-key-negative-prefix-only",
+            "baseten-api-key-negative-short-placeholder",
+            "baseten-api-key-negative-visible-key-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "baseten-api-key-boundary-dash-in-secret",
+            "baseten-api-key-boundary-double-dot",
+            "baseten-api-key-boundary-glued-trailing-dash",
+            "baseten-api-key-boundary-glued-trailing-underscore",
+            "baseten-api-key-boundary-hyphen-separator",
+            "baseten-api-key-boundary-id-7",
+            "baseten-api-key-boundary-id-9",
+            "baseten-api-key-boundary-lookalike-b100",
+            "baseten-api-key-boundary-lookalike-b1o",
+            "baseten-api-key-boundary-lookalike-bt10",
+            "baseten-api-key-boundary-lookalike-hyphen",
+            "baseten-api-key-boundary-missing-separator",
+            "baseten-api-key-boundary-pre-cutoff-unprefixed",
+            "baseten-api-key-boundary-secret-31",
+            "baseten-api-key-boundary-secret-33",
+            "baseten-api-key-boundary-underscore-in-id",
+            "baseten-api-key-boundary-underscore-separator",
+            "baseten-api-key-boundary-uppercase-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for baseten_api_key (baseten-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "baseten_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -17511,6 +17945,7 @@
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "aws-secret-access-key-incremental-adjacent-lines",
+            "baseten-api-key-incremental-exact-width-partitions",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",
@@ -17529,6 +17964,10 @@
             "contextual-assignment-nested-no-separator-masked-value",
             "contextual-assignment-stops-at-line-terminator",
             "contextual-closed-call-code-expressions",
+            "curl-user-incremental-continued-commands",
+            "curl-user-incremental-pending-continuation-cr",
+            "curl-user-incremental-quoted-and-bounded",
+            "curl-user-incremental-silent-open-quote",
             "datadog-api-key-line-scoped-context-different-line",
             "datadog-api-key-line-scoped-context-same-line",
             "digitalocean-embedded-identifier-discriminating-boundary",
@@ -17576,6 +18015,7 @@
             "openai-project-length-twin-discriminating-boundary",
             "openai-svcacct-length-twin-discriminating-boundary",
             "openrouter-api-key-incremental-exact-width-partitions",
+            "ory-token-incremental-session-and-oauth2-partitions",
             "otpauth-embedded-identifier-discriminating-boundary",
             "private-key-empty-body-then-real-key-discriminating-boundary",
             "private-key-public-block-then-real-key-discriminating-boundary",
@@ -17619,6 +18059,8 @@
             "aws-secret-access-key-adversarial-long-line",
             "axiom-token-adversarial-long-run",
             "azdo-pat-adversarial-long-padding",
+            "baseten-api-key-adversarial-glued-keys",
+            "baseten-api-key-adversarial-prefix-run",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
             "bitwarden-sm-access-token-adversarial-glued-tokens",
@@ -17644,6 +18086,8 @@
             "contextual-adversarial-overlong",
             "convex-deployment-key-adversarial-long-run",
             "crates-io-token-adversarial-long-run",
+            "curl-user-adversarial-continuation-run",
+            "curl-user-adversarial-curl-word-run",
             "databricks-personal-access-token-adversarial-long-suffix",
             "datadog-api-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-dense-findings",
@@ -17718,6 +18162,8 @@
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
             "openrouter-api-key-adversarial-long-suffix",
+            "ory-token-adversarial-long-key-run-without-dot",
+            "ory-token-adversarial-repeated-prefixes",
             "otpauth-adversarial-overlong-query",
             "paddle-api-key-adversarial-long-run",
             "perplexity-api-key-adversarial-long-suffix",
@@ -17953,6 +18399,7 @@
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "aws-secret-access-key-incremental-adjacent-lines",
+            "baseten-api-key-incremental-exact-width-partitions",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",
@@ -17971,6 +18418,10 @@
             "contextual-assignment-nested-no-separator-masked-value",
             "contextual-assignment-stops-at-line-terminator",
             "contextual-closed-call-code-expressions",
+            "curl-user-incremental-continued-commands",
+            "curl-user-incremental-pending-continuation-cr",
+            "curl-user-incremental-quoted-and-bounded",
+            "curl-user-incremental-silent-open-quote",
             "datadog-api-key-line-scoped-context-different-line",
             "datadog-api-key-line-scoped-context-same-line",
             "digitalocean-embedded-identifier-discriminating-boundary",
@@ -18018,6 +18469,7 @@
             "openai-project-length-twin-discriminating-boundary",
             "openai-svcacct-length-twin-discriminating-boundary",
             "openrouter-api-key-incremental-exact-width-partitions",
+            "ory-token-incremental-session-and-oauth2-partitions",
             "otpauth-embedded-identifier-discriminating-boundary",
             "private-key-empty-body-then-real-key-discriminating-boundary",
             "private-key-public-block-then-real-key-discriminating-boundary",
@@ -18122,6 +18574,8 @@
             "aws-secret-access-key-adversarial-long-line",
             "axiom-token-adversarial-long-run",
             "azdo-pat-adversarial-long-padding",
+            "baseten-api-key-adversarial-glued-keys",
+            "baseten-api-key-adversarial-prefix-run",
             "bearer-adversarial-punctuation",
             "bearer-token-adversarial-long-join-chain",
             "bitwarden-sm-access-token-adversarial-glued-tokens",
@@ -18147,6 +18601,8 @@
             "contextual-adversarial-overlong",
             "convex-deployment-key-adversarial-long-run",
             "crates-io-token-adversarial-long-run",
+            "curl-user-adversarial-continuation-run",
+            "curl-user-adversarial-curl-word-run",
             "databricks-personal-access-token-adversarial-long-suffix",
             "datadog-api-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-dense-findings",
@@ -18221,6 +18677,8 @@
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
             "openrouter-api-key-adversarial-long-suffix",
+            "ory-token-adversarial-long-key-run-without-dot",
+            "ory-token-adversarial-repeated-prefixes",
             "otpauth-adversarial-overlong-query",
             "paddle-api-key-adversarial-long-run",
             "perplexity-api-key-adversarial-long-suffix",
@@ -18517,6 +18975,7 @@
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "aws-secret-access-key-incremental-adjacent-lines",
+            "baseten-api-key-incremental-exact-width-partitions",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "bearer-token-whole-value-placeholder-exclusion-boundary",
@@ -18535,6 +18994,10 @@
             "contextual-assignment-nested-no-separator-masked-value",
             "contextual-assignment-stops-at-line-terminator",
             "contextual-closed-call-code-expressions",
+            "curl-user-incremental-continued-commands",
+            "curl-user-incremental-pending-continuation-cr",
+            "curl-user-incremental-quoted-and-bounded",
+            "curl-user-incremental-silent-open-quote",
             "datadog-api-key-line-scoped-context-different-line",
             "datadog-api-key-line-scoped-context-same-line",
             "digitalocean-embedded-identifier-discriminating-boundary",
@@ -18582,6 +19045,7 @@
             "openai-project-length-twin-discriminating-boundary",
             "openai-svcacct-length-twin-discriminating-boundary",
             "openrouter-api-key-incremental-exact-width-partitions",
+            "ory-token-incremental-session-and-oauth2-partitions",
             "otpauth-embedded-identifier-discriminating-boundary",
             "private-key-empty-body-then-real-key-discriminating-boundary",
             "private-key-public-block-then-real-key-discriminating-boundary",

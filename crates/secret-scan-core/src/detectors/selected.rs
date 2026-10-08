@@ -200,6 +200,8 @@ selected! {
     square_token = "square-token", super::square::SQUARE;
     mapbox_token = "mapbox-token", super::mapbox::MAPBOX;
     fly_token = "fly-token", super::fly::FLY;
+    ory_token = "ory-token", super::ory_token::ORY_TOKEN;
+    baseten_api_key = "baseten-api-key", super::baseten_api_key::BASETEN_API_KEY;
     jwt = "jwt", super::jwt::JwtDetector, common = super::jwt::REQUIRED_LITERALS;
     bearer_token = "bearer-token", super::bearer_token::BearerTokenDetector;
     connection_string = "connection-string", super::connection_string::ConnectionStringDetector, common = super::connection_string::REQUIRED_LITERALS;

@@ -2305,7 +2305,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 288,
+        "fixtureCount": 371,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2383,6 +2383,42 @@
         "contextual-positive-template-embedded-still-detected",
         "contextual-positive-template-prefix-only-still-detected",
         "contextual-positive-vals-scheme-prefix-still-detected",
+        "curl-user-positive-atlas-digest",
+        "curl-user-positive-attached-short",
+        "curl-user-positive-bash-c",
+        "curl-user-positive-cluster",
+        "curl-user-positive-colon-at-percent",
+        "curl-user-positive-continuation-before-flag",
+        "curl-user-positive-continuation-crlf",
+        "curl-user-positive-continuation-lf",
+        "curl-user-positive-digest-before",
+        "curl-user-positive-double-quoted",
+        "curl-user-positive-empty-user",
+        "curl-user-positive-exe-crlf",
+        "curl-user-positive-flag-after-url",
+        "curl-user-positive-long-equals",
+        "curl-user-positive-long-equals-quoted",
+        "curl-user-positive-long-flag",
+        "curl-user-positive-make-recipe",
+        "curl-user-positive-markdown-prompt",
+        "curl-user-positive-multibyte-before",
+        "curl-user-positive-path-qualified",
+        "curl-user-positive-pipe-after",
+        "curl-user-positive-proxy-user",
+        "curl-user-positive-quote-after-colon",
+        "curl-user-positive-quoted-other-quote",
+        "curl-user-positive-quoted-space",
+        "curl-user-positive-short-flag",
+        "curl-user-positive-single-quoted",
+        "curl-user-positive-substitution",
+        "curl-user-positive-substitution-paren",
+        "curl-user-positive-two-commands",
+        "curl-user-positive-unquoted-escapes",
+        "curl-user-positive-upper-flag",
+        "curl-user-positive-weak-literal",
+        "curl-user-positive-wrapper-sudo",
+        "curl-user-positive-yaml-run",
+        "curl-user-positive-zendesk-email-token",
         "generic-token-positive-convex-deploy-key-dotenv",
         "generic-token-positive-convex-lead-literal-body",
         "generic-token-positive-convex-self-hosted-admin-key-compose",
@@ -2448,7 +2484,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 288,
+        "fixtureCount": 371,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2525,7 +2561,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 288,
+        "fixtureCount": 371,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -7231,12 +7267,134 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "fly_access_token"
+    },
+    {
+      "detector": "ory-token",
+      "evidence": {
+        "fixtureCount": 36,
+        "hostContextsExercised": [
+          "chat",
+          "dotenv",
+          "http",
+          "json",
+          "markdown",
+          "plain-text",
+          "python"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "ory-token-positive-session-bare",
+        "ory-token-positive-session-dotenv",
+        "ory-token-positive-session-sdk-call",
+        "ory-token-positive-session-sentence-dot",
+        "ory-token-positive-session-x-session-token-header"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "ory_session_token"
+    },
+    {
+      "detector": "ory-token",
+      "evidence": {
+        "fixtureCount": 36,
+        "hostContextsExercised": [
+          "chat",
+          "dotenv",
+          "http",
+          "json",
+          "markdown",
+          "plain-text",
+          "python"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "ory-token-positive-oauth2-access-bare",
+        "ory-token-positive-oauth2-authorization-code-bare",
+        "ory-token-positive-oauth2-bearer-header",
+        "ory-token-positive-oauth2-dotenv",
+        "ory-token-positive-oauth2-refresh-bare",
+        "ory-token-positive-oauth2-sdk-call",
+        "ory-token-positive-oauth2-sentence-dot",
+        "ory-token-positive-oauth2-token-response-json",
+        "ory-token-positive-oauth2-wider-key-48"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "ory_oauth2_token"
+    },
+    {
+      "detector": "baseten-api-key",
+      "evidence": {
+        "fixtureCount": 41,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "baseten-api-key-positive-authorization-api-key-header",
+        "baseten-api-key-positive-bare",
+        "baseten-api-key-positive-chat-sentence",
+        "baseten-api-key-positive-cli-argument",
+        "baseten-api-key-positive-crlf-unicode-prefix",
+        "baseten-api-key-positive-curl",
+        "baseten-api-key-positive-dotenv",
+        "baseten-api-key-positive-json-api-key",
+        "baseten-api-key-positive-log",
+        "baseten-api-key-positive-punctuation-adjacent",
+        "baseten-api-key-positive-repeated-value",
+        "baseten-api-key-positive-second-key",
+        "baseten-api-key-positive-shell-export",
+        "baseten-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "baseten_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 157,
+    "supported": 160,
     "unresolved": 0
   }
 }

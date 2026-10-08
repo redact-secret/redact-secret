@@ -82,7 +82,8 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
 /// or a reference token; the credential-evidence Cases flag the value by its
 /// position, not its shape. Exactly this name: `jfrog_art_api`,
 /// `x_jfrog_art_api_id` and a further-prefixed `my_x_jfrog_art_api` do not
-/// match. `curl -u user:<secret>` is not read (issue #1247).
+/// match. The `curl -u user:<secret>` password slot is the curl
+/// credential-argument reader's (issue #1247, `super::curl_user`).
 ///
 /// Issue #1230 (Group E, `HubSpot` legacy API key) adds `hapikey`, the query
 /// parameter that carries both the retired account API key and the current
@@ -619,7 +620,7 @@ const DIGIT_SUFFIX_PLACEHOLDER_WORDS: &[&str] = &[
     "replaceme",
 ];
 
-fn is_generic_placeholder_word(value: &str) -> bool {
+pub(super) fn is_generic_placeholder_word(value: &str) -> bool {
     matches_placeholder_vocabulary(value, PLACEHOLDER_WORDS, DIGIT_SUFFIX_PLACEHOLDER_WORDS)
         || is_placeholder_led_phrase(value)
 }
@@ -729,7 +730,7 @@ fn is_runtime_expression_reference(value: &str) -> bool {
 /// `true` for a value fully wrapped in a matching pair of backticks
 /// (`` `${process.env.X}` ``, `` `date +%s` ``): shell command substitution
 /// or a JS template literal, not a secret.
-fn is_backtick_reference(value: &str) -> bool {
+pub(super) fn is_backtick_reference(value: &str) -> bool {
     is_fully_delimited(value, "`", "`")
 }
 
@@ -1819,7 +1820,7 @@ fn brace_placeholder_len(bytes: &[u8]) -> Option<usize> {
 /// keeps the value reported (a brace-wrapped GUID or random alphanumeric
 /// secret is not a placeholder). FN cost: a real secret that is letters only
 /// in short words inside one pair of braces.
-fn is_brace_placeholder_reference(value: &str) -> bool {
+pub(super) fn is_brace_placeholder_reference(value: &str) -> bool {
     brace_placeholder_len(value.as_bytes()) == Some(value.len())
 }
 
@@ -4362,6 +4363,7 @@ impl Detector for GenericTokenDetector {
             candidates.extend(call_argument_candidates(input));
             candidates.extend(npmrc_credential_candidates(input));
             candidates.extend(email_token_candidates(input));
+            candidates.extend(super::curl_user::candidates(input));
         }
         Ok(candidates)
     }

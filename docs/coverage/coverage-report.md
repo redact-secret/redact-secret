@@ -11,15 +11,15 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 ## Summary
 
-These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 157/157 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
+These counts describe finding-type inventory rows with corpus evidence, not detector counts or an accuracy rate. `supported` means positive conformance evidence exists; 160/160 supported does not mean 100% recall or precision. See [detection reliability](../reference/detection-reliability.md) for separately measured outcomes.
 
 | Row state | Count |
 | --- | --- |
-| supported | 157 |
+| supported | 160 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 168.
+Coverage declarations: 171.
 
 ## Coverage by detector
 
@@ -35,6 +35,7 @@ Coverage declarations: 168.
 | aws-secret-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | axiom-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| baseten-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bitwarden-secrets-manager-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | browserbase-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -102,6 +103,7 @@ Coverage declarations: 168.
 | onepassword-service-account-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | openai-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | openrouter-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| ory-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | paddle-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | perplexity-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -162,6 +164,7 @@ Coverage declarations: 168.
 | axiom_api_token | axiom-token | provider | supported | not-applicable | none |
 | axiom_personal_token | axiom-token | provider | supported | not-applicable | none |
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
+| baseten_api_key | baseten-api-key | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | bitwarden_secrets_manager_access_token | bitwarden-secrets-manager-access-token | provider | supported | not-applicable | none |
 | browserbase_api_key | browserbase-api-key | provider | supported | not-applicable | none |
@@ -251,6 +254,8 @@ Coverage declarations: 168.
 | openai_admin_api_key | openai-token | provider | supported | not-applicable | none |
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
 | openrouter_api_key | openrouter-api-key | provider | supported | not-applicable | none |
+| ory_oauth2_token | ory-token | provider | supported | not-applicable | none |
+| ory_session_token | ory-token | provider | supported | not-applicable | none |
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
 | paddle_api_key | paddle-api-key | provider | supported | not-applicable | none |
 | perplexity_api_key | perplexity-api-key | provider | supported | not-applicable | none |
@@ -330,15 +335,15 @@ Coverage declarations: 168.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 168 | 0 | 0 |
-| boundary | 157 | 0 | 0 |
-| host-context | 157 | 0 | 0 |
+| adversarial | 171 | 0 | 0 |
+| boundary | 160 | 0 | 0 |
+| host-context | 160 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 168 | 0 | 0 |
-| near-miss-negative | 157 | 0 | 0 |
-| overlap | 157 | 0 | 0 |
-| positive | 157 | 0 | 0 |
-| range | 168 | 0 | 0 |
+| malformed | 171 | 0 | 0 |
+| near-miss-negative | 160 | 0 | 0 |
+| overlap | 160 | 0 | 0 |
+| positive | 160 | 0 | 0 |
+| range | 171 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

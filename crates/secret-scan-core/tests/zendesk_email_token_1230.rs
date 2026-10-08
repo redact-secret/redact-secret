@@ -229,26 +229,27 @@ fn a_left_side_that_is_not_an_email_address_is_not_read() {
 }
 
 #[test]
-fn the_basic_flag_form_is_read_by_the_literal_not_by_a_flag_reader() {
-    // The `/token:` literal anchors the token wherever it stands, so the
-    // `curl` Basic form of the Case is read as a consequence. The flag is
-    // joined at run time; no `-u user:value` reader exists (issue #1247).
+fn the_basic_flag_form_is_one_finding_on_the_token() {
+    // The `/token:` literal and the curl credential-argument reader (issue
+    // #1247) read the same bytes: one finding, the token only. The flag is
+    // joined at run time.
     let token = value(ALNUM, 40, 50);
     let flag = ["-", "u"].concat();
-    assert_value(
-        &format!(
+    for input in [
+        format!(
             "curl https://example-subdomain.zendesk.example.test/api/v2/users.json {flag} \"agent@example.test/token:{token}\"\n"
         ),
-        &token,
-    );
+        format!(
+            "curl {flag} 'agent@example.test/token:{token}' https://example-subdomain.zendesk.example.test/api/v2/users.json\n"
+        ),
+    ] {
+        assert_value(&input, &token);
+    }
+    // A plain username and password is the same carrier: the password only.
     assert_value(
         &format!(
-            "curl {flag} 'agent@example.test/token:{token}' https://example-subdomain.zendesk.example.test/api/v2/users.json\n"
+            "curl {flag} agent:{token} https://example-subdomain.zendesk.example.test/api/v2/users.json\n"
         ),
         &token,
     );
-    // A plain username and password is not read (issue #1247).
-    assert_clean(&format!(
-        "curl {flag} agent:{token} https://example-subdomain.zendesk.example.test/api/v2/users.json\n"
-    ));
 }

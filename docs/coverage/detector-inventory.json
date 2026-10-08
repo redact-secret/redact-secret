@@ -1128,6 +1128,27 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "\u0066m2_SyntheticRevokedFlyMacaroonFixture0000000000000000000000000000000000",
       "schemes": null
+    },
+    {
+      "type": "ory_session_token",
+      "detector": "ory-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u006fry_st_SyntheticRevokedOryFixture000000",
+      "schemes": null
+    },
+    {
+      "type": "ory_oauth2_token",
+      "detector": "ory-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u006fry_at_SYNTHETIC-REVOKED-ORY-OAUTH2-KEY-0000000000.SYNTHETIC-REVOKED-ORY-SIGNATURE-00000000000",
+      "schemes": null
+    },
+    {
+      "type": "baseten_api_key",
+      "detector": "baseten-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0062\u0031\u0030_Synth000.FixtureFixtureFixtureFixture0000",
+      "schemes": null
     }
   ],
   "consumers": [

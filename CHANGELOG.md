@@ -164,6 +164,32 @@ evidence is linked from each published version.
   The comparison is related in the JavaScript package, not in the artifact: on
   the standard `full` WebAssembly artifact the change is +1,044 bytes brotli
   (204,726 to 205,770), 13.13% above the pre-epic 181,882 in total.
+- `ory-token` (#1110): Ory session tokens, `ory_st_` + exactly 32 `[A-Za-z0-9]`
+  (`ory_session_token`), and Ory Hydra OAuth2 access, refresh and
+  authorization-code tokens, `ory_at_`, `ory_rt_` or `ory_ac_` + a base64url key
+  of 43 or more + `.` + exactly 43 base64url (`ory_oauth2_token`), always
+  redacted. A three-part dotted value is JWT-shaped and stays with `jwt`. The
+  admin keys (`ory_pat_`, `ory_apikey_`, `ory_wak_`), the `ory_lo_` logout
+  token, enterprise custom OAuth2 prefixes and pre-2023 unprefixed session
+  tokens are not claimed.
+- `baseten-api-key` (#1111): Baseten API keys created from 2026-10-01 15:00 GMT,
+  `b10_` + exactly 8 `[A-Za-z0-9]` + `.` + exactly 32 `[A-Za-z0-9]`
+  (`baseten_api_key`), always redacted. The grammar is the regex Baseten's
+  documentation publishes (T1). Keys created before the cutoff carry no prefix
+  and stay unclaimed; the visible key prefix and any other length or separator
+  are not keys.
+- `curl` credential argument (#1247,
+  `decision-read-the-curl-user-password-argument-as-a-contextual-secret`): the
+  password of a `curl -u`, `-U`, `--user` or `--proxy-user` argument (the text after
+  the first colon, as written) is a `contextual_secret` at high confidence, always
+  redacted, in `full` and `common`, with or without `--digest`; the user, an email,
+  Zendesk's `/token` and Atlas's public key stay unclaimed. It reads one `curl` command
+  (up to `;`, `&`, `|`, a newline without a backslash continuation, or 8,192 bytes), so
+  `docker run -u 1000:1000` is not read. References, masks, placeholders and
+  `password`-style documentation literals are silent; a weak real value such as `admin`
+  is redacted. The curl config file, argument arrays, an unterminated quote and a
+  password over 4,096 bytes stay false negatives. No new finding type or interface; a
+  command continued with a backslash is held by the incremental session until it ends.
 
 ### Fixed
 

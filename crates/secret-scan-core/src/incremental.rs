@@ -70,10 +70,10 @@ use crate::composition::Composition;
 use crate::detectors::{
     LookbackTail, MAX_LOOKBACK_LINES, PrivateKeyRetentionTracker, carries_aws_access_key_id,
     continues_previous_line, has_open_aws_secret_candidate_line_in, has_open_bearer_authorization,
-    has_open_confluent_properties_in, has_open_contextual_assignment, has_open_deepgram_request_in,
-    has_open_heroku_legacy_context_in, has_open_list_item_pair_in, has_open_provider_sibling_in,
-    has_open_scoped_context_in, has_open_twilio_cli_table_in, is_open_tail_neutral,
-    lookback_tail_lines,
+    has_open_confluent_properties_in, has_open_contextual_assignment, has_open_curl_command,
+    has_open_deepgram_request_in, has_open_heroku_legacy_context_in, has_open_list_item_pair_in,
+    has_open_provider_sibling_in, has_open_scoped_context_in, has_open_twilio_cli_table_in,
+    is_open_tail_neutral, lookback_tail_lines,
 };
 #[cfg(test)]
 use crate::detectors::{
@@ -455,6 +455,7 @@ struct LookbackHints {
     provider_sibling: bool,
     deepgram_request: bool,
     scoped_context: bool,
+    curl_user: bool,
     aws_secret_access_key: bool,
 }
 
@@ -479,6 +480,7 @@ impl LookbackHints {
             provider_sibling: reads_provider_siblings(registry),
             deepgram_request: registry.contains(DEEPGRAM_DETECTOR_ID),
             scoped_context: registry.contains(GENERIC_TOKEN_DETECTOR_ID),
+            curl_user: registry.contains(GENERIC_TOKEN_DETECTOR_ID),
             aws_secret_access_key: registry.contains(AWS_SECRET_ACCESS_KEY_DETECTOR_ID),
         }
     }
@@ -513,7 +515,9 @@ fn reads_provider_siblings(registry: &DetectorRegistry) -> bool {
 const DEEPGRAM_DETECTOR_ID: &str = "deepgram-api-key";
 
 /// `generic-token` also reads a scoped name beside a sibling member within a
-/// few lines (`has_open_scoped_context_in`, issues #1228 to #1230).
+/// few lines (`has_open_scoped_context_in`, issues #1228 to #1230), and the
+/// password argument of a `curl` command whose line continues or whose quote
+/// is still open (`has_open_curl_command`, issue #1247).
 const GENERIC_TOKEN_DETECTOR_ID: &str = "generic-token";
 
 /// A bounded, side-effect-free incremental sanitizer session over built-in
@@ -1006,7 +1010,8 @@ impl IncrementalSanitizer {
                 || (lookbacks.list_item_pair && has_open_list_item_pair_in(tail))
                 || (lookbacks.provider_sibling && has_open_provider_sibling_in(tail))
                 || (lookbacks.deepgram_request && has_open_deepgram_request_in(tail))
-                || (lookbacks.scoped_context && has_open_scoped_context_in(tail)),
+                || (lookbacks.scoped_context && has_open_scoped_context_in(tail))
+                || (lookbacks.curl_user && has_open_curl_command(scanned)),
             aws_secret_candidate: lookbacks.aws_secret_access_key
                 && has_open_aws_secret_candidate_line_in(tail, || {
                     self.line_above_unit_carries_aws_id()
@@ -1079,7 +1084,9 @@ impl IncrementalSanitizer {
             || (self.registry.contains(DEEPGRAM_DETECTOR_ID)
                 && has_open_deepgram_request(&rescanned))
             || (self.registry.contains(GENERIC_TOKEN_DETECTOR_ID)
-                && has_open_scoped_context(&rescanned));
+                && has_open_scoped_context(&rescanned))
+            || (self.registry.contains(GENERIC_TOKEN_DETECTOR_ID)
+                && has_open_curl_command(&rescanned));
         assert_eq!(open.other, reference, "open single-line construct");
         let aws_reference = self.registry.contains(AWS_SECRET_ACCESS_KEY_DETECTOR_ID)
             && has_open_aws_secret_candidate_line(&rescanned, || {
@@ -1977,6 +1984,78 @@ mod tests {
             let input: String = (0..length).map(|_| PIECES[next(PIECES.len())]).collect();
             assert_every_partition_matches_the_rescan(&input);
         }
+    }
+
+    #[test]
+    fn a_curl_command_window_holds_the_unit_exactly_as_a_rescan_does() {
+        // Pieces of a curl command line: the command word, the credential
+        // flags, quotes, escapes, continuations of both line-ending kinds,
+        // and the command and line ends that close a window (issue #1247).
+        // Every closed line asserts the rescan; every partition must equal
+        // the one-chunk output.
+        const PIECES: &[&str] = &[
+            "curl ",
+            "curl.exe ",
+            "/usr/bin/curl ",
+            "-u ",
+            "-U ",
+            "--user ",
+            "--user=",
+            "--proxy-user ",
+            "-sSfLku",
+            "svc:",
+            "svc",
+            ":",
+            MARKER,
+            "-u svc:SYNTHETIC_REVOKED_RETENTION_MARKER ",
+            "--user=\"svc:SYNTHETIC_REVOKED_RETENTION_MARKER\" ",
+            "-sSu 'svc:SYNTHETIC_REVOKED_RETENTION_MARKER' ",
+            "\"",
+            "'",
+            "\\",
+            "\\\n",
+            "\\\r\n",
+            "\\\r",
+            "\r",
+            "\n",
+            "\r\n",
+            ";",
+            "&&",
+            "|",
+            " ",
+            "\t",
+            "$(",
+            ")",
+            "@",
+            "\u{e9}",
+            "\u{65e5}",
+            "\u{200B}",
+            "https://api.example.invalid/v1 ",
+            "docker run ",
+            "--digest ",
+        ];
+        let mut state: u64 = 0xC0DE_1247_C0DE_1247;
+        let mut next = |bound: usize| {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            usize::try_from(state >> 33).unwrap() % bound
+        };
+        let mut read = 0usize;
+        for round in 0..400 {
+            let length = 1 + next(16);
+            let mut input: String = (0..length).map(|_| PIECES[next(PIECES.len())]).collect();
+            // Half of the inputs start from a command word, so that most of
+            // them have a window to hold open.
+            if round % 2 == 0 {
+                input.insert_str(0, "curl ");
+            }
+            if crate::detectors::curl_user_candidate_count(&input) > 0 {
+                read += 1;
+            }
+            assert_every_partition_matches_the_rescan(&input);
+        }
+        assert!(read > 20, "the generator must exercise real reads: {read}");
     }
 
     #[test]

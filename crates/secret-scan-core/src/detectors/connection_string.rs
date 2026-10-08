@@ -232,7 +232,7 @@ fn single_at(authority: &str) -> Option<usize> {
     Some(first)
 }
 
-fn is_placeholder(value: &str) -> bool {
+pub(super) fn is_placeholder(value: &str) -> bool {
     const NAMES: [&str; 10] = [
         "password",
         "secret",
