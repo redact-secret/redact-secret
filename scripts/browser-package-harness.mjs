@@ -21,7 +21,7 @@ import {
   scanAndRedact,
   VERSION,
 } from "@redact-secret/core";
-import { WebStreamSanitizer } from "@redact-secret/core/web-stream";
+import { createWebStreamSanitizer, WebStreamSanitizer } from "@redact-secret/core/web-stream";
 
 import { qualify as qualifyCore } from "./browser-package-harness-core.mjs";
 
@@ -36,5 +36,6 @@ export const qualify = (fixtures) =>
     redact,
     scan,
     scanAndRedact,
+    createWebStreamSanitizer,
     WebStreamSanitizer,
   });

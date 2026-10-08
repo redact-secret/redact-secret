@@ -129,6 +129,205 @@ function runJourney(row, journey, init) {
   });
 }
 
+// Fresh workers prove the installed public factories share the initialized owner.
+// WASM rows use the existing forced-WASM loader and report direct sessions only.
+export async function installedIncrementalBoundary({ load, profile, probe }) {
+  const { strict: assert } = await import("node:assert");
+  const { pathToFileURL } = await import("node:url");
+  const { join } = await import("node:path");
+  let api;
+  const factories = [];
+  if (load.type === "package") {
+    const suffix = profile === "common" ? "/common" : "";
+    api = await import(`@redact-secret/core${suffix}`);
+    const node = await import(`@redact-secret/core${suffix}/node-stream`);
+    const web = await import(`@redact-secret/core${suffix}/web-stream`);
+    factories.push(["node", node.createNodeStreamSanitizer], ["web", web.createWebStreamSanitizer]);
+  } else {
+    const { createRedactSecretRuntime } = await import(pathToFileURL(join(load.coreDist, "runtime.js")).href);
+    const { loadWasmFallback } = await import(pathToFileURL(join(load.coreDist, "runtime", "node.js")).href);
+    api = createRedactSecretRuntime(({ pii }) => loadWasmFallback(profile, Boolean(pii)), profile);
+  }
+  const limits = {
+    maxInputCodeUnits: 65536,
+    maxBufferedCodeUnits: 16512,
+    maxTokenCodeUnits: 8192,
+    maxMultilineCodeUnits: 16384,
+  };
+  let getterReads = 0,
+    policyCalls = 0,
+    formatterCalls = 0;
+  const policy = {
+    evaluate() {
+      policyCalls += 1;
+      return "redact";
+    },
+  };
+  const formatter = () => {
+    formatterCalls += 1;
+    return "<SECRET_1>";
+  };
+  const inheritedGetter = Object.defineProperty({}, "ruleset", {
+    get() {
+      getterReads += 1;
+      throw new Error("getter must not run");
+    },
+  });
+  const options = [
+    { limits, ruleset: "SYNTHETIC_REVOKED_RULESET" },
+    { limits, ruleset: undefined },
+    Object.assign(Object.create({ ruleset: "SYNTHETIC_REVOKED_RULESET" }), { limits }),
+    Object.assign(Object.create({ ruleset: undefined }), { limits }),
+    Object.assign(Object.create(inheritedGetter), { limits }),
+  ].map((value) => Object.assign(value, { policy, placeholderFormatter: formatter }));
+  const opens = [["session", (options) => api.createIncrementalSanitizer(options)], ...factories];
+  const rejects = (open, option, code) => {
+    let error;
+    try {
+      open(option);
+    } catch (caught) {
+      error = caught;
+    }
+    assert.equal(error?.name, "SecretScanError", "installed boundary must throw synchronously");
+    assert.equal(error?.code, code, "installed boundary returned another code");
+    assert.ok(!error.message.includes("SYNTHETIC_REVOKED"), "installed diagnostic contains input");
+  };
+  for (const [, open] of opens) for (const option of options) rejects(open, option, "NOT_INITIALIZED");
+  await api.initialize();
+  for (const [, open] of opens) for (const option of options) rejects(open, option, "INVALID_OPTIONS");
+  assert.equal(getterReads, 0, "installed rejection read a getter");
+  assert.equal(policyCalls, 0, "installed rejection called policy");
+  assert.equal(formatterCalls, 0, "installed rejection called formatter");
+  // Custom detection migrates to bounded whole-input processing, never per-chunk fallback.
+  const migrationInput = `TOKEN=ACME_${"SYNTHETICREVOKED".repeat(2)}`;
+  assert.ok(new TextEncoder().encode(migrationInput).byteLength <= 32768, "migration input exceeds bound");
+  const ruleset =
+    'ruleset-revision: 1\n\ndetector: acme-internal-token\nspecificity: contextual\nprefix: "ACME_"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n';
+  const migration = api.scanAndRedact(migrationInput, {
+    ruleset,
+    actionPolicy: JSON.stringify({
+      actionPolicyRevision: 1,
+      base: "default",
+      rules: [{ id: "redact-acme", match: { type: ["acme-internal-token"] }, action: "redact" }],
+    }),
+  });
+  assert.notEqual(migration.text, migrationInput, "whole-input migration did not redact");
+  assert.ok(
+    migration.findings.some((finding) => finding.detector === "acme-internal-token" && finding.action === "redact"),
+    "whole-input migration lost custom detection",
+  );
+  const expected = api.scanAndRedact(probe).text;
+  assert.notEqual(expected, probe, "installed absent-key control did not redact");
+  const session = api.createIncrementalSanitizer({ limits });
+  assert.equal(session.append(probe).text + session.finalize().text, expected, "installed direct session differs");
+  const result = {
+    host: "node",
+    artifact: api.artifact(),
+    profile,
+    directSession: { rejectedKeys: options.length, validControl: true },
+    boundedWholeInputMigration: "custom ruleset with explicit redaction",
+    factories: {},
+  };
+  for (const [kind, open] of factories) {
+    const sanitizer = open({ limits });
+    const output = [];
+    if (kind === "node") {
+      const { Readable, Writable } = await import("node:stream");
+      const { pipeline } = await import("node:stream/promises");
+      await pipeline(
+        Readable.from([Buffer.from(probe)]),
+        sanitizer,
+        new Writable({
+          write(chunk, _encoding, done) {
+            output.push(chunk.toString());
+            done();
+          },
+        }),
+      );
+      const failure = new Error("synthetic source failure");
+      const failed = open({ limits });
+      await assert.rejects(
+        pipeline(
+          Readable.from(
+            (async function* () {
+              yield Buffer.from("synthetic pending input");
+              throw failure;
+            })(),
+          ),
+          failed,
+          new Writable({
+            write(_chunk, _encoding, done) {
+              done();
+            },
+          }),
+        ),
+        (error) => error === failure,
+      );
+      assert.deepEqual(failed.findings, [], "failed stream retained findings");
+    } else {
+      await new ReadableStream({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode(probe));
+          controller.close();
+        },
+      })
+        .pipeThrough(sanitizer)
+        .pipeTo(
+          new WritableStream({
+            write(chunk) {
+              output.push(chunk);
+            },
+          }),
+        );
+      const failure = new Error("synthetic source failure");
+      const failed = open({ limits });
+      await assert.rejects(
+        new ReadableStream({
+          pull(controller) {
+            controller.error(failure);
+          },
+        })
+          .pipeThrough(failed)
+          .pipeTo(new WritableStream()),
+        (error) => error === failure,
+      );
+      assert.deepEqual(failed.findings, [], "failed stream retained findings");
+    }
+    assert.equal(output.join(""), expected, "installed public factory differs from whole input");
+    result.factories[kind] = {
+      rejectedKeys: options.length,
+      validControl: true,
+      sourceFailurePropagated: true,
+      host: kind === "web" ? "node-web-streams" : "node-streams",
+    };
+  }
+  return result;
+}
+
+export function runInstalledIncrementalBoundary(row) {
+  return new Promise((resolveRun, reject) => {
+    const source = `import {parentPort,workerData} from "node:worker_threads";\n(${installedIncrementalBoundary.toString()})(workerData).then(result=>parentPort.postMessage({ok:true,result})).catch(error=>parentPort.postMessage({ok:false,code:error?.code??null}));`;
+    const coreDist = row.load.coreDist ?? fileURLToPath(new URL(".", row.load.url));
+    const project = resolve(coreDist, "../../../..");
+    const workerFile = join(project, `.incremental-boundary-${row.id.replaceAll("/", "-")}.mjs`);
+    writeFileSync(workerFile, source);
+    const worker = new Worker(workerFile, {
+      workerData: { load: row.load, profile: row.profile, probe: PROBES.structural },
+    });
+    let received = false;
+    worker.once("message", (message) => {
+      received = true;
+      void worker.terminate();
+      if (message.ok) resolveRun(message.result);
+      else reject(new Error(`${row.id}: installed incremental key boundary failed (${message.code ?? "assertion"})`));
+    });
+    worker.once("error", () => reject(new Error(`${row.id}: installed incremental boundary worker failed`)));
+    worker.once("exit", () => {
+      if (!received) reject(new Error(`${row.id}: installed incremental boundary worker exited without a result`));
+    });
+  });
+}
+
 const publicRow = ({ id, profile, manifestKind, piiAvailable, piiInProcess }) => ({
   id,
   profile,
@@ -421,6 +620,14 @@ async function qualifyRow(row, installed, report) {
   checkEffectiveEquivalence(row, runs);
   row.defaults = runs[0];
   entry.checks = { effectiveEquivalence: runs.length };
+  if (row.profile !== "custom") {
+    entry.checks.incrementalKeyBoundary = await runInstalledIncrementalBoundary(row);
+    assert.equal(
+      entry.checks.incrementalKeyBoundary.artifact,
+      row.loadedArtifact,
+      `${row.id}: boundary loaded another artifact`,
+    );
+  }
 
   const target = targetOf(row.known);
   checkSelectionBeforeOverlap(row, await runJourney(row, "overlap"), runs[0].scans);

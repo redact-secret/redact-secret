@@ -14,16 +14,8 @@
  * `buildFixtures`), so this file does not need to know which profile it is
  * running against.
  *
- * `api.WebStreamSanitizer` is optional. `@redact-secret/core/web-stream`'s
- * convenience export, `createWebStreamSanitizer`, is not profile-aware — it
- * always opens its session against the `full` registry
- * (`packages/javascript/src/adapters/web-stream.ts` imports `runtime` from
- * `../session.js`, unconditionally) — and merely importing anything from that
- * module pulls in `full`'s WebAssembly artifact loader, which would defeat
- * `common`'s entire bundle-size purpose if the common harness imported it too.
- * `scripts/browser-package-harness-common.mjs` therefore omits it, and every
- * check that needs it is skipped rather than failed. This is a real, recorded
- * limitation (see the issue #382 evidence record), not a gap in this harness.
+ * Each wrapper passes its matching public Web stream factory. The common
+ * subpath keeps the common artifact; it does not import the full runtime.
  */
 
 import { qualifyIncrementalInput } from "./qualify-incremental-input.mjs";
@@ -95,8 +87,7 @@ function actualTuples(findings) {
  * Runs every check against `api`, the one package entry's exports
  * (`{ RANGE_UNIT, SecretScanError, VERSION, compareActionPolicies,
  * createIncrementalSanitizer, initialize, redact, scan, scanAndRedact,
- * WebStreamSanitizer? }`).
- * `WebStreamSanitizer` is optional; see this file's module comment.
+ * createWebStreamSanitizer, WebStreamSanitizer }`).
  */
 export async function qualify(fixtures, api) {
   const {
@@ -109,6 +100,7 @@ export async function qualify(fixtures, api) {
     redact,
     scan,
     scanAndRedact,
+    createWebStreamSanitizer,
     WebStreamSanitizer,
   } = api;
 
@@ -360,12 +352,8 @@ export async function qualify(fixtures, api) {
     assertEqual(thrown.code, "INVALID_STATE", "post-finalize append code");
   });
 
-  // The Web `TransformStream` adapter, wrapped around the same real session
-  // as the checks above, on the real WebAssembly artifact. Skipped when the
-  // caller omitted `WebStreamSanitizer` (see this file's module comment).
-  if (WebStreamSanitizer === undefined) {
-    return { ok: failures === 0, failures, checks: results };
-  }
+  // The public factory opens the profile's real WebAssembly session.
+  assert(typeof createWebStreamSanitizer === "function", "the public Web stream factory is missing");
 
   // `fixture` is one canonical, single-finding corpus entry: real enough that
   // an actual detector must decide it, synthetic enough to publish. It is
@@ -388,12 +376,41 @@ export async function qualify(fixtures, api) {
     return createIncrementalSanitizer({ limits: STREAM_LIMITS });
   }
 
+  check("the public Web stream factory rejects own and inherited ruleset keys synchronously before input", () => {
+    const marker = "SYNTHETIC-RULESET-CONTENT";
+    let getters = 0;
+    for (const ruleset of [undefined, marker]) {
+      for (const options of [
+        { limits: STREAM_LIMITS, ruleset },
+        Object.assign(Object.create({ ruleset }), { limits: STREAM_LIMITS }),
+      ]) {
+        Object.defineProperty(options, "limits", {
+          get() {
+            getters += 1;
+            throw new Error(marker);
+          },
+        });
+        let thrown;
+        try {
+          createWebStreamSanitizer(options);
+        } catch (error) {
+          thrown = error;
+        }
+        assert(thrown instanceof SecretScanError, "the factory did not throw a package error synchronously");
+        assertEqual(thrown.code, "INVALID_OPTIONS", "incremental ruleset code");
+        assertEqual(thrown.message, "Secret scan options are invalid.", "fixed incremental ruleset diagnostic");
+        assert(!JSON.stringify(thrown).includes(marker), "ruleset content appeared in diagnostics");
+      }
+    }
+    assertEqual(getters, 0, "the rejected factory read options before refusing the ruleset");
+  });
+
   function oracle(text) {
     return scanAndRedact(text);
   }
 
   async function sanitizeChunks(chunks) {
-    const transform = new WebStreamSanitizer(openStreamSession());
+    const transform = createWebStreamSanitizer({ limits: STREAM_LIMITS });
     const writer = transform.writable.getWriter();
     const reader = transform.readable.getReader();
     const output = [];

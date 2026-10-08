@@ -518,9 +518,9 @@
       "rationale": "The maintainer-local scan_cost bench parses its own flags (--runs, --filter, --json, --no-detectors, --top, --list) from its arguments to choose which synthetic workloads to time and how to print them. They are never interpreted as a command, passed to a shell, or used to launch another process, and the bench is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
     },
-    "15b279e8f4876c40": {
+    "4c121d04ceee16e6": {
       "classification": "false_positive",
-      "line": 194,
+      "line": 186,
       "path": "scripts/browser-package-harness-core.mjs",
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here.",
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string"

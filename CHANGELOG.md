@@ -200,11 +200,18 @@ evidence is linked from each published version.
 
 ### Fixed
 
-- An incremental session no longer ignores a `ruleset` option (#1255, epic #1246):
-  `createIncrementalSanitizer` now rejects the key with `INVALID_OPTIONS`, as it already did `detection`, instead
-  of running the session without the detectors the caller asked for. Rulesets in
-  incremental sessions were never part of contract 1; callers that pass one
-  silently got no ruleset detection, and the adapters never pass one.
+- JavaScript incremental options reject an own or inherited `ruleset` key,
+  including `ruleset: undefined`, with fixed `INVALID_OPTIONS` before allocating
+  a session or processing input (#1255, #1285, #1286, #1287, epic #1246).
+  This applies to Node/browser artifacts and `full`/`common`. Public Node/Web
+  stream factories forward caller options and throw synchronously during
+  creation. Released beta.14 silently ignored these unsupported keys; shared
+  option variables can still pass TypeScript checks and require migration.
+  Whole-input rulesets and incremental `actionPolicy` remain supported. See
+  [migration and error handling](docs/guides/streaming.md#migrating-shared-options-from-beta14).
+  This validation tightening does not itself require `0.2.0` under contract 1,
+  because incremental rulesets were unsupported; the runtime compatibility
+  impact on these call shapes is explicit. This entry is unreleased.
 - JavaScript `typedPlaceholderFormatter` upper-cases only ASCII letters in a
   finding type, matching the Rust core's `to_ascii_uppercase` (#1276). Every
   built-in type name is ASCII, so built-in output is unchanged; a custom

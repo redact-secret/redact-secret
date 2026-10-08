@@ -86,6 +86,14 @@ const COMMON_EXPECTATIONS = "common-profile-expectations.json";
 const PACKAGE_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "index.js");
 const PACKAGE_COMMON_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "common.js");
 const PACKAGE_WEB_STREAM_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "adapters", "web-stream.js");
+const PACKAGE_COMMON_WEB_STREAM_ENTRY = join(
+  REPO_ROOT,
+  "packages",
+  "javascript",
+  "dist",
+  "adapters",
+  "web-stream-common.js",
+);
 
 /** The engines this artifact is qualified in, in the order they run. */
 const ENGINES = ["chromium", "firefox", "webkit"];
@@ -348,12 +356,11 @@ async function bundlePackageHarness(artifactDir, outFile, detectorProfile, pii =
   const alias =
     detectorProfile === "common"
       ? {
-          // No `@redact-secret/core/web-stream` alias: the common harness
-          // does not import it (see its own module comment — that adapter
-          // is not profile-aware yet). The PII harness imports the root
-          // specifier, which for `common` is the `/common` entry.
+          // The PII harness imports the root specifier; common streams use
+          // their own subpath so this bundle never loads the full runtime.
           ...(pii ? { "@redact-secret/core": PACKAGE_COMMON_ENTRY } : {}),
           "@redact-secret/core/common": PACKAGE_COMMON_ENTRY,
+          "@redact-secret/core/common/web-stream": PACKAGE_COMMON_WEB_STREAM_ENTRY,
           "@redact-secret/wasm/common": join(artifactDir, glue),
           "@redact-secret/wasm/common/pii": join(artifactDir, piiGlue),
         }
