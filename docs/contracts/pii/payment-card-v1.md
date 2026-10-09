@@ -153,3 +153,20 @@ field-label occurrence because `?`/`&` are outside the frozen context-token
 separator grammar. The detector performs no issuer-registry lookup,
 network authorization, account validation, ownership check, decoding, or
 Unicode digit normalization.
+
+
+## Evidence handoff boundary
+
+The [family handoff](https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341) reviews the
+[immutable pii-evidence candidate](https://github.com/redact-secret/pii-evidence/blob/841bad92c3af75199088fda55b12a36b6f197808/docs/research/snapshot-v2-handoff.json)
+`public-pii-phi/2026-10-08/ee61c7afc32d`. This candidate is unregistered and
+unpublished; the review does not adopt it as an active qualification snapshot.
+Its project-maintained research dispositions are not independent validation.
+
+Issue #1299 has a no-code deferred disposition: the candidate contains no
+accepted payment-card cases. Public-safe source redistribution and accepted
+carrier/grouping semantics remain unresolved in pii-evidence. This deferral
+applies to additional hardening under epic #1293, not removal of the existing
+family contract or its conformance controls. No issuer/network rule, test-value
+exclusion or sensitivity change is inferred from Luhn or scanner output.
+Reopen hardening after a source-backed handoff includes this family.

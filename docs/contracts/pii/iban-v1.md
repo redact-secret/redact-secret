@@ -113,3 +113,19 @@ variants outside the uppercase alphanumeric validator, lowercase or locally
 formatted forms, alternate whitespace, hidden-character obfuscation, malformed
 grouping, values without reviewed high-signal context, and the narrow named
 documentation/example suppression above.
+
+
+## Evidence handoff boundary
+
+The [family handoff](https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341) reviews the
+[immutable pii-evidence candidate](https://github.com/redact-secret/pii-evidence/blob/841bad92c3af75199088fda55b12a36b6f197808/docs/research/snapshot-v2-handoff.json)
+`public-pii-phi/2026-10-08/ee61c7afc32d`. This candidate is unregistered and
+unpublished; the review does not adopt it as an active qualification snapshot.
+Its project-maintained research dispositions are not independent validation.
+
+Issue #1300 has a no-code deferred disposition: the candidate contains no
+accepted IBAN cases. Its source acquisition, per-country structure/length
+evidence and public-safe provenance remain unresolved. This does not invalidate
+the existing Release 103 product contract or its checksum/normalization
+regressions. No new country rule or personal-account inference is added.
+Reopen hardening after a source-backed handoff includes this family.

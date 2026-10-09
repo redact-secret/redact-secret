@@ -173,3 +173,20 @@ never-issued combinations, but applying those rules without an issuance date
 would incorrectly reject numbers that became assignable after randomization;
 v1 deliberately does not do so. Runtime Numident verification, partial
 masking, and stable support promotion are outside this issue.
+
+
+## Evidence handoff boundary
+
+The [family handoff](https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341) reviews the
+[immutable pii-evidence candidate](https://github.com/redact-secret/pii-evidence/blob/841bad92c3af75199088fda55b12a36b6f197808/docs/research/snapshot-v2-handoff.json)
+`public-pii-phi/2026-10-08/ee61c7afc32d`. This candidate is unregistered and
+unpublished; the review does not adopt it as an active qualification snapshot.
+Its project-maintained research dispositions are not independent validation.
+
+Issue #1298 retains the SSA structural exclusions and existing selector
+closure. The candidate's assignable positive is description-only, so it
+cannot supply a located detection target or authorize inventing an SSN value.
+Invalid complete candidates remain unmatched under customer, patient and
+documentation labels. Product-seeded labeled and generic-ID counterparts
+protect sensitivity separately from identity; this is not an issuance or PHI
+claim. No validator or grammar expansion follows from this handoff.

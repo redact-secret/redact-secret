@@ -101,6 +101,110 @@
       "id":"phone-context-stops-at-another-candidate",
       "input":"contact details 555-234-5678 555-234-5678",
       "expected":[{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":16,"end":28}]
+    },
+    {
+      "id": "phone-evidence-json-labeled",
+      "input": "{\"phone\":\"555-234-5678\"}",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":10,"end":22}],
+      "evidence": {
+        "issues": [
+          1295,
+          1297
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Literal JSON phone field preserves the bounded NANP candidate and approved context."
+      }
+    },
+    {
+      "id": "phone-evidence-tel-label-same-digits",
+      "input": "tel: 555-234-5678",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1297
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [
+          "phone/global/basic/twin/tel-label-same-digits"
+        ],
+        "transfer": "seeded-wrapper",
+        "rationale": "Unreviewed tel label cannot establish sensitivity for the same valid NANP digits."
+      }
+    },
+    {
+      "id": "phone-evidence-numeric-id",
+      "input": "order_id: 555-234-5678",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1297
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Generic order identifiers do not establish phone sensitivity."
+      }
+    },
+    {
+      "id": "phone-evidence-medical-labeled",
+      "input": "clinical note phone: 555-234-5678",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":21,"end":33}],
+      "evidence": {
+        "issues": [
+          1295,
+          1297
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Approved phone field establishes sensitivity; medical prose adds no separate policy."
+      }
+    },
+    {
+      "id": "phone-evidence-medical-unlabeled",
+      "input": "clinical note patient number 555-234-5678",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1297
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Medical prose without a reviewed phone label does not establish sensitivity."
+      }
+    },
+    {
+      "id": "phone-evidence-medical-reserved",
+      "input": "clinical note phone: 212-555-0100",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1297
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Whole reserved 555 exchange and line remains non-sensitive under medical prose."
+      }
     }
   ]
 }
