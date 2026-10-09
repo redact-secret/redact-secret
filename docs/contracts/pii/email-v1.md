@@ -162,8 +162,9 @@ ownership, DNS, or mailbox validation.
 
 The [family handoff](https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341) reviews the
 [immutable pii-evidence candidate](https://github.com/redact-secret/pii-evidence/blob/841bad92c3af75199088fda55b12a36b6f197808/docs/research/snapshot-v2-handoff.json)
-`public-pii-phi/2026-10-08/ee61c7afc32d`. This candidate is unregistered and
-unpublished; the review does not adopt it as an active qualification snapshot.
+`public-pii-phi/2026-10-08/ee61c7afc32d`. At the #1293 review this candidate
+was unregistered and unpublished; that historical review did not adopt it as
+an active qualification snapshot.
 Its project-maintained research dispositions are not independent validation.
 
 Issue #1296 retains the frozen grammar and context rules. Reserved-domain
@@ -173,3 +174,25 @@ source-backed raw carrier shapes are transferred into the product corpus
 with existing deterministic seeded material and explicit product expectations,
 not copied canonical truth. Approved-label positives have benign twins.
 No current-contract recall defect is established by this handoff.
+
+## Active-v2 disposition
+
+Epic [#1303](https://github.com/redact-secret/redact-secret/issues/1303) revisits
+the released active snapshot `public-pii-phi/2026-10-08/ee61c7afc32d` at
+[pii-evidence source](https://github.com/redact-secret/pii-evidence/blob/e22bbc16cb9009de1a6a91e97e7322ebbc32bcf0/docs/research/snapshot-v2-handoff.json).
+The current comparison uses `pii-v1` revision 3, artifact schema 1.5, mapping
+revision 3 and population version 3. Context and identity are retained by
+that mapping; the earlier mapping-loss rationale is historical. Canonical
+reported outcomes remain evidence-owned and are not rewritten by the product
+disposition. The [active-v2 case ledger](https://github.com/redact-secret/redact-secret/issues/1305#issuecomment-6089713572)
+records each applicability ruling and its source lineage.
+
+Issue #1306 retains the current contract. Whole reserved/documentation domains
+remain non-sensitive, including under high-signal or medical labels. Quoted
+local parts, candidates immediately enclosed in `<...>` or adjacent to
+comments, and source-route forms remain unsupported. CSV headers and escaped
+nested labels do not acquire context or decoding authority. Authored sensitivity does not override these product exclusions.
+A canonical public-output type miss can therefore coexist with established
+internal identity and intentional suppression. No actionable current-contract
+defect is established; the seeded carrier, approved-label and benign pairs
+added for #1295 remain product regression controls, not evidence replacements.
