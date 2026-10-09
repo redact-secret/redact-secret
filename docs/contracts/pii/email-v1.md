@@ -156,3 +156,20 @@ delivery domains, combining-mark SMTPUTF8 spellings, an address without
 reviewed high-signal context, and an otherwise sensitive occurrence under a
 reserved/documentation namespace. The detector performs no deliverability,
 ownership, DNS, or mailbox validation.
+
+
+## Evidence handoff boundary
+
+The [family handoff](https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341) reviews the
+[immutable pii-evidence candidate](https://github.com/redact-secret/pii-evidence/blob/841bad92c3af75199088fda55b12a36b6f197808/docs/research/snapshot-v2-handoff.json)
+`public-pii-phi/2026-10-08/ee61c7afc32d`. This candidate is unregistered and
+unpublished; the review does not adopt it as an active qualification snapshot.
+Its project-maintained research dispositions are not independent validation.
+
+Issue #1296 retains the frozen grammar and context rules. Reserved-domain
+positives remain non-sensitive, and CSV headers, escaped JSON labels and
+medical prose do not establish a new context or decoding contract. The
+source-backed raw carrier shapes are transferred into the product corpus
+with existing deterministic seeded material and explicit product expectations,
+not copied canonical truth. Approved-label positives have benign twins.
+No current-contract recall defect is established by this handoff.

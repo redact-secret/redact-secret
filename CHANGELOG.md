@@ -7,6 +7,14 @@ evidence is linked from each published version.
 
 ### Added
 
+- PII evidence regression controls (#1293, #1295): seeded email, phone and
+  US SSN cases cover raw serialization carriers, approved versus ambiguous
+  labels, reserved/invalid controls and medical-context twins. The reviewed
+  evidence establishes no recall-expansion fix; detector grammars, selectors,
+  decoding exclusions and support statuses retain their existing contracts.
+  Additional payment-card and IBAN hardening is deferred until source-backed
+  evidence is available.
+
 - Strict policy previews in JavaScript (#1283): `runtime-config/v2` adds
   `closedTypes` and `closedDetectors`, reusing Rust policy diagnostics. Unknown
   policy names become errors only for a declared closed vocabulary. The v2 tag

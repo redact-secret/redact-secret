@@ -71,6 +71,188 @@
     {"id":"email-bare-pipe-korean-label","input":"|이메일|fixture876-q7m9@x4z8v2n6.synthetic|","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":11,"end":45}]},
     {"id":"email-bare-pipe-label-prefix-is-not-a-whole-token","input":"|emailx|fixture876-q7m9@x4z8v2n6.synthetic|","expected":[]},
     {"id":"email-bare-pipe-unreviewed-fields-stay-joined","input":"|user|a|fixture876-q7m9@x4z8v2n6.synthetic|","expected":[]},
-    {"id":"email-bare-pipe-reserved-domain-control","input":"|email|person@example.com|","expected":[]}
+    {"id":"email-bare-pipe-reserved-domain-control","input":"|email|person@example.com|","expected":[]},
+    {
+      "id": "email-evidence-csv-crlf-record-end",
+      "input": "contact\r\nfixture876-q7m9@x4z8v2n6.synthetic\r\nnext-record",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1296
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [
+          "email/global/basic/twin/csv-crlf-record-end"
+        ],
+        "transfer": "seeded-wrapper",
+        "rationale": "CSV header and candidate are on separate logical lines. Existing seeded candidate replaces the reserved evidence value; no evidence sensitivity annotation is promoted."
+      }
+    },
+    {
+      "id": "email-evidence-csv-doubled-quote-field",
+      "input": "note,contact\n\"say \"\"fixture876-q7m9@x4z8v2n6.synthetic\"\" now\",x",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1296
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [
+          "email/global/basic/twin/csv-doubled-quote-field"
+        ],
+        "transfer": "seeded-wrapper",
+        "rationale": "CSV contact header is ambiguous and separated by a logical line. Existing seeded candidate replaces the reserved evidence value; no evidence sensitivity annotation is promoted."
+      }
+    },
+    {
+      "id": "email-evidence-csv-quoted-field",
+      "input": "contact\n\"fixture876-q7m9@x4z8v2n6.synthetic\"",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1296
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [
+          "email/global/basic/twin/csv-quoted-field"
+        ],
+        "transfer": "seeded-wrapper",
+        "rationale": "CSV contact header does not establish sensitivity on a later line. Existing seeded candidate replaces the reserved evidence value; no evidence sensitivity annotation is promoted."
+      }
+    },
+    {
+      "id": "email-evidence-json-escaped-quote-adjacent",
+      "input": "{\"note\":\"say \\\"fixture876-q7m9@x4z8v2n6.synthetic\\\" twice\"}",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1296
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [
+          "email/global/basic/twin/json-escaped-quote-adjacent"
+        ],
+        "transfer": "seeded-wrapper",
+        "rationale": "Raw escaped quotes do not supply a reviewed email label. Existing seeded candidate replaces the reserved evidence value; no evidence sensitivity annotation is promoted."
+      }
+    },
+    {
+      "id": "email-evidence-json-nested-string",
+      "input": "{\"payload\":\"{\\\"email\\\":\\\"fixture876-q7m9@x4z8v2n6.synthetic\\\"}\"}",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1296
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [
+          "email/global/basic/twin/json-nested-string"
+        ],
+        "transfer": "seeded-wrapper",
+        "rationale": "Escaped nested JSON field labels are not decoded by the raw-input scanner. Existing seeded candidate replaces the reserved evidence value; no evidence sensitivity annotation is promoted."
+      }
+    },
+    {
+      "id": "email-evidence-logfmt-quoted-value",
+      "input": "level=info msg=\"contact fixture876-q7m9@x4z8v2n6.synthetic\" id=7",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1296
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [
+          "email/global/basic/twin/logfmt-quoted-value"
+        ],
+        "transfer": "seeded-wrapper",
+        "rationale": "Quoted logfmt prose with ambiguous contact does not establish sensitivity. Existing seeded candidate replaces the reserved evidence value; no evidence sensitivity annotation is promoted."
+      }
+    },
+    {
+      "id": "email-evidence-json-labeled",
+      "input": "{\"email\":\"fixture876-q7m9@x4z8v2n6.synthetic\"}",
+      "expected": [{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":10,"end":44}],
+      "evidence": {
+        "issues": [
+          1295,
+          1296
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Literal JSON email field preserves approved context without parsing."
+      }
+    },
+    {
+      "id": "email-evidence-json-reserved",
+      "input": "{\"email\":\"identity@example.com\"}",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1296
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Reserved documentation domain remains non-sensitive under an approved literal JSON label."
+      }
+    },
+    {
+      "id": "email-evidence-medical-labeled",
+      "input": "clinical note email: fixture876-q7m9@x4z8v2n6.synthetic",
+      "expected": [{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":21,"end":55}],
+      "evidence": {
+        "issues": [
+          1295,
+          1296
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Approved email field establishes sensitivity; medical prose adds no separate policy."
+      }
+    },
+    {
+      "id": "email-evidence-medical-unlabeled",
+      "input": "clinical note patient address fixture876-q7m9@x4z8v2n6.synthetic",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1296
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Medical prose without a reviewed email label does not establish sensitivity."
+      }
+    }
   ]
 }

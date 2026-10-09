@@ -326,6 +326,15 @@ to carry plaintext into a public expectation.
 
 ## Mutation provenance
 
+Family PII cases added for epic #1293 carry an `evidence` object with the
+immutable source commit, full snapshot identity, originating case IDs when
+applicable, and a product-regression rationale. `seeded-wrapper` replaces only
+the source candidate with the family's existing deterministic seed;
+`product-owned-pair` declares a local regression control. These fields trace
+the review without copying canonical provenance or adopting its expectations.
+Fixture consumers continue to replay `input` and `expected` through the same
+public surfaces; pii-evidence retains ownership of evidence truth.
+
 A fixture's optional `mutation` object (`CanonicalMutationProvenance`:
 `grammar`, `seedId`, `operation`, `ordinal`) records where a boundary or
 regression case came from. It is validated for shape by `schema.ts`

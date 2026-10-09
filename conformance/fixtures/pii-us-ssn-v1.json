@@ -86,6 +86,108 @@
     {"id":"us-ssn-template-reference-unmatched","input":"ssn={{890-62-6879}}","expected":[]},
     {"id":"us-ssn-extra-leading-digit-unmatched","input":"ssn=1890-62-6879","expected":[]},
     {"id":"us-ssn-extra-trailing-digit-unmatched","input":"ssn=890-62-68790","expected":[]},
-    {"id":"us-ssn-repeated-hyphen-unmatched","input":"ssn=890--62-6879","expected":[]}
+    {"id":"us-ssn-repeated-hyphen-unmatched","input":"ssn=890--62-6879","expected":[]},
+    {
+      "id": "us-ssn-evidence-json-labeled",
+      "input": "{\"ssn\":\"890626879\"}",
+      "expected": [{"detector":"pii-domain","type":"pii_jurisdiction_us_ssn","confidence":"high","action":"redact","start":8,"end":17}],
+      "evidence": {
+        "issues": [
+          1295,
+          1298
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Literal JSON SSN field preserves approved context for a seeded structurally admissible candidate."
+      }
+    },
+    {
+      "id": "us-ssn-evidence-json-invalid",
+      "input": "{\"ssn\":\"000-62-6879\"}",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1298
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Invalid zero area cannot establish SSN identity despite an approved JSON label."
+      }
+    },
+    {
+      "id": "us-ssn-evidence-generic-numeric-id",
+      "input": "order_id: 890626879",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1298
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Generic order identifiers do not establish US SSN sensitivity."
+      }
+    },
+    {
+      "id": "us-ssn-evidence-medical-labeled",
+      "input": "clinical note ssn: 890626879",
+      "expected": [{"detector":"pii-domain","type":"pii_jurisdiction_us_ssn","confidence":"high","action":"redact","start":19,"end":28}],
+      "evidence": {
+        "issues": [
+          1295,
+          1298
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Approved SSN field establishes sensitivity; medical prose adds no separate policy."
+      }
+    },
+    {
+      "id": "us-ssn-evidence-medical-unlabeled",
+      "input": "clinical note patient identifier 890626879",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1298
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Medical prose without a reviewed SSN field does not establish sensitivity."
+      }
+    },
+    {
+      "id": "us-ssn-evidence-medical-invalid",
+      "input": "clinical note ssn: 000-62-6879",
+      "expected": [],
+      "evidence": {
+        "issues": [
+          1295,
+          1298
+        ],
+        "handoff": "https://github.com/redact-secret/redact-secret/issues/1294#issuecomment-6082141341",
+        "sourceCommit": "841bad92c3af75199088fda55b12a36b6f197808",
+        "snapshotId": "public-pii-phi/2026-10-08/ee61c7afc32d",
+        "evidenceCaseIds": [],
+        "transfer": "product-owned-pair",
+        "rationale": "Invalid zero area remains identity-unmatched under a medical SSN field."
+      }
+    }
   ]
 }
