@@ -2,9 +2,10 @@
 
 [Documentation home](README.md) · [Installation](getting-started.md)
 
-Each path below starts in an empty directory, installs only the published
-package, and redacts one synthetic value. Pick the runtime you use; each one
-takes about five minutes on a supported development machine, most of it
+Each path below starts in an empty directory, installs a registry package,
+and redacts one synthetic value. Candidate pins are used for qualification;
+use the latest published version until candidate publication is recorded.
+Pick the runtime you use; each one takes about five minutes on a supported development machine, most of it
 spent downloading packages or compiling.
 
 | I use | Section | Installs |
@@ -21,8 +22,9 @@ Every release so far is a beta; the stable `0.1.0` is not published yet.
 
 > **Version status.** Latest published: `0.1.0-beta.14`
 > ([release record](releases/0.1.0-beta.14/README.md), [status](releases/status.md)).
-> The commands below pin it because this page is qualified against it (PyPI
-> spells it `0.1.0b14`).
+> Release candidate: `0.1.0-beta.15`, not published. The commands below pin
+> the candidate for qualification; use `0.1.0-beta.14` (`0.1.0b14` on PyPI)
+> until publication is recorded.
 
 The pinned commands give the same result tomorrow as today. Pin the version in
 your own lockfile too.
@@ -61,7 +63,7 @@ Requires Node.js 20, 22, or 24. In an empty directory:
 ```sh qualify=node:setup
 npm init -y
 npm pkg set type=module
-npm install @redact-secret/core@0.1.0-beta.14
+npm install @redact-secret/core@0.1.0-beta.15
 ```
 
 Save this as `quickstart.mjs`:
@@ -85,7 +87,7 @@ node quickstart.mjs
 Expected output:
 
 ```text qualify=node:expect
-redact-secret 0.1.0-beta.14 loaded addon
+redact-secret 0.1.0-beta.15 loaded addon
 API_KEY=<SECRET_1>
 findings: 1
 ```
@@ -103,7 +105,7 @@ Requires CPython 3.10 or newer on a platform with a published wheel (see
 
 ```sh qualify=python:setup
 python3 -m venv .venv
-.venv/bin/python -m pip install --only-binary=:all: redact-secret==0.1.0b14
+.venv/bin/python -m pip install --only-binary=:all: redact-secret==0.1.0b15
 ```
 
 `--only-binary=:all:` makes an unsupported platform fail during install
@@ -127,7 +129,7 @@ Run it:
 Expected output:
 
 ```text qualify=python:expect
-redact-secret 0.1.0-beta.14
+redact-secret 0.1.0-beta.15
 API_KEY=<SECRET_1>
 findings: 1
 ```
@@ -140,7 +142,7 @@ conditions and emits the WebAssembly asset. In an empty directory:
 ```sh qualify=browser:setup
 npm init -y
 npm pkg set type=module
-npm install @redact-secret/core@0.1.0-beta.14 vite@7.3.6
+npm install @redact-secret/core@0.1.0-beta.15 vite@7.3.6
 ```
 
 Save this as `index.html`:
@@ -187,7 +189,7 @@ npx vite preview --port 4173 --strictPort
 Expected page text:
 
 ```text qualify=browser:expect
-redact-secret 0.1.0-beta.14 loaded wasm
+redact-secret 0.1.0-beta.15 loaded wasm
 API_KEY=<SECRET_1>
 findings: 1
 ```
@@ -203,7 +205,7 @@ Requires Rust 1.88 or newer. In an empty directory:
 ```sh qualify=rust:setup
 cargo new redact-quickstart
 cd redact-quickstart
-cargo add redact-secret@0.1.0-beta.14
+cargo add redact-secret@0.1.0-beta.15
 ```
 
 Replace `src/main.rs` with:
@@ -229,7 +231,7 @@ cargo run --quiet
 Expected output:
 
 ```text qualify=rust:expect
-redact-secret 0.1.0-beta.14
+redact-secret 0.1.0-beta.15
 API_KEY=<SECRET_1>
 findings: 1
 ```
@@ -245,7 +247,7 @@ and `--version` is required while every release is a beta. In an empty
 directory:
 
 ```sh qualify=cli:setup
-cargo install redact-secret-cli --version 0.1.0-beta.14 --locked
+cargo install redact-secret-cli --version 0.1.0-beta.15 --locked
 ```
 
 Save this as `input.txt`:
@@ -265,7 +267,7 @@ redact-secret input.txt || echo "exit $?"
 Expected output:
 
 ```text qualify=cli:expect
-redact-secret 0.1.0-beta.14
+redact-secret 0.1.0-beta.15
 API_KEY=<SECRET_1>
 input.txt:8-39 contextual_secret detector=generic-token confidence=high action=redact obfuscation=none id=finding-1
 exit 1

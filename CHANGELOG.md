@@ -5,6 +5,24 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+## 0.1.0-beta.15 (release candidate)
+
+### Compatibility and qualification
+
+- TypeScript `CoreStatus` requires `configuration`, and its `profile` union
+  includes `custom`. Update constructed status values and exhaustive profile
+  assumptions. Rust `SecretScanErrorCode::ALL` grows from 23 to 26 entries;
+  consumers asserting its fixed array length must update. Error-code and profile
+  enums remain non-exhaustive.
+- Incremental JavaScript sessions reject an own or inherited `ruleset` key,
+  including `undefined`, with `INVALID_OPTIONS`. Custom names passed to
+  `typedPlaceholderFormatter` use ASCII uppercase; non-ASCII names can produce
+  different placeholders. Existing ASCII names keep their output.
+- Candidate performance, memory, size, installed-artifact qualification, SAST
+  and package rehearsal must bind to the final merged beta.15 SHA. Historical
+  #1283 measurements do not approve this candidate. [Preparation and final
+  evidence](https://github.com/redact-secret/redact-secret/issues/1320).
+
 ### Added
 
 - PII evidence regression controls (#1293, #1295): seeded email, phone and
@@ -12,8 +30,10 @@ evidence is linked from each published version.
   labels, reserved/invalid controls and medical-context twins. The reviewed
   evidence establishes no recall-expansion fix; detector grammars, selectors,
   decoding exclusions and support statuses retain their existing contracts.
-  Additional payment-card and IBAN hardening is deferred until source-backed
-  evidence is available.
+  The adopted active-v2 ledger (#1303) establishes no actionable current-
+  contract gap; its exact installed-artifact comparison preserves every outcome.
+  Payment-card, IBAN and network-address hardening lack an active evidence target;
+  their existing product controls remain protected. No PII support is promoted.
 
 - Strict policy previews in JavaScript (#1283): `runtime-config/v2` adds
   `closedTypes` and `closedDetectors`, reusing Rust policy diagnostics. Unknown
@@ -40,7 +60,8 @@ evidence is linked from each published version.
 - Artifact manifest, `artifact-manifest/v1` (#1250, epic #1246,
   `decision-define-the-artifact-manifest-and-configuration-data-contracts`):
   a consumer can read what the exact loaded artifact contains without scanning
-  an input and without initializing anything. The Rust core generates the
+  an input. The JavaScript facade requires `initialize()` first; Rust, Python
+  and the CLI can read it without runtime activation. The Rust core generates the
   document from the registration rows the artifact links (ids, canonical
   order, pack, the finding types each built-in can emit, whether the PII
   runtime is linked, capabilities, build defaults, bounds, and a SHA-256
@@ -102,8 +123,8 @@ evidence is linked from each published version.
     detector ids and digest are withheld unless asked for. The snapshot holds no
     input, ruleset body, value, path or sensitivity score.
   - New fixed error codes `INVALID_DETECTION_CONFIG`, `DETECTION_CONFIG_CONFLICT`
-    and `EMPTY_DETECTION_SET`. `status()` gains `configuration` (additive, not a
-    breaking change).
+    and `EMPTY_DETECTION_SET`. `status()` gains `configuration`; TypeScript
+    consumers constructing `CoreStatus` values must add that field.
   - Cost: the standard WebAssembly artifacts carry the selection, the resolver
     and a small JSON reader; the measured delta is in the pull request.
 
@@ -134,8 +155,9 @@ evidence is linked from each published version.
   `SampleRuleHits` (sample rule hits, kept apart from static reachability: no
   hit never proves a rule dead) and `ConfigRequest::closed_types` /
   `closed_detectors` (strict validation, an error instead of a warning, only
-  for a vocabulary the caller declares closed; not offered in JavaScript, whose
-  `runtime-config/v1` has no such member). The `ConfigDiagnostic` id may now be
+  for a vocabulary the caller declares closed). JavaScript exposes the same
+  strict previews through `runtime-config/v2` (#1283); `runtime-config/v1`
+  retains its prior open-vocabulary behavior. The `ConfigDiagnostic` id may now be
   a rule id as well as a catalog detector id.
 
 - Static custom composition (#1253, epic #1246,
@@ -187,7 +209,7 @@ evidence is linked from each published version.
   `ConfigurationComparison` and its member types; Rust
   `compare_configurations`, `ConfigurationSide`, `ConfigurationComparison`,
   `ConfigurationResult`, `ConfigurationDifference(s)`, `DifferenceKind`,
-  `Correspondence`, `SideStatus`, `CHANGE_NAMES`, and the
+  `Correspondence`, `SideStatus`, and the
   `ConfigSnapshot` accessors `detection_selection`, `pii_selection` and
   `whole_input_limits`; the Node addon exports `scanConfigurationSide` and
   `scanConfigurationSideCommon` and the WebAssembly module `scanConfigurationSide`.

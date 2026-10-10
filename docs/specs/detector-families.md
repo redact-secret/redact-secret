@@ -1643,7 +1643,7 @@ row is not support.
 the sibling shapes of the historical
 [#1014 Ory handoff](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1014/ory.md)
 after the 2026-10-07 reconciliation and adoption ruling in
-[`docs/audits/evidence/1110/README.md`](../audits/evidence/1110/README.md). It
+[pinned reconciliation and adoption ruling](https://github.com/redact-secret/redact-secret/blob/ca09aeb6bb360aed20914e475230836250e2759a/docs/audits/evidence/1110/README.md). It
 is a new detector, `Provider` specificity, high confidence and always redacted,
 not an extension of an existing family. The admin keys stay blocked and are not
 part of this contract. No support-status claim until the benchmarks arrival
@@ -1677,7 +1677,7 @@ the body grammar. Tests: `crates/secret-scan-core/src/detectors/ory_token.rs`,
 ## Beta.15 credential families (#1111)
 
 Baseten ([#1111](https://github.com/redact-secret/redact-secret/issues/1111),
-evidence note: [`docs/audits/evidence/1111/README.md`](../audits/evidence/1111/README.md);
+evidence note: [pinned structure review](https://github.com/redact-secret/redact-secret/blob/ca09aeb6bb360aed20914e475230836250e2759a/docs/audits/evidence/1111/README.md);
 research record: [#1012](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1012/baseten.md)).
 The core adoption ruling is dated 2026-10-07: the provider's documentation
 states the prefix, separator, both body lengths and the alphabet as a scanner

@@ -100,8 +100,9 @@ detection, and it changes no default.
 `resolveConfig` (JavaScript) and `resolve_config` (Rust) check a policy that
 loaded against the artifact's catalog and the resolved configuration, and report
 findings as `config-diagnostics/v1` items. They never change loading: the same
-document is accepted or rejected as before, a typo leaves `ok` true, and the
-only place it shows is the diagnostics. Each item carries a code, a severity, a
+document is accepted or rejected as before. With an open vocabulary, a typo
+leaves `ok` true and appears only in diagnostics; a declared closed vocabulary
+in `runtime-config/v2` can instead make it an error. Each item carries a code, a severity, a
 fixed-syntax `path` such as `actionPolicy.rules[2].match.type[0]`, and an `id`
 that is only a catalog detector id or a rule id. A name you typed is never
 echoed, only its position. At most 256 items are returned, errors first; the

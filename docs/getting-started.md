@@ -13,17 +13,19 @@ yet.
 
 > **Version status.** Latest published: `0.1.0-beta.14`
 > ([release record](releases/0.1.0-beta.14/README.md), [status](releases/status.md)).
-> The commands below pin it.
+> Release candidate: `0.1.0-beta.15`, not published. The commands below pin
+> the candidate for qualification; use `0.1.0-beta.14` (`0.1.0b14` on PyPI)
+> until publication is recorded.
 
 [Release status](releases/status.md) lists what the registries currently
 carry. Select the version explicitly and keep it in your application's
 dependency lockfile.
 
 ```bash
-npm install @redact-secret/core@0.1.0-beta.14
-python -m pip install redact-secret==0.1.0b14
-cargo add redact-secret@0.1.0-beta.14
-cargo install redact-secret-cli --version 0.1.0-beta.14 --locked
+npm install @redact-secret/core@0.1.0-beta.15
+python -m pip install redact-secret==0.1.0b15
+cargo add redact-secret@0.1.0-beta.15
+cargo install redact-secret-cli --version 0.1.0-beta.15 --locked
 ```
 
 Run only the command for your runtime. What an unpinned install gives you

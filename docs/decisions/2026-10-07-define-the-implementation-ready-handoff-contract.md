@@ -16,7 +16,7 @@ spec: evidence-and-gates
 state in which research and the product contract are finished and an outside
 contributor can implement without repeating provider research. The benchmarks
 repository already decided a five-word work-item vocabulary
-([`decision-define-benchmark-handoff-states`](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/decisions/2026-09-30-define-benchmark-handoff-states.md))
+([`decision-define-benchmark-handoff-states`](https://github.com/redact-secret/redact-secret-benchmarks/blob/40809e8ce53eb94509d3b6bb3ae877ca8d4021f4/docs/decisions/2026-09-30-define-benchmark-handoff-states.md))
 and names this issue as its core counterpart. Core had no definition: the Ory
 issue [#1110](https://github.com/redact-secret/redact-secret/issues/1110) shows
 the cost, a handoff whose first screen is a research disposition and whose
