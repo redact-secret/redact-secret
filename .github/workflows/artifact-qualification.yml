@@ -1271,6 +1271,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run the configuration journeys against the installed candidate
+        env:
+          REHEARSAL_VERSION: ${{ inputs.rehearsal-version }}
         run: |
           node scripts/qualify-configuration.mjs \
             --candidate-dir target/configuration-qualification/candidate \
