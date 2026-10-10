@@ -426,6 +426,26 @@ export async function buildCustomArtifact(options) {
   const workspace = readWorkspace(run, root);
   requireMatchingBindgen(run, workspace.bindgenVersion);
   const revision = options.sourceRevision ?? sourceRevision(run, root);
+  // A rehearsal keeps its dirty/null identity and separately proves the exact version transform.
+  const rehearsalSource = process.env.REHEARSAL_VERSION
+    ? JSON.parse(
+        run(
+          "python3",
+          [
+            "-B",
+            join(root, "scripts", "rehearsal-version.py"),
+            "provenance",
+            "--source",
+            revision.revision ?? "",
+            "--version",
+            process.env.REHEARSAL_VERSION,
+            "--run-id",
+            process.env.GITHUB_RUN_ID ?? "",
+          ],
+          { cwd: root },
+        ),
+      )
+    : undefined;
   rmSync(workDir, { recursive: true, force: true });
   mkdirSync(workDir, { recursive: true });
   const leaf = writeLeaf(workDir, resolved, workspace, root);
@@ -600,7 +620,11 @@ export async function buildCustomArtifact(options) {
   const report = {
     schema: REPORT_SCHEMA,
     version: workspace.version,
-    engine: { sourceRevision: revision.revision, sourceTreeDirty: revision.dirty },
+    engine: {
+      sourceRevision: revision.revision,
+      sourceTreeDirty: revision.dirty,
+      ...(rehearsalSource ? { rehearsalSource } : {}),
+    },
     toolchain,
     composition: { name: resolved.name, id: resolved.id, document: JSON.parse(resolved.document) },
     manifest: { file: PACKAGED_MANIFEST_FILE, digest: manifest.digest },

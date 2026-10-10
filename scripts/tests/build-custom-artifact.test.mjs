@@ -256,6 +256,63 @@ test("an output directory that is not a previous custom artifact is never overwr
   }
 });
 
+test("a rejected rehearsal source transform stops before generating or compiling the artifact", async () => {
+  const root = mkdtempSync(join(tmpdir(), "custom-rehearsal-"));
+  const previous = { version: process.env.REHEARSAL_VERSION, run: process.env.GITHUB_RUN_ID };
+  try {
+    writeFileSync(join(root, "Cargo.toml"), 'wasm-bindgen = "=0.2.128"\n');
+    process.env.REHEARSAL_VERSION = "0.1.0-beta.9876543210";
+    process.env.GITHUB_RUN_ID = "9876543210";
+    const calls = [];
+    const run = (command, args) => {
+      calls.push([command, args]);
+      if (command === "cargo" && args[0] === "metadata") {
+        return JSON.stringify({
+          packages: [
+            { name: "redact-secret-wasm", version: process.env.REHEARSAL_VERSION },
+            { name: "wasm-bindgen", version: "0.2.128" },
+          ],
+        });
+      }
+      if (command === "wasm-bindgen") return "wasm-bindgen 0.2.128";
+      if (command === "python3") throw new Error("version-only provenance rejected");
+      throw new Error("unexpected command");
+    };
+    await assert.rejects(
+      buildCustomArtifact({
+        root,
+        catalog: catalog(),
+        composition: { schema: "composition/v1", name: "x", include: ["jwt"], pii: "none" },
+        sourceRevision: { revision: "a".repeat(40), dirty: true },
+        outDir: "out",
+        run,
+      }),
+      /version-only provenance rejected/,
+    );
+    assert.deepEqual(calls.at(-1), [
+      "python3",
+      [
+        "-B",
+        join(root, "scripts", "rehearsal-version.py"),
+        "provenance",
+        "--source",
+        "a".repeat(40),
+        "--version",
+        "0.1.0-beta.9876543210",
+        "--run-id",
+        "9876543210",
+      ],
+    ]);
+    assert.equal(existsSync(join(root, "out.work")), false);
+  } finally {
+    if (previous.version === undefined) delete process.env.REHEARSAL_VERSION;
+    else process.env.REHEARSAL_VERSION = previous.version;
+    if (previous.run === undefined) delete process.env.GITHUB_RUN_ID;
+    else process.env.GITHUB_RUN_ID = previous.run;
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("the generated leaf names exactly the selected constructors, in canonical order", () => {
   const resolved = resolveComposition(
     parseComposition({

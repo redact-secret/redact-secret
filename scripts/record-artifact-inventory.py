@@ -201,13 +201,49 @@ def collect_configuration_qualification(artifacts: Path, revision: str, version:
             core["version"] == version and digest(core_path) == core["sha256"],
             "core tarball differs from installed candidate",
         )
-        require(
-            build["engine"]["sourceRevision"] == revision and build["engine"]["sourceTreeDirty"] is False,
-            "custom build source is not the clean candidate",
-        )
-        require(
-            manifest["sourceRevision"] == revision and manifest["version"] == version, "custom manifest source differs"
-        )
+        rehearsal_source = None
+        if os.environ.get("REHEARSAL_VERSION"):
+            try:
+                rehearsal_source = json.loads(
+                    subprocess.check_output(
+                        [
+                            sys.executable,
+                            "-B",
+                            str(ROOT / "scripts/rehearsal-version.py"),
+                            "provenance",
+                            "--source",
+                            revision,
+                            "--version",
+                            version,
+                            "--run-id",
+                            os.environ.get("GITHUB_RUN_ID", ""),
+                        ],
+                        cwd=ROOT,
+                    )
+                )
+            except (subprocess.CalledProcessError, ValueError) as failure:
+                raise ValueError("rehearsal source transform is not verified") from failure
+            require(os.environ["REHEARSAL_VERSION"] == version, "rehearsal version differs")
+        if rehearsal_source is None:
+            require(
+                build["engine"]["sourceRevision"] == revision and build["engine"]["sourceTreeDirty"] is False,
+                "custom build source is not the clean candidate",
+            )
+            require(
+                manifest["sourceRevision"] == revision and manifest["version"] == version,
+                "custom manifest source differs",
+            )
+        else:
+            require(
+                build["engine"]["sourceRevision"] == revision
+                and build["engine"]["sourceTreeDirty"] is True
+                and build["engine"].get("rehearsalSource") == rehearsal_source,
+                "custom build rehearsal source transform differs",
+            )
+            require(
+                manifest["sourceRevision"] is None and manifest["version"] == version,
+                "custom rehearsal manifest must retain its dirty-source identity",
+            )
         require(manifest["artifact"]["variant"] == "custom", "custom manifest variant differs")
         require(build["manifest"]["digest"] == manifest["digest"], "build manifest digest differs")
         require(build["composition"]["id"] == manifest["composition"]["id"], "build composition differs")
@@ -277,6 +313,7 @@ def collect_configuration_qualification(artifacts: Path, revision: str, version:
             "compositionId": manifest["composition"]["id"],
             "files": files,
             "customRuntimes": report["customRuntimes"],
+            **({"rehearsalSource": rehearsal_source} if rehearsal_source is not None else {}),
             "corePackage": {
                 "name": "@redact-secret/core",
                 "version": version,

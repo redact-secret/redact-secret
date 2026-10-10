@@ -34,10 +34,13 @@ developer's working tree is not bumped by accident.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -169,6 +172,80 @@ def apply(root: Path, new: str) -> dict[str, int]:
     return edits
 
 
+def provenance(root: Path, source: str, version: str, run_id: str) -> dict:
+    """Prove the checkout differs from source only by the exact version transform."""
+
+    def git(*args: str) -> bytes:
+        return subprocess.check_output(["git", *args], cwd=root)
+
+    if not re.fullmatch(r"[0-9a-f]{40}", source) or git("rev-parse", "HEAD").decode().strip() != source:
+        raise RehearsalError("rehearsal source must be the exact checked-out commit")
+    tracked = git("ls-tree", "-r", "--name-only", source).decode().splitlines()
+    if any(entry[0] != "H" for entry in git("ls-files", "-v", "-z").decode().split("\0") if entry):
+        raise RehearsalError("hidden index entries cannot be bound to the rehearsal source")
+    native = [p for p in tracked if re.fullmatch(r"bindings/node/npm/[^/]+/package.json", p)]
+    paths = sorted({CARGO_TOML, CARGO_LOCK, TYPESCRIPT_VERSION, *LOCKFILES, *DOC_PINS, *JSON_MANIFESTS, *native})
+    with tempfile.TemporaryDirectory(prefix="rehearsal-provenance-") as temporary:
+        expected = Path(temporary)
+        originals = {}
+        for name in paths:
+            originals[name] = git("show", f"{source}:{name}")
+            path = expected / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(originals[name])
+        original_version = workspace_version(expected)
+        if version != derive(run_id, original_version):
+            raise RehearsalError("rehearsal version must be derived from this run and committed version")
+        apply(expected, version)
+        transformed = {name: (expected / name).read_bytes() for name in paths}
+    changed = {name for name in paths if originals[name] != transformed[name]}
+    disk_changes = set(git("diff", "HEAD", "--name-only").decode().splitlines())
+    staged_changes = set(git("diff", "--cached", "--name-only").decode().splitlines())
+    if disk_changes != changed or not staged_changes.issubset(changed):
+        raise RehearsalError("checkout changes differ from the exact rehearsal version transform")
+    for name in paths:
+        path = root / name
+        if path.is_symlink() or not path.is_file() or path.read_bytes() != transformed[name]:
+            raise RehearsalError(f"{name}: bytes differ from the rehearsal version transform")
+        if name in staged_changes and git("show", f":{name}") != transformed[name]:
+            raise RehearsalError(f"{name}: staged bytes differ from the rehearsal version transform")
+        mode = git("ls-tree", source, "--", name).decode().split()[0]
+        index_mode = git("ls-files", "--stage", "--", name).decode().split()[0]
+        if index_mode != mode or bool(path.stat().st_mode & 0o111) != (mode == "100755"):
+            raise RehearsalError(f"{name}: file mode differs from committed source")
+    # Reject extra engine, wrapper and build-tool source; generated outputs stay ignored.
+    untracked = git(
+        "ls-files",
+        "--others",
+        "--exclude-standard",
+        "--",
+        "crates",
+        "bindings",
+        "packages",
+        "scripts",
+        CARGO_TOML,
+        CARGO_LOCK,
+    )
+    if untracked.strip():
+        raise RehearsalError("untracked custom-engine source cannot be bound to the rehearsal")
+    files = {
+        name: {
+            "before": hashlib.sha256(originals[name]).hexdigest(),
+            "after": hashlib.sha256(transformed[name]).hexdigest(),
+        }
+        for name in sorted(changed)
+    }
+    return {
+        "schema": "rehearsal-source/v1",
+        "sourceCommit": source,
+        "sourceTree": git("rev-parse", f"{source}^{{tree}}").decode().strip(),
+        "sourceVersion": original_version,
+        "rehearsalVersion": version,
+        "runId": run_id,
+        "files": files,
+    }
+
+
 def _status(url: str) -> int:
     request = urllib.request.Request(url, headers={"User-Agent": "redact-secret-release-rehearsal"})
     try:
@@ -217,9 +294,16 @@ def main() -> int:
     apply_cmd.add_argument("--force-local", action="store_true")
     check_cmd = sub.add_parser("check-unpublished", help="prove no registry carries the version")
     check_cmd.add_argument("--version", required=True)
+    provenance_cmd = sub.add_parser("provenance", help="verify and record the exact version-only source transform")
+    provenance_cmd.add_argument("--source", required=True)
+    provenance_cmd.add_argument("--version", required=True)
+    provenance_cmd.add_argument("--run-id", required=True)
     args = parser.parse_args()
 
     try:
+        if args.command == "provenance":
+            print(json.dumps(provenance(ROOT, args.source, args.version, args.run_id), sort_keys=True))
+            return 0
         if args.command == "derive":
             print(derive(args.run_id, workspace_version(ROOT)))
             return 0
