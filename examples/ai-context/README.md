@@ -137,7 +137,7 @@ The details are in [`examples/mcp-redact`](../mcp-redact/README.md).
 
 - Support: the [support matrix](../../docs/support-matrix.md).
 - Core cost per scan and per artifact: `redact-secret-benchmarks`'
-  [operational evidence](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/reports/2026-09-25-beta8-141-operational-evidence.md).
+  [operational evidence](https://github.com/redact-secret/redact-secret-benchmarks/blob/bab4cfc84024e1eb0dd26d5975b9df2bcd02dc0b/docs/reports/2026-09-25-beta8-141-operational-evidence.md).
 - The contract's conformance fixture, replayed by the adapter on the real
   core, and the core range it is qualified against: the adapters
   repository's

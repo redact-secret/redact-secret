@@ -59,7 +59,7 @@ are:
 - **Core performance and artifact size.**
   [`benchmarks/operational-evidence.json`](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/benchmarks/operational-evidence.json)
   in `redact-secret-benchmarks`, with its
-  [beta.8 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/reports/2026-09-25-beta8-141-operational-evidence.md)
+  [beta.8 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/bab4cfc84024e1eb0dd26d5975b9df2bcd02dc0b/docs/reports/2026-09-25-beta8-141-operational-evidence.md)
   (redact-secret-benchmarks#141).
 - **Adapter compatibility.** The adapters repository's
   [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/ea92c2abd451b66899722170344e73d8f34ef47e/compatibility.json)

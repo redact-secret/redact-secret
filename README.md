@@ -28,20 +28,21 @@ Every release so far is a beta; the stable `0.1.0` is not published yet.
 
 > **Version status.** Latest published: `0.1.0-beta.14`
 > ([release record](docs/releases/0.1.0-beta.14/README.md), [status](docs/releases/status.md)).
-> The install commands below pin it, because the install paths are qualified
-> against it.
+> Release candidate: `0.1.0-beta.15`, not published. The commands below pin
+> the candidate for qualification; use `0.1.0-beta.14` (`0.1.0b14` on PyPI)
+> until publication is recorded.
 
 Pick your runtime, install, and redact
 one synthetic value in about five minutes:
 
 | Runtime | Install | Steps |
 | --- | --- | --- |
-| JavaScript: Node.js 20, 22, 24, and browsers | `npm install @redact-secret/core@beta` | [Node.js](docs/quickstart.md#nodejs), [browser](docs/quickstart.md#browser-with-a-bundler) |
-| Python 3.10 or newer | `pip install --only-binary=:all: redact-secret` | [Python](docs/quickstart.md#python) |
-| Rust 1.88 or newer | `cargo add redact-secret` | [Rust](docs/quickstart.md#rust) |
-| Command line | `cargo install redact-secret-cli --locked --version 0.1.0-beta.14` | [CLI](docs/quickstart.md#command-line); `--version` is required while every release is a beta |
+| JavaScript: Node.js 20, 22, 24, and browsers | `npm install @redact-secret/core@0.1.0-beta.15` | [Node.js](docs/quickstart.md#nodejs), [browser](docs/quickstart.md#browser-with-a-bundler) |
+| Python 3.10 or newer | `pip install --only-binary=:all: redact-secret==0.1.0b15` | [Python](docs/quickstart.md#python) |
+| Rust 1.88 or newer | `cargo add redact-secret@0.1.0-beta.15` | [Rust](docs/quickstart.md#rust) |
+| Command line | `cargo install redact-secret-cli --locked --version 0.1.0-beta.15` | [CLI](docs/quickstart.md#command-line); `--version` is required while every release is a beta |
 
-These pin the latest published beta. The [quickstart](docs/quickstart.md#which-version-you-get)
+These pin the release candidate, which is not yet published. The [quickstart](docs/quickstart.md#which-version-you-get)
 pins an exact version, says what a bare install resolves today, and says what
 changes when `0.1.0` is published. No prebuilt CLI binary is published.
 

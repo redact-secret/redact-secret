@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lifecycleAuthority": "https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/decisions/2026-09-18-govern-benchmark-promotion.md",
+  "lifecycleAuthority": "https://github.com/redact-secret/redact-secret-benchmarks/blob/40809e8ce53eb94509d3b6bb3ae877ca8d4021f4/docs/decisions/2026-09-18-govern-benchmark-promotion.md",
   "records": [
     {
       "id": "benchmark-gap-292",

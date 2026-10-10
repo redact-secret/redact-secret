@@ -132,7 +132,7 @@ before pino writes it. There is no state across calls.
 
 - Support: the [support matrix](../../docs/support-matrix.md).
 - Core cost per scan and per artifact: `redact-secret-benchmarks`'
-  [operational evidence](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/reports/2026-09-25-beta8-141-operational-evidence.md).
+  [operational evidence](https://github.com/redact-secret/redact-secret-benchmarks/blob/bab4cfc84024e1eb0dd26d5975b9df2bcd02dc0b/docs/reports/2026-09-25-beta8-141-operational-evidence.md).
 - Which pino and core versions the adapter is qualified against, and which
   it refuses: the adapters repository's
   [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/ea92c2abd451b66899722170344e73d8f34ef47e/compatibility.json).

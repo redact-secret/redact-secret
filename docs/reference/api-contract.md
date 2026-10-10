@@ -108,8 +108,8 @@ throw or raise, and return only fixed fields: `initialized` (boolean),
 `pii_activation()` identity once initialized, otherwise `null` / `None`). The
 JavaScript result also carries the additive field `configuration`, the `digest`
 of the snapshot of the configuration the runtime is fixed to (`describeConfig()`),
-`null` before initialization; it is an additive output field, not a breaking
-change, and Python's result does not have it (Python has no configuration
+`null` before initialization. TypeScript consumers constructing `CoreStatus`
+values must add it; Python's result does not have it (Python has no configuration
 resolution). Both types are named `CoreStatus`. They are additive stable names, not available in
 releases before the one that adds them, and they are not a detection-readiness
 claim. The Rust crate and the CLI add nothing: Rust has no lifecycle to query
@@ -120,11 +120,13 @@ deliberately not part of the contract
 ## Artifact manifest
 
 `artifact-manifest/v1` says what the exact loaded artifact contains, without a
-scan and without initializing anything: build identity, the built-in detectors
+scan: build identity, the built-in detectors
 in canonical order with their pack and the finding types each can emit, whether
 the PII runtime is linked, capabilities, build defaults, bounds and a digest.
 The Rust core generates it from the registration rows the artifact links, so
 every surface forwards one value and keeps no detector table of its own.
+JavaScript requires `initialize()` first; Rust, Python and the CLI can read the
+manifest without runtime activation.
 
 | Surface | Name |
 | --- | --- |
@@ -161,7 +163,7 @@ public constructor per built-in detector plus the types that consume them.
 | Node addon, Python, CLI | unsupported |
 
 The constructor names are the accepted public naming of the `core-public-api`
-review: `composition` is the one name added to the crate root (73 names), and
+review: `composition` is one of the additions to the crate root (95 names), and
 adding a built-in detector adds one constructor, pinned by tests against the
 registration row, the catalog and the prefilter declaration. `Composition::new`
 validates the canonical registration order (a composition never reorders it),
@@ -385,7 +387,7 @@ custom detector callbacks are a direct Rust surface only.
 
 | Surface | Covered | Not covered |
 | --- | --- | --- |
-| Rust | The 73 names the `redact_secret` crate root exports, pinned by `core-public-api` in the workspace manifest and by `tests/public_api.rs` | Every private module; `Detector` implementations you write |
+| Rust | The 95 names the `redact_secret` crate root exports, pinned by `core-public-api` in the workspace manifest and by `tests/public_api.rs` | Every private module; `Detector` implementations you write |
 | JavaScript | `@redact-secret/core` and its subpaths `./common`, `./node-stream`, `./web-stream`, `./common/node-stream`, `./common/web-stream`: exported functions, constants, classes and types | `@redact-secret/wasm`, `@redact-secret/node` and the platform packages: installed as dependencies, not for direct use, versioned only in lockstep |
 | Python | Names in `redact_secret.__all__` and the shipped `.pyi` stubs | `redact_secret._native` and anything not re-exported |
 | CLI | Arguments, exit codes `0`/`1`/`2`, the `--json` report fields, standard-stream behavior | The line-per-finding text format (it is for people; parse `--json`), and diagnostic wording beyond the fixed code |
@@ -431,7 +433,8 @@ hot loop read `.findings` once into a local variable.
 `RANGE_UNIT` names it.
 
 **Errors.** Every failure carries a fixed code and an input-free message. The
-23 core codes (the latest is `INVALID_ACTION_POLICY`) are identical in Rust, JavaScript and Python; JavaScript adds
+26 core codes (including `INVALID_DETECTION_CONFIG`,
+`DETECTION_CONFIG_CONFLICT` and `EMPTY_DETECTION_SET`) are identical in Rust, JavaScript and Python; JavaScript adds
 five host codes (`NOT_INITIALIZED`, `INITIALIZATION_FAILED`, `INVALID_CHUNK`,
 `INVALID_UTF8`, `UNPAIRED_SURROGATE`). A lone surrogate cannot reach the core
 in either host: JavaScript rejects it with `UNPAIRED_SURROGATE`, Python with
@@ -565,7 +568,7 @@ current contract, stated here so that no consumer has to infer it.
 
 | Fact | Evidence |
 | --- | --- |
-| Every whole-input call is synchronous. A started call runs until it returns a value or an error and cannot be interrupted. No whole-input function, option or callback takes a cancellation token, a deadline or a budget. JavaScript `scan`, `redact` and `scanAndRedact` are plain functions; only `initialize()` is asynchronous, and it loads the artifact. The Node addon and the WebAssembly binding run on the calling thread. Python releases the GIL during detection, so other Python threads keep running, but the native code does not poll for signals and the call cannot be interrupted. | `scan`, `redact`, `scanAndRedact` (`packages/javascript/src/runtime.ts`); `bindings/node/src/lib.rs`; `detect` (`bindings/python/src/lib.rs`). The names and signatures are pinned by `tests/public_api.rs` (the 73 root names), `packages/javascript/test/exact-exports.test.ts`, `packages/javascript/test/type-contracts.ts` and the Python `__all__`; no test asserts the absence of a cancellation parameter by that name. |
+| Every whole-input call is synchronous. A started call runs until it returns a value or an error and cannot be interrupted. No whole-input function, option or callback takes a cancellation token, a deadline or a budget. JavaScript `scan`, `redact` and `scanAndRedact` are plain functions; only `initialize()` is asynchronous, and it loads the artifact. The Node addon and the WebAssembly binding run on the calling thread. Python releases the GIL during detection, so other Python threads keep running, but the native code does not poll for signals and the call cannot be interrupted. | `scan`, `redact`, `scanAndRedact` (`packages/javascript/src/runtime.ts`); `bindings/node/src/lib.rs`; `detect` (`bindings/python/src/lib.rs`). The names and signatures are pinned by `tests/public_api.rs` (the 95 root names), `packages/javascript/test/exact-exports.test.ts`, `packages/javascript/test/type-contracts.ts` and the Python `__all__`; no test asserts the absence of a cancellation parameter by that name. |
 | Policy and formatter callbacks cannot act as a deadline. The policy runs only after detection has finished and the formatter only after the policy, so neither can cut detection short. A Rust custom `Detector` may return `DetectorFailure`, but that is the detector's own choice; the core never preempts it. | `scan_with_limits`, `scan_and_redact_with_limits` (`src/pipeline.rs`). |
 | `abort()` on an incremental session, and `cancel()` or `abort()` on a stream adapter, discard retained plaintext between calls. They cannot interrupt an `append` or `finalize` that is already running. | `IncrementalSanitizer::abort` (`src/incremental.rs`); `WebStreamSanitizer` (`packages/javascript/src/adapters/web-stream-core.ts`). Tests: `abort_rejects_every_later_call` (`tests/incremental.rs`), `packages/javascript/test/adapters/`. |
 | The only bounds are `max_input_bytes`, 64 MiB (67,108,864 bytes), and `max_findings`, 50,000. Both fail closed, as described in the previous section. They bound input size and finding count, not running time: the time a call takes depends on the host, the build, the profile, the PII selection, the ruleset and the content of the input. A CLI file source uses the same 64 MiB bound, and CLI standard input runs under the explicit incremental limits that `--help` lists. | `DEFAULT_MAX_INPUT_BYTES`, `DEFAULT_MAX_FINDINGS` (`src/limits.rs`); `crates/secret-scan-cli/src/limits.rs`. Tests: `default_matches_declared_constants` (`src/limits.rs`), the 50,001-finding and 64 MiB + 1 cases in `tests/sanitize_golden_path_1078.rs`. No test asserts the literal values 67,108,864 and 50,000. |

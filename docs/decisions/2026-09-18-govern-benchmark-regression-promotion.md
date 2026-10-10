@@ -15,7 +15,7 @@ spec: evidence-and-gates
 owns evaluation truth: discovery fixtures, generated variants, differential and
 holdout evaluation, raw evidence, known-gap lifecycle, and fixed-candidate
 revalidation. Its
-[promotion decision](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/decisions/2026-09-18-govern-benchmark-promotion.md)
+[promotion decision](https://github.com/redact-secret/redact-secret-benchmarks/blob/40809e8ce53eb94509d3b6bb3ae877ca8d4021f4/docs/decisions/2026-09-18-govern-benchmark-promotion.md)
 is authoritative for the detailed lifecycle and transition evidence. The
 coordinating work is tracked by
 [benchmark issue #10](https://github.com/redact-secret/redact-secret-benchmarks/issues/10)
