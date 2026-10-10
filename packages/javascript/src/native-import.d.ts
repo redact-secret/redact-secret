@@ -17,3 +17,8 @@ declare module "#native" {
 declare module "#native-common" {
   export const loadNativeBinding: import("./native.js").NativeBindingLoader;
 }
+
+/** Private host-selected hashing; it does not add a public package export. */
+declare module "#manifest-digest" {
+  export function getManifestDigest(): ((bytes: Uint8Array) => string | Promise<string>) | undefined;
+}

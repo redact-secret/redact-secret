@@ -7,6 +7,11 @@ evidence is linked from each published version.
 
 ### Changed
 
+- For the 0.1.0-beta.15 candidate, the core full/common Node entry points verify
+  artifact manifest digests with synchronous builtin SHA-256 inside
+  initialization. Canonical bytes and fail-closed comparison are unchanged;
+  browsers, edge runtimes and neutral custom bundles retain Web Crypto verification.
+
 - For the 0.1.0-beta.15 candidate, Linux Node addon selection omits network
   collection from its libc diagnostic report when Node provides `excludeNetwork`,
   restoring the previous setting after the probe. GNU/musl package selection
