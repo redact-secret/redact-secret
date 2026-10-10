@@ -23,6 +23,7 @@ def load(name: str, filename: str):
 
 
 REHEARSAL = load("rehearsal_version", "rehearsal-version.py")
+INVENTORY = load("rehearsal_inventory", "record-artifact-inventory.py")
 WORKSPACE = load("check_rust_workspace_for_rehearsal", "check-rust-workspace.py")
 
 THROWAWAY = "0.1.0-beta.9876543210"
@@ -171,6 +172,13 @@ class ProvenanceTests(unittest.TestCase):
         self.assertEqual(receipt["sourceCommit"], self.source)
         self.assertEqual(receipt["rehearsalVersion"], THROWAWAY)
         self.assertTrue(receipt["files"])
+
+    def test_inventory_adapter_recomputes_proof_and_translates_rejection(self) -> None:
+        self.assertEqual(
+            INVENTORY.rehearsal_source_provenance(self.root, self.source, THROWAWAY, "9876543210"), self.receipt()
+        )
+        with self.assertRaisesRegex(ValueError, "source transform is not verified"):
+            INVENTORY.rehearsal_source_provenance(self.root, self.source, THROWAWAY, "9876543211")
 
     def test_unrelated_source_edit_or_relevant_untracked_source_is_rejected(self) -> None:
         source = self.root / "crates/synthetic.rs"

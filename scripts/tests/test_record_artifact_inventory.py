@@ -4,7 +4,6 @@ import hashlib
 import importlib.util
 import json
 import os
-import subprocess
 import sys
 import tempfile
 import unittest
@@ -1046,7 +1045,7 @@ class ConfigurationQualificationTests(unittest.TestCase):
         self.manifest["sourceRevision"] = None
         with (
             mock.patch.dict(os.environ, {"REHEARSAL_VERSION": PRODUCT_VERSION, "GITHUB_RUN_ID": "9876543210"}),
-            mock.patch.object(RECORD.subprocess, "check_output", return_value=json.dumps(proof).encode()),
+            mock.patch.object(RECORD, "rehearsal_source_provenance", return_value=proof),
         ):
             record, errors = self.collect()
             self.assertEqual(errors, [])
@@ -1058,7 +1057,7 @@ class ConfigurationQualificationTests(unittest.TestCase):
             self.assertTrue(self.collect()[1])
         with (
             mock.patch.dict(os.environ, {"REHEARSAL_VERSION": PRODUCT_VERSION}),
-            mock.patch.object(RECORD.subprocess, "check_output", side_effect=subprocess.CalledProcessError(1, "proof")),
+            mock.patch.object(RECORD, "rehearsal_source_provenance", side_effect=ValueError("proof rejected")),
         ):
             self.assertTrue(self.collect()[1])
 

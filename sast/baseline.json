@@ -497,9 +497,9 @@
       "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-dynamic-method",
       "rationale": "The dynamic lookup selects a lane function from a literal three-entry object (`node`/`python`/`browser`); `options.lane` is validated against the fixed `LANES` list during argument parsing, before this call, so the invoked function is always one of the three lane functions defined in this file, never externally controlled. This is a local qualification script, not a network-facing service."
     },
-    "33109d3a53487fd7": {
+    "cd06ac9a2e952102": {
       "classification": "false_positive",
-      "line": 175,
+      "line": 252,
       "path": "scripts/rehearsal-version.py",
       "rationale": "The URL is built from a fixed, hardcoded registry host (registry.npmjs.org, crates.io, or pypi.org) with only a package name and the throwaway version path-appended; the host is never attacker-influenced, so this cannot be redirected to an untrusted origin.",
       "rule_id": "sast.rules.python.lang.security.audit.dynamic-urllib-use-detected"

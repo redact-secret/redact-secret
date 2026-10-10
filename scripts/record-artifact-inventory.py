@@ -46,6 +46,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import re
@@ -171,6 +172,21 @@ def collect(artifacts: Path) -> list[dict]:
     return collected
 
 
+def rehearsal_source_provenance(root: Path, revision: str, version: str, run_id: str) -> dict:
+    """Recompute the version transform with the same reviewed helper, without a child interpreter."""
+    spec = importlib.util.spec_from_file_location(
+        "inventory_rehearsal_version", Path(__file__).with_name("rehearsal-version.py")
+    )
+    if spec is None or spec.loader is None:
+        raise ValueError("rehearsal provenance helper is unavailable")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    try:
+        return module.provenance(root, revision, version, run_id)
+    except module.RehearsalError as failure:
+        raise ValueError("rehearsal source transform is not verified") from failure
+
+
 def collect_configuration_qualification(artifacts: Path, revision: str, version: str) -> tuple[dict, list[str]]:
     """Bind custom runtime receipts to the emitted composition a consumer can download."""
     directory = artifacts / "configuration-journeys"
@@ -203,26 +219,7 @@ def collect_configuration_qualification(artifacts: Path, revision: str, version:
         )
         rehearsal_source = None
         if os.environ.get("REHEARSAL_VERSION"):
-            try:
-                rehearsal_source = json.loads(
-                    subprocess.check_output(
-                        [
-                            sys.executable,
-                            "-B",
-                            str(ROOT / "scripts/rehearsal-version.py"),
-                            "provenance",
-                            "--source",
-                            revision,
-                            "--version",
-                            version,
-                            "--run-id",
-                            os.environ.get("GITHUB_RUN_ID", ""),
-                        ],
-                        cwd=ROOT,
-                    )
-                )
-            except (subprocess.CalledProcessError, ValueError) as failure:
-                raise ValueError("rehearsal source transform is not verified") from failure
+            rehearsal_source = rehearsal_source_provenance(ROOT, revision, version, os.environ.get("GITHUB_RUN_ID", ""))
             require(os.environ["REHEARSAL_VERSION"] == version, "rehearsal version differs")
         if rehearsal_source is None:
             require(
