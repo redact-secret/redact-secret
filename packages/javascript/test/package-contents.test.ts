@@ -45,6 +45,10 @@ describe("package contents", () => {
     expect(paths).toContain("dist/index.d.ts");
     expect(paths).toContain("dist/common.js");
     expect(paths).toContain("dist/common.d.ts");
+    expect(paths).toContain("dist/runtime/manifest-digest-node.js");
+    expect(paths).toContain("dist/runtime/manifest-digest-node.d.ts");
+    expect(paths).toContain("dist/runtime/manifest-digest-web.js");
+    expect(paths).toContain("dist/runtime/manifest-digest-web.d.ts");
     expect(paths).toContain("dist/runtime/node.js");
     expect(paths).toContain("dist/runtime/browser.js");
     expect(paths).toContain("dist/runtime/node-common.js");
@@ -101,7 +105,21 @@ describe("package contents", () => {
     // `#native`/`#native-common` are subpath *imports*: how this package
     // selects its own runtime adapter for each profile, and are not
     // reachable from outside.
-    expect(Object.keys(manifest.imports).sort()).toEqual(["#native", "#native-common"]);
+    expect(Object.keys(manifest.imports).sort()).toEqual(["#manifest-digest", "#native", "#native-common"]);
+  });
+
+  it("keeps workerd ahead of Node for the private digest provider", () => {
+    const manifest = JSON.parse(readFileSync(join(PACKAGE_ROOT, "package.json"), "utf8")) as {
+      imports: Record<string, Record<string, string>>;
+    };
+    const mapping = manifest.imports["#manifest-digest"];
+    expect(Object.keys(mapping ?? {})).toEqual(["workerd", "node", "browser", "default"]);
+    expect(mapping).toEqual({
+      workerd: "./dist/runtime/manifest-digest-web.js",
+      node: "./dist/runtime/manifest-digest-node.js",
+      browser: "./dist/runtime/manifest-digest-web.js",
+      default: "./dist/runtime/manifest-digest-web.js",
+    });
   });
 
   it("keeps the Web adapter free of Node-only modules", () => {
@@ -127,6 +145,7 @@ describe("package contents", () => {
       readFileSync(join(PACKAGE_ROOT, "dist", "common.d.ts"), "utf8");
 
     for (const internal of [
+      "#manifest-digest",
       "#native",
       "#native-common",
       "NATIVE_HANDLE",

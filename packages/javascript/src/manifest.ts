@@ -12,6 +12,8 @@
  * version mismatch already uses, and carries no document content.
  */
 
+import { getManifestDigest } from "#manifest-digest";
+
 import { SecretScanError } from "./errors.js";
 import type { ArtifactManifest } from "./types.js";
 import { VERSION } from "./version.js";
@@ -93,30 +95,23 @@ function sortKeys(value: unknown): unknown {
   return value;
 }
 
-interface DigestCrypto {
-  readonly subtle?: {
-    digest(algorithm: "SHA-256", data: Uint8Array): Promise<ArrayBuffer>;
-  };
-}
-
 /**
- * Checks that `manifest.digest` is the SHA-256 of the canonical JSON of the
- * manifest without its `digest`. Uses the runtime's Web Crypto when it has
- * one (Node 20+, browsers and edge runtimes all do); a runtime without it
- * skips only this recomputation, the schema, version and profile checks
- * having already run. A mismatch throws `INITIALIZATION_FAILED`.
+ * Checks the SHA-256 of the canonical document without `digest` before activation.
+ * The package's Node full/common entry points always use builtin crypto. Browser,
+ * edge and neutral custom bundles retain Web Crypto and no-subtle compatibility.
  */
 export async function assertManifestDigest(manifest: ArtifactManifest): Promise<void> {
-  const subtle = (globalThis as { crypto?: DigestCrypto }).crypto?.subtle;
-  if (subtle === undefined) return;
-  const { digest, ...rest } = manifest;
-  const bytes = new TextEncoder().encode(canonicalJson(rest));
   let hex: string;
+  let expected: string;
   try {
-    const hash = new Uint8Array(await subtle.digest("SHA-256", bytes));
-    hex = Array.from(hash, (byte) => byte.toString(16).padStart(2, "0")).join("");
+    const hash = getManifestDigest();
+    if (hash === undefined) return;
+    const { digest, ...rest } = manifest;
+    expected = digest;
+    const bytes = new TextEncoder().encode(canonicalJson(rest));
+    hex = await hash(bytes);
   } catch {
     return fail();
   }
-  if (digest !== `sha256:${hex}`) fail();
+  if (expected !== `sha256:${hex}`) fail();
 }

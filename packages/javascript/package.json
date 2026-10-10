@@ -64,6 +64,12 @@
       "workerd": "./dist/runtime/workerd-common.js",
       "browser": "./dist/runtime/browser-common.js",
       "default": "./dist/runtime/browser-common.js"
+    },
+    "#manifest-digest": {
+      "workerd": "./dist/runtime/manifest-digest-web.js",
+      "node": "./dist/runtime/manifest-digest-node.js",
+      "browser": "./dist/runtime/manifest-digest-web.js",
+      "default": "./dist/runtime/manifest-digest-web.js"
     }
   },
   "types": "./dist/index.d.ts",
