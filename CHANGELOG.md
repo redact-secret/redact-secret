@@ -5,19 +5,9 @@ evidence is linked from each published version.
 
 ## Unreleased
 
-### Changed
+## 0.1.0-beta.15 — 2026-10-10
 
-- For the 0.1.0-beta.15 candidate, the core full/common Node entry points verify
-  artifact manifest digests with synchronous builtin SHA-256 inside
-  initialization. Canonical bytes and fail-closed comparison are unchanged;
-  browsers, edge runtimes and neutral custom bundles retain Web Crypto verification.
-
-- For the 0.1.0-beta.15 candidate, Linux Node addon selection omits network
-  collection from its libc diagnostic report when Node provides `excludeNetwork`,
-  restoring the previous setting after the probe. GNU/musl package selection
-  retains the same header signal.
-
-## 0.1.0-beta.15 (release candidate)
+Publication evidence: [durable release record](docs/releases/0.1.0-beta.15/README.md).
 
 ### Compatibility and qualification
 
@@ -30,15 +20,22 @@ evidence is linked from each published version.
   including `undefined`, with `INVALID_OPTIONS`. Custom names passed to
   `typedPlaceholderFormatter` use ASCII uppercase; non-ASCII names can produce
   different placeholders. Existing ASCII names keep their output.
-- Candidate performance, memory, size, installed-artifact qualification, SAST
-  and package rehearsal must bind to the final merged beta.15 SHA. Historical
-  #1283 measurements do not approve this candidate. [Preparation and final
-  evidence](https://github.com/redact-secret/redact-secret/issues/1320).
+- Exact-source artifact qualification, SAST, package rehearsal, publication and
+  registry installs passed at `2aea4ee95ccf9a5b891ad77f30e2edd8213622fd`.
+  Performance acceptance includes the scoped owner decisions below; historical
+  #1283 measurements are not this release's qualification. [Release evidence](docs/releases/0.1.0-beta.15/README.md).
 
 ### Changed
 
-- The Linux Node startup change under [Unreleased](#unreleased) is included in
-  this candidate.
+- The core full/common Node entry points verify
+  artifact manifest digests with synchronous builtin SHA-256 inside
+  initialization. Canonical bytes and fail-closed comparison are unchanged;
+  browsers, edge runtimes and neutral custom bundles retain Web Crypto verification.
+
+- Linux Node addon selection omits network
+  collection from its libc diagnostic report when Node provides `excludeNetwork`,
+  restoring the previous setting after the probe. GNU/musl package selection
+  retains the same header signal.
 
 ### Added
 
@@ -306,6 +303,34 @@ evidence is linked from each published version.
   are retired from the tree. History is preserved by 40-hex permalinks, and
   `docs/audits/` keeps only the retained reviews, each with an owner and a
   retirement trigger. No detection, redaction or public API behavior changes.
+
+### Known cost limitations
+
+- The unchanged machine fixed RC result is 45/46, REJECT: Node medium
+  initialization 14.301824 ms passes 15 ms; browser-small 32.9 ms exceeds 30 ms.
+  The owner approved a source-scoped beta browser exception and 32 cost breaches
+  (4 initialization, 28 size) in the [exact-source live ledger](https://github.com/redact-secret/redact-secret-benchmarks/blob/019a450a4dbecf7d4dc0941b06ca4fbcb726cd0e/benchmarks/accepted-regressions.json).
+  Raw measurements and thresholds were not rewritten. All samples remain in
+  [benchmarks #906](https://github.com/redact-secret/redact-secret-benchmarks/issues/906#issuecomment-6097375295).
+
+### Support status
+
+102 providers, 184 credential families: stable 129, provisional 33, pending 5, unsupported 17. See the [support matrix](/docs/support-matrix.md).
+
+Stable qualification: documented 96, empirical 33, policy-qualified 0. Evidence tiers: T1 115, T2 41, T3 6, T0 1.
+
+The previous pinned matrix is not comparable, so no stable delta is stated: the legacy and canonical qualification views use different measurement sources.
+
+Counts are credential families and statuses, not detectors. Canonical public qualification view, released npm package `@redact-secret/core@0.1.0-beta.14`, pinned benchmarks revision `6c1ffd6717e5acc534c063337652d12f8701434b` and policy `rs-policy-1:sha256:94c247cf72ea74fa1f226af3392764e58a3bf64ad7af5056c3d68926a844f0da`. Product source commit and measurement timestamp are not recorded; these statuses do not qualify later source. Current PII target `5696d7e1a2950bdf54fa21244f351e1c4b171f25`: 6 families pending, official public measurement recorded, qualified false. Validator, public qualification, cost and protected gates remain unmet; this is not an owner-approved deferral. The historical Beta.11 PII disposition is separate from credential counts and the current-target section.
+
+### Support evidence caveat
+
+- The original release manifest retains 15 raw support-drift regressions,
+  11 new/unclassified families, 15 stale-provenance warnings and 0 improvements.
+  These compare a legacy matrix with the active published-beta.14 qualification
+  view without a comparability guard. They are material historical metadata and
+  unresolved support reasons, not measured beta.15 source downgrades. No support
+  repin or PII promotion is performed; complete flags remain in the release record.
 
 ## 0.1.0-beta.14 — 2026-10-07
 

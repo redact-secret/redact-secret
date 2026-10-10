@@ -1,0 +1,290 @@
+{
+  "status": "PASS",
+  "source": "2aea4ee95ccf9a5b891ad77f30e2edd8213622fd",
+  "version": "0.1.0-beta.15",
+  "run": {
+    "id": 38081324692,
+    "head_sha": "2aea4ee95ccf9a5b891ad77f30e2edd8213622fd",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "path": ".github/workflows/reconcile-release.yml",
+    "html_url": "https://github.com/redact-secret/redact-secret/actions/runs/38081324692"
+  },
+  "inputs": {
+    "version": "0.1.0-beta.15",
+    "source_commit": "2aea4ee95ccf9a5b891ad77f30e2edd8213622fd",
+    "source_run": "38079305406",
+    "dry_run": "true"
+  },
+  "jobs": [
+    {
+      "id": 114298673240,
+      "name": "reconcile",
+      "head_sha": "2aea4ee95ccf9a5b891ad77f30e2edd8213622fd",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-10T19:49:54Z",
+          "completed_at": "2026-10-10T19:49:57Z"
+        },
+        {
+          "name": "Require main as the release source",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 2,
+          "started_at": "2026-10-10T19:49:57Z",
+          "completed_at": "2026-10-10T19:49:57Z"
+        },
+        {
+          "name": "Check out repository",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-10T19:49:57Z",
+          "completed_at": "2026-10-10T19:50:01Z"
+        },
+        {
+          "name": "Validate release source and version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-10T19:50:01Z",
+          "completed_at": "2026-10-10T19:50:01Z"
+        },
+        {
+          "name": "Set up Node.js",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-10T19:50:01Z",
+          "completed_at": "2026-10-10T19:50:01Z"
+        },
+        {
+          "name": "Set up stable Rust",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-10T19:50:01Z",
+          "completed_at": "2026-10-10T19:50:02Z"
+        },
+        {
+          "name": "Cache Cargo artifacts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-10T19:50:02Z",
+          "completed_at": "2026-10-10T19:50:05Z"
+        },
+        {
+          "name": "Locate release manifest artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-10T19:50:05Z",
+          "completed_at": "2026-10-10T19:50:05Z"
+        },
+        {
+          "name": "Download release manifest",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2026-10-10T19:50:05Z",
+          "completed_at": "2026-10-10T19:50:05Z"
+        },
+        {
+          "name": "Evaluate reconcile guard",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-10T19:50:05Z",
+          "completed_at": "2026-10-10T19:50:05Z"
+        },
+        {
+          "name": "Snapshot the issues closed before the source revision",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-10T19:50:05Z",
+          "completed_at": "2026-10-10T19:50:11Z"
+        },
+        {
+          "name": "Verify the source revision's audit lifecycle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-10T19:50:11Z",
+          "completed_at": "2026-10-10T19:50:11Z"
+        },
+        {
+          "name": "Verify original run and artifact inventory",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-10T19:50:11Z",
+          "completed_at": "2026-10-10T19:50:12Z"
+        },
+        {
+          "name": "Reconcile npm dependency packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-10T19:50:12Z",
+          "completed_at": "2026-10-10T19:50:31Z"
+        },
+        {
+          "name": "Reconcile crates.io",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-10T19:50:31Z",
+          "completed_at": "2026-10-10T19:50:41Z"
+        },
+        {
+          "name": "Reconcile PyPI",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-10T19:50:41Z",
+          "completed_at": "2026-10-10T19:50:42Z"
+        },
+        {
+          "name": "Publish to PyPI",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17,
+          "started_at": "2026-10-10T19:50:42Z",
+          "completed_at": "2026-10-10T19:50:42Z"
+        },
+        {
+          "name": "Reconcile npm facade",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-10-10T19:50:42Z",
+          "completed_at": "2026-10-10T19:50:48Z"
+        },
+        {
+          "name": "Post Cache Cargo artifacts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 34,
+          "started_at": "2026-10-10T19:50:48Z",
+          "completed_at": "2026-10-10T19:50:50Z"
+        },
+        {
+          "name": "Post Set up Node.js",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35,
+          "started_at": "2026-10-10T19:50:50Z",
+          "completed_at": "2026-10-10T19:50:50Z"
+        },
+        {
+          "name": "Post Check out repository",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 36,
+          "started_at": "2026-10-10T19:50:50Z",
+          "completed_at": "2026-10-10T19:50:50Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-10-10T19:50:50Z",
+          "completed_at": "2026-10-10T19:50:50Z"
+        }
+      ]
+    },
+    {
+      "id": 114298927716,
+      "name": "Verify registry install (browser)",
+      "head_sha": "2aea4ee95ccf9a5b891ad77f30e2edd8213622fd",
+      "status": "completed",
+      "conclusion": "skipped",
+      "steps": []
+    },
+    {
+      "id": 114298927884,
+      "name": "Verify registry install ${{ matrix.target }}",
+      "head_sha": "2aea4ee95ccf9a5b891ad77f30e2edd8213622fd",
+      "status": "completed",
+      "conclusion": "skipped",
+      "steps": []
+    },
+    {
+      "id": 114298928169,
+      "name": "Tag reconciled release",
+      "head_sha": "2aea4ee95ccf9a5b891ad77f30e2edd8213622fd",
+      "status": "completed",
+      "conclusion": "skipped",
+      "steps": []
+    }
+  ],
+  "actions": {
+    "skip": 13,
+    "publish": 0,
+    "block": 0
+  },
+  "evidence": {
+    "dependencies": "Nine explicit already-published exact-content lines",
+    "crates": "Explicit core=skip cli=skip after fresh source repack checksum matches",
+    "pypi": "Explicit all qualified files match; publisher step skipped",
+    "facade": "Exact-source build/pack comparison succeeded against existing published shasum; success step has no explicit skip line"
+  },
+  "tagObjectUnchanged": "920a8f68ef74f8b5b87c029287264dd6ef4d5013",
+  "limitations": [
+    "Dryrun downstream matrix was not expanded: one actual job, three skipped job definitions.",
+    "Facade skip is inferred from successful strict existing-registry comparison and observed published metadata, not a printed plan line.",
+    "No live reconciliation/publication or new tag was invoked."
+  ],
+  "postRunNpmMetadata": [
+    {
+      "package": "@redact-secret/core",
+      "shasum": "29fd141438cbf2fc1f1992236d298543baa9c616"
+    },
+    {
+      "package": "@redact-secret/node-darwin-arm64",
+      "shasum": "d3168e76afb82d4ab3732dafd956cd43d7e9de7a"
+    },
+    {
+      "package": "@redact-secret/node-darwin-x64",
+      "shasum": "108c7910b548bd19e32699b40b85f3c26e7472bb"
+    },
+    {
+      "package": "@redact-secret/node-linux-arm64-gnu",
+      "shasum": "807ae5d2ce886a348f80978e5a313d59099a67d2"
+    },
+    {
+      "package": "@redact-secret/node-linux-arm64-musl",
+      "shasum": "aa3c30acd742c27b75bf7b3b0a70ae6f7a38b6f4"
+    },
+    {
+      "package": "@redact-secret/node-linux-x64-gnu",
+      "shasum": "f7b362001e8d7bd13ad12d0f3f51e3aa487b8ac1"
+    },
+    {
+      "package": "@redact-secret/node-linux-x64-musl",
+      "shasum": "2f97a80772756fffe20c66d5ebfea0f4b6ef323c"
+    },
+    {
+      "package": "@redact-secret/node-win32-arm64-msvc",
+      "shasum": "8a1888c8e7751344b29b191b48128624708a7481"
+    },
+    {
+      "package": "@redact-secret/node-win32-x64-msvc",
+      "shasum": "a270a93487737bd253a1e89ba2696c74e03cfd0a"
+    },
+    {
+      "package": "@redact-secret/wasm",
+      "shasum": "3384fec63c0d8ecf73cc96ef06c76046e51e8156"
+    }
+  ]
+}

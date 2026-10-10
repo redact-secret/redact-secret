@@ -1,0 +1,95 @@
+{
+  "schema": "published-consumer-smoke/v1",
+  "sourceCommit": "2aea4ee95ccf9a5b891ad77f30e2edd8213622fd",
+  "releaseRun": 38079305406,
+  "releaseInventorySha256": "92ddb328f20e675fc40eff4055e9f5544fde3688e2a70f5e3c239816a949c19f",
+  "hostScope": "Darwin arm64 local consumers only, no Rust/Python all-platform matrix or CLI install claim",
+  "python": {
+    "stage": "python-public-wheel",
+    "startUTC": "2026-10-10T19:44:37.012881+00:00",
+    "status": "passed",
+    "origin": "https://files.pythonhosted.org/packages/76/50/1fa6b301fcdab89975e18dd67d186a7b17ea40cfcfe62daa86308d52c4a5/redact_secret-0.1.0b15-cp310-abi3-macosx_11_0_arm64.whl",
+    "expectedSha256": "ea753c30eb73d66831ccce5d934230894036617069aa5c5d118002606ecb6d25",
+    "checks": {
+      "version": "0.1.0-beta.15",
+      "redaction": "passed",
+      "manifestVersion": "passed",
+      "findings": 1
+    },
+    "wheelSha256": "ea753c30eb73d66831ccce5d934230894036617069aa5c5d118002606ecb6d25",
+    "pythonVersion": "Python 3.14.7",
+    "nativeBinarySha256": "f3848c964ef6b4e849f56d0d7762479251be2923a6788c80caee72ea54c12c03",
+    "endUTC": "2026-10-10T19:44:43.522438+00:00",
+    "elapsedSeconds": 6.508490708190948,
+    "installedNativeBinaryMatchesPublicWheel": true,
+    "installedNativeBinarySha256": "f3848c964ef6b4e849f56d0d7762479251be2923a6788c80caee72ea54c12c03"
+  },
+  "rust": {
+    "stage": "rust-public-registry-library",
+    "startUTC": "2026-10-10T19:45:04.501511+00:00",
+    "status": "passed",
+    "cargoLockVerified": true,
+    "registry": "crates.io",
+    "version": "0.1.0-beta.15",
+    "sharedTargetReused": true,
+    "exitCode": 0,
+    "checks": {
+      "version": "0.1.0-beta.15",
+      "redaction": "passed",
+      "findings": 1
+    },
+    "rustcVersion": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "cargoVersion": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+    "binarySha256": "c43100c705da682b108d6de5a475ee53acfafc14d7edcf5e50ee3d9812bc9777",
+    "endUTC": "2026-10-10T19:45:15.459577+00:00",
+    "elapsedSeconds": 10.95707141701132,
+    "downloadedRegistryCrateSha256": "41d4dfd613c394c0b106cb0b102aa3c570d9c49cacdf2fe298a54eef457cb8a0",
+    "downloadedRegistryCrateBytes": 831162,
+    "publishedCrateMatchesOwnReleaseInventory": true
+  },
+  "inputVerification": {
+    "schema": "published-consumer-input-verification/v1",
+    "verifiedAtUTC": "2026-10-10T19:44:18.699257+00:00",
+    "sourceCommit": "2aea4ee95ccf9a5b891ad77f30e2edd8213622fd",
+    "releaseRun": 38079305406,
+    "inventorySha256": "92ddb328f20e675fc40eff4055e9f5544fde3688e2a70f5e3c239816a949c19f",
+    "python": {
+      "version": "0.1.0b15",
+      "filename": "redact_secret-0.1.0b15-cp310-abi3-macosx_11_0_arm64.whl",
+      "url": "https://files.pythonhosted.org/packages/76/50/1fa6b301fcdab89975e18dd67d186a7b17ea40cfcfe62daa86308d52c4a5/redact_secret-0.1.0b15-cp310-abi3-macosx_11_0_arm64.whl",
+      "sha256": "ea753c30eb73d66831ccce5d934230894036617069aa5c5d118002606ecb6d25",
+      "bytes": 781648,
+      "yanked": false
+    },
+    "rust": {
+      "version": "0.1.0-beta.15",
+      "checksum": "41d4dfd613c394c0b106cb0b102aa3c570d9c49cacdf2fe298a54eef457cb8a0",
+      "yanked": false,
+      "registry": "https://index.crates.io/re/da/redact-secret"
+    },
+    "preparedFiles": {
+      "python-smoke.py": "a3810af953d2e302f314fafbb520e467449d609b238bddfa18c58f0ce033c2a6",
+      "rust/Cargo.toml": "981e5f171cca726b4edd5de6051b4b5c8195cdbba198eeea4897741018de650c",
+      "rust/src/main.rs": "106a2f80daa5c85c1b0c00d4d72b09b8a8b8a772029236da607973fd069bd174"
+    },
+    "sharedTarget": "existing shared Cargo target cache, preserved",
+    "otherLocalCargoProcessActive": false,
+    "fullMatrix": false,
+    "metadataOnlyFailedAttempts": [
+      "localPythonCA",
+      "crates.ioAPI403"
+    ],
+    "certVerificationDisabled": false
+  },
+  "preExecutionMetadataFailures": [
+    "local framework Python CA verification failed; resolved with OS curl TLS verification, no bypass",
+    "crates.io API403; checksum/yanked verified through official sparse registry index"
+  ],
+  "consumerSource": {
+    "python-smoke.py": "import json, redact_secret\nassert redact_secret.VERSION == \"0.1.0-beta.15\"\nr=redact_secret.scan_and_redact(\"API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE\")\nassert r.text == \"API_KEY=<SECRET_1>\" and len(r.findings)==1\nm=redact_secret.artifact_manifest()\nassert m[\"version\"]==redact_secret.VERSION\nprint(json.dumps({\"version\":redact_secret.VERSION,\"redaction\":\"passed\",\"manifestVersion\":\"passed\",\"findings\":len(r.findings)}))\n",
+    "rust/Cargo.toml": "[package]\nname = \"beta15-published-consumer-smoke\"\nversion = \"0.0.0\"\nedition = \"2024\"\n[dependencies]\nredact-secret = \"=0.1.0-beta.15\"\n[workspace]\n",
+    "rust/src/main.rs": "use redact_secret::{sanitize, VERSION};\nfn main() {\n assert_eq!(VERSION,\"0.1.0-beta.15\");\n let result=sanitize(\"API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE\").expect(\"synthetic sanitization\");\n assert_eq!(result.text(),\"API_KEY=<SECRET_1>\");\n assert_eq!(result.findings().len(),1);\n println!(\"version={VERSION};redaction=passed;findings=1\");\n}\n"
+  },
+  "nativeArtifactsRetainedInRecord": false,
+  "benchmarkTimingRun": false
+}

@@ -3,8 +3,7 @@
 [Documentation home](README.md) · [Installation](getting-started.md)
 
 Each path below starts in an empty directory, installs a registry package,
-and redacts one synthetic value. Candidate pins are used for qualification;
-use the latest published version until candidate publication is recorded.
+and redacts one synthetic value. The commands pin the published beta.15 version.
 Pick the runtime you use; each one takes about five minutes on a supported development machine, most of it
 spent downloading packages or compiling.
 
@@ -20,11 +19,8 @@ spent downloading packages or compiling.
 
 Every release so far is a beta; the stable `0.1.0` is not published yet.
 
-> **Version status.** Latest published: `0.1.0-beta.14`
-> ([release record](releases/0.1.0-beta.14/README.md), [status](releases/status.md)).
-> Release candidate: `0.1.0-beta.15`, not published. The commands below pin
-> the candidate for qualification; use `0.1.0-beta.14` (`0.1.0b14` on PyPI)
-> until publication is recorded.
+> **Version status.** Latest published: `0.1.0-beta.15`
+> ([release record](releases/0.1.0-beta.15/README.md), [status](releases/status.md)).
 
 The pinned commands give the same result tomorrow as today. Pin the version in
 your own lockfile too.
@@ -51,8 +47,10 @@ release candidate (see
 It reads them from this page, so a change here changes the qualification too.
 For the Rust and command-line sections CI checks the version pin and the page's
 shape but does not execute them, because no candidate registry serves crates.
-They were executed from this page's text against the published crates when
-the page was last revised ([evidence](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1070/README.md)).
+Earlier Rust and CLI recipes were executed against published crates in the
+[historical recipe check](https://github.com/redact-secret/redact-secret/blob/2816897f96c405c3eb8c87a0c70eba5df273c121/docs/audits/evidence/1070/README.md).
+The [beta.15 release record](releases/0.1.0-beta.15/README.md) separately records a
+minimal public-registry Rust library smoke; it does not claim a new CLI recipe run.
 Commands are POSIX shell. On Windows, run them from Git Bash or WSL, or use
 `.venv\Scripts\python` in place of `.venv/bin/python`.
 
