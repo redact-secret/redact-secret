@@ -15,8 +15,8 @@ Your application handles text it does not fully control: user input, pasted
 configuration, error messages, HTTP bodies, and tool results. Before that text
 reaches logs, persistence, telemetry, tool output, or model context, pass it
 through Redact Secret. It finds supported credential formats (plus opt-in
-structured PII, whose `pii-v1` statuses at the Beta.11 qualification were five families
-`provisional`, US SSN `pending`, none `stable`)
+structured PII, whose six current qualification targets remain `pending`, none
+`stable`, with no beta.15 support promotion)
 and returns the text with those matches replaced, plus findings that describe what was
 found and where without ever including the secret itself. It runs in your
 process. It makes no network calls and sends no telemetry, and the same input
@@ -26,11 +26,8 @@ always gives the same result.
 
 Every release so far is a beta; the stable `0.1.0` is not published yet.
 
-> **Version status.** Latest published: `0.1.0-beta.14`
-> ([release record](docs/releases/0.1.0-beta.14/README.md), [status](docs/releases/status.md)).
-> Release candidate: `0.1.0-beta.15`, not published. The commands below pin
-> the candidate for qualification; use `0.1.0-beta.14` (`0.1.0b14` on PyPI)
-> until publication is recorded.
+> **Version status.** Latest published: `0.1.0-beta.15`
+> ([release record](docs/releases/0.1.0-beta.15/README.md), [status](docs/releases/status.md)).
 
 Pick your runtime, install, and redact
 one synthetic value in about five minutes:
@@ -42,7 +39,7 @@ one synthetic value in about five minutes:
 | Rust 1.88 or newer | `cargo add redact-secret@0.1.0-beta.15` | [Rust](docs/quickstart.md#rust) |
 | Command line | `cargo install redact-secret-cli --locked --version 0.1.0-beta.15` | [CLI](docs/quickstart.md#command-line); `--version` is required while every release is a beta |
 
-These pin the release candidate, which is not yet published. The [quickstart](docs/quickstart.md#which-version-you-get)
+These pin the published beta.15 release. The [quickstart](docs/quickstart.md#which-version-you-get)
 pins an exact version, says what a bare install resolves today, and says what
 changes when `0.1.0` is published. No prebuilt CLI binary is published.
 

@@ -11,11 +11,8 @@ the supported runtimes, and how to build this checkout.
 Every published release so far is a beta; the stable `0.1.0` is not published
 yet.
 
-> **Version status.** Latest published: `0.1.0-beta.14`
-> ([release record](releases/0.1.0-beta.14/README.md), [status](releases/status.md)).
-> Release candidate: `0.1.0-beta.15`, not published. The commands below pin
-> the candidate for qualification; use `0.1.0-beta.14` (`0.1.0b14` on PyPI)
-> until publication is recorded.
+> **Version status.** Latest published: `0.1.0-beta.15`
+> ([release record](releases/0.1.0-beta.15/README.md), [status](releases/status.md)).
 
 [Release status](releases/status.md) lists what the registries currently
 carry. Select the version explicitly and keep it in your application's

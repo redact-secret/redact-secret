@@ -35,7 +35,6 @@ shrinks when a unit is retired; it keeps no row for a retired unit.
 
 | Unit | Owner | Status | Retires |
 | --- | --- | --- | --- |
-| [beta.15 candidate public-contract review](beta15-candidate-public-contract-review.md) | [#1320](https://github.com/redact-secret/redact-secret/issues/1320) | `retained`: candidate review, not release approval | after release `0.1.0-beta.15` |
 | [#1003 us-ssn identity-only mismatch, public investigation](evidence/1003/README.md) | [#1003](https://github.com/redact-secret/redact-secret/issues/1003) | `deferred`: the protected half of the issue is open | after #1003 |
 
 ## History

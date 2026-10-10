@@ -1,0 +1,2374 @@
+{
+  "artifact_digests": {
+    "crate:redact-secret": [
+      {
+        "built": "41d4dfd613c394c0b106cb0b102aa3c570d9c49cacdf2fe298a54eef457cb8a0",
+        "comparable": true,
+        "file": "redact-secret-0.1.0-beta.15.crate",
+        "note": null,
+        "published": "41d4dfd613c394c0b106cb0b102aa3c570d9c49cacdf2fe298a54eef457cb8a0",
+        "qualified": "41d4dfd613c394c0b106cb0b102aa3c570d9c49cacdf2fe298a54eef457cb8a0"
+      }
+    ],
+    "crate:redact-secret-cli": [
+      {
+        "built": "f57b86794b6e675af7a1eed3e6b78edbcc1363954ef71aa2244e310eb13973ea",
+        "comparable": true,
+        "file": "redact-secret-cli-0.1.0-beta.15.crate",
+        "note": null,
+        "published": "f57b86794b6e675af7a1eed3e6b78edbcc1363954ef71aa2244e310eb13973ea",
+        "qualified": "f57b86794b6e675af7a1eed3e6b78edbcc1363954ef71aa2244e310eb13973ea"
+      }
+    ],
+    "npm:@redact-secret/core": [
+      {
+        "built": "29fd141438cbf2fc1f1992236d298543baa9c616",
+        "comparable": true,
+        "file": "packages/javascript",
+        "note": null,
+        "published": "29fd141438cbf2fc1f1992236d298543baa9c616",
+        "qualified": "29fd141438cbf2fc1f1992236d298543baa9c616"
+      }
+    ],
+    "npm:@redact-secret/node-darwin-arm64": [
+      {
+        "built": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\nd406b1ae6cb95687c8d2a8bd2487bba22c024e9f04d5d599708cbcf63b04aae7",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.darwin-arm64.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "d3168e76afb82d4ab3732dafd956cd43d7e9de7a",
+        "qualified": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\nd406b1ae6cb95687c8d2a8bd2487bba22c024e9f04d5d599708cbcf63b04aae7"
+      }
+    ],
+    "npm:@redact-secret/node-darwin-x64": [
+      {
+        "built": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\ncac7d2272f658d15193d661b445b0f97162be2ed5d91cadf584d6b397751b79e",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.darwin-x64.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "108c7910b548bd19e32699b40b85f3c26e7472bb",
+        "qualified": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\ncac7d2272f658d15193d661b445b0f97162be2ed5d91cadf584d6b397751b79e"
+      }
+    ],
+    "npm:@redact-secret/node-linux-arm64-gnu": [
+      {
+        "built": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\n937b9987687bea203d71a5e1479bb583978cea67298a83cfd324cc523035ed07",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-arm64-gnu.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "807ae5d2ce886a348f80978e5a313d59099a67d2",
+        "qualified": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\n937b9987687bea203d71a5e1479bb583978cea67298a83cfd324cc523035ed07"
+      }
+    ],
+    "npm:@redact-secret/node-linux-arm64-musl": [
+      {
+        "built": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\na0af6aa9cd3387c24adbbeaca847f8d6ad58b3092b78172906142cb3a1564ca1",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-arm64-musl.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "aa3c30acd742c27b75bf7b3b0a70ae6f7a38b6f4",
+        "qualified": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\na0af6aa9cd3387c24adbbeaca847f8d6ad58b3092b78172906142cb3a1564ca1"
+      }
+    ],
+    "npm:@redact-secret/node-linux-x64-gnu": [
+      {
+        "built": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\n759a2b4625ffa7ab352d844adf84c4e19a6bf7ea02486e099b93f6f369b1c77e",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-x64-gnu.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "f7b362001e8d7bd13ad12d0f3f51e3aa487b8ac1",
+        "qualified": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\n759a2b4625ffa7ab352d844adf84c4e19a6bf7ea02486e099b93f6f369b1c77e"
+      }
+    ],
+    "npm:@redact-secret/node-linux-x64-musl": [
+      {
+        "built": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\n18c66c90a9945a7de8397d95ff909b91b2d572e09e072f2aa1865e3bea33598e",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-x64-musl.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "2f97a80772756fffe20c66d5ebfea0f4b6ef323c",
+        "qualified": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\n18c66c90a9945a7de8397d95ff909b91b2d572e09e072f2aa1865e3bea33598e"
+      }
+    ],
+    "npm:@redact-secret/node-win32-arm64-msvc": [
+      {
+        "built": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\n68c9f4df2b048684ba003116c8c8d22dfcb447ecbcb4c060af2600df65532e3a",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.win32-arm64-msvc.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "8a1888c8e7751344b29b191b48128624708a7481",
+        "qualified": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\n68c9f4df2b048684ba003116c8c8d22dfcb447ecbcb4c060af2600df65532e3a"
+      }
+    ],
+    "npm:@redact-secret/node-win32-x64-msvc": [
+      {
+        "built": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\nf521734abf15a2a3928ea890dbe877c8d35e335e8f4efb483a612e5751736358",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.win32-x64-msvc.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "a270a93487737bd253a1e89ba2696c74e03cfd0a",
+        "qualified": "7c5e267d3cc46c200935307b0328f3037acb05ec5999ded9e8bef3f8775b185d\n9280736ff65f3e7dbfefe995bc0963d786069b90cddabc916f55dc7bfe1bfbf1\nf521734abf15a2a3928ea890dbe877c8d35e335e8f4efb483a612e5751736358"
+      }
+    ],
+    "npm:@redact-secret/wasm": [
+      {
+        "built": "e98c5a78db6f0aad1c94b9d91d3db6a907ce1e978085a4acde33cffa142c92ee",
+        "comparable": false,
+        "file": "redact_secret_wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "e98c5a78db6f0aad1c94b9d91d3db6a907ce1e978085a4acde33cffa142c92ee"
+      },
+      {
+        "built": "c57b52740fa8d56a2dd2993bbcdf0171c4943eb48a5478e26c6a29ccb47fb02b",
+        "comparable": false,
+        "file": "redact_secret_wasm.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "c57b52740fa8d56a2dd2993bbcdf0171c4943eb48a5478e26c6a29ccb47fb02b"
+      },
+      {
+        "built": "7bb680c6ac3308c3b7be7720eb041ad017d1425840bea3dbc8bd04981a7e25a9",
+        "comparable": false,
+        "file": "redact_secret_wasm_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "7bb680c6ac3308c3b7be7720eb041ad017d1425840bea3dbc8bd04981a7e25a9"
+      },
+      {
+        "built": "81ee49a062be9391ed50a1f72cc9d8f29270ad713f52252706e770012d635af5",
+        "comparable": false,
+        "file": "redact_secret_wasm_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "81ee49a062be9391ed50a1f72cc9d8f29270ad713f52252706e770012d635af5"
+      },
+      {
+        "built": "e98c5a78db6f0aad1c94b9d91d3db6a907ce1e978085a4acde33cffa142c92ee",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "e98c5a78db6f0aad1c94b9d91d3db6a907ce1e978085a4acde33cffa142c92ee"
+      },
+      {
+        "built": "7cfdccdaa0debc84d4509e2cc3466c0d96c6785b72f04d5bd341abdb536b0c01",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "7cfdccdaa0debc84d4509e2cc3466c0d96c6785b72f04d5bd341abdb536b0c01"
+      },
+      {
+        "built": "d48b98a6913a84563eb2a3c467251790c544240c804f81889bfb127b164110c9",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "d48b98a6913a84563eb2a3c467251790c544240c804f81889bfb127b164110c9"
+      },
+      {
+        "built": "81ee49a062be9391ed50a1f72cc9d8f29270ad713f52252706e770012d635af5",
+        "comparable": false,
+        "file": "redact_secret_wasm_pii_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "81ee49a062be9391ed50a1f72cc9d8f29270ad713f52252706e770012d635af5"
+      },
+      {
+        "built": "e98c5a78db6f0aad1c94b9d91d3db6a907ce1e978085a4acde33cffa142c92ee",
+        "comparable": false,
+        "file": "redact_secret_wasm_common.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "e98c5a78db6f0aad1c94b9d91d3db6a907ce1e978085a4acde33cffa142c92ee"
+      },
+      {
+        "built": "819c0ee6d74c21610a60d90e43bb3b5ad31c1c6106f6c5f392257262b9c1718c",
+        "comparable": false,
+        "file": "redact_secret_wasm_common.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "819c0ee6d74c21610a60d90e43bb3b5ad31c1c6106f6c5f392257262b9c1718c"
+      },
+      {
+        "built": "bffc2fc9948eb953d1747d1e62287ce8ff9007882648ee04980374aea04cc884",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "bffc2fc9948eb953d1747d1e62287ce8ff9007882648ee04980374aea04cc884"
+      },
+      {
+        "built": "81ee49a062be9391ed50a1f72cc9d8f29270ad713f52252706e770012d635af5",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "81ee49a062be9391ed50a1f72cc9d8f29270ad713f52252706e770012d635af5"
+      },
+      {
+        "built": "e98c5a78db6f0aad1c94b9d91d3db6a907ce1e978085a4acde33cffa142c92ee",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "e98c5a78db6f0aad1c94b9d91d3db6a907ce1e978085a4acde33cffa142c92ee"
+      },
+      {
+        "built": "56c7ead3708cd6104ceb1abfa927dd08abc86c6a6749bc9660283c4c3e4053ae",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "56c7ead3708cd6104ceb1abfa927dd08abc86c6a6749bc9660283c4c3e4053ae"
+      },
+      {
+        "built": "a62f7b97e97fb658008f1f64e3df72a466f9bb420774d4185aa2ddd389d6c8f2",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "a62f7b97e97fb658008f1f64e3df72a466f9bb420774d4185aa2ddd389d6c8f2"
+      },
+      {
+        "built": "81ee49a062be9391ed50a1f72cc9d8f29270ad713f52252706e770012d635af5",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_pii_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "3384fec63c0d8ecf73cc96ef06c76046e51e8156",
+        "qualified": "81ee49a062be9391ed50a1f72cc9d8f29270ad713f52252706e770012d635af5"
+      }
+    ],
+    "pypi:redact-secret": [
+      {
+        "built": "cba17a170ea2d0f861d7878d6bb32c7369c2b83b269db63984401bbb10c04523",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b15.tar.gz",
+        "note": null,
+        "published": "cba17a170ea2d0f861d7878d6bb32c7369c2b83b269db63984401bbb10c04523",
+        "qualified": "cba17a170ea2d0f861d7878d6bb32c7369c2b83b269db63984401bbb10c04523"
+      },
+      {
+        "built": "ea753c30eb73d66831ccce5d934230894036617069aa5c5d118002606ecb6d25",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b15-cp310-abi3-macosx_11_0_arm64.whl",
+        "note": null,
+        "published": "ea753c30eb73d66831ccce5d934230894036617069aa5c5d118002606ecb6d25",
+        "qualified": "ea753c30eb73d66831ccce5d934230894036617069aa5c5d118002606ecb6d25"
+      },
+      {
+        "built": "f0858dfc6ffe32e3b01a5b1d7089f9870547073287fd3d174bdb5c17117c1e60",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b15-cp310-abi3-win_arm64.whl",
+        "note": null,
+        "published": "f0858dfc6ffe32e3b01a5b1d7089f9870547073287fd3d174bdb5c17117c1e60",
+        "qualified": "f0858dfc6ffe32e3b01a5b1d7089f9870547073287fd3d174bdb5c17117c1e60"
+      },
+      {
+        "built": "6dc94207683c3208aa146b349ce9b738b49bb0f6a4abd01f4be36b6fbce28037",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b15-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+        "note": null,
+        "published": "6dc94207683c3208aa146b349ce9b738b49bb0f6a4abd01f4be36b6fbce28037",
+        "qualified": "6dc94207683c3208aa146b349ce9b738b49bb0f6a4abd01f4be36b6fbce28037"
+      },
+      {
+        "built": "4d483a1f58e2387420043a628c6046cc9fdfb546f5f80864d7a0029bb23e9aa8",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b15-cp310-abi3-musllinux_1_2_aarch64.whl",
+        "note": null,
+        "published": "4d483a1f58e2387420043a628c6046cc9fdfb546f5f80864d7a0029bb23e9aa8",
+        "qualified": "4d483a1f58e2387420043a628c6046cc9fdfb546f5f80864d7a0029bb23e9aa8"
+      },
+      {
+        "built": "b8a1b698834c48e18aa3c78adda584a69cbc7a1df7a882fe66bf59598fb5ffa8",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b15-cp310-abi3-macosx_10_12_x86_64.whl",
+        "note": null,
+        "published": "b8a1b698834c48e18aa3c78adda584a69cbc7a1df7a882fe66bf59598fb5ffa8",
+        "qualified": "b8a1b698834c48e18aa3c78adda584a69cbc7a1df7a882fe66bf59598fb5ffa8"
+      },
+      {
+        "built": "b9e6963de6c64d1f5cfa070200cd626f6d39dcc02d4777c2e153a1bc4a850f12",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b15-cp310-abi3-win_amd64.whl",
+        "note": null,
+        "published": "b9e6963de6c64d1f5cfa070200cd626f6d39dcc02d4777c2e153a1bc4a850f12",
+        "qualified": "b9e6963de6c64d1f5cfa070200cd626f6d39dcc02d4777c2e153a1bc4a850f12"
+      },
+      {
+        "built": "f614a2838cc553425a6a27ae83ba1891ea6a85054debd6bc948a20329d05fe4b",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b15-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "note": null,
+        "published": "f614a2838cc553425a6a27ae83ba1891ea6a85054debd6bc948a20329d05fe4b",
+        "qualified": "f614a2838cc553425a6a27ae83ba1891ea6a85054debd6bc948a20329d05fe4b"
+      },
+      {
+        "built": "bb1eb65f5841b765ea551d9d0fe24d2f0b3cec0cb42eb59c857a939290ae3211",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b15-cp310-abi3-musllinux_1_2_x86_64.whl",
+        "note": null,
+        "published": "bb1eb65f5841b765ea551d9d0fe24d2f0b3cec0cb42eb59c857a939290ae3211",
+        "qualified": "bb1eb65f5841b765ea551d9d0fe24d2f0b3cec0cb42eb59c857a939290ae3211"
+      }
+    ]
+  },
+  "artifact_set": [
+    "crate:redact-secret",
+    "crate:redact-secret-cli",
+    "npm:@redact-secret/core",
+    "npm:@redact-secret/node-darwin-arm64",
+    "npm:@redact-secret/node-darwin-x64",
+    "npm:@redact-secret/node-linux-arm64-gnu",
+    "npm:@redact-secret/node-linux-arm64-musl",
+    "npm:@redact-secret/node-linux-x64-gnu",
+    "npm:@redact-secret/node-linux-x64-musl",
+    "npm:@redact-secret/node-win32-arm64-msvc",
+    "npm:@redact-secret/node-win32-x64-msvc",
+    "npm:@redact-secret/wasm",
+    "pypi:redact-secret"
+  ],
+  "conformance_identity": "9a66504a20cb014ab56d5ad8f046cb06109246fe",
+  "registry_state": {
+    "crate:redact-secret": "published",
+    "crate:redact-secret-cli": "published",
+    "npm:@redact-secret/core": "published",
+    "npm:@redact-secret/node-darwin-arm64": "published",
+    "npm:@redact-secret/node-darwin-x64": "published",
+    "npm:@redact-secret/node-linux-arm64-gnu": "published",
+    "npm:@redact-secret/node-linux-arm64-musl": "published",
+    "npm:@redact-secret/node-linux-x64-gnu": "published",
+    "npm:@redact-secret/node-linux-x64-musl": "published",
+    "npm:@redact-secret/node-win32-arm64-msvc": "published",
+    "npm:@redact-secret/node-win32-x64-msvc": "published",
+    "npm:@redact-secret/wasm": "published",
+    "pypi:redact-secret": "published"
+  },
+  "source_revision": "2aea4ee95ccf9a5b891ad77f30e2edd8213622fd",
+  "support_matrix_drift": {
+    "baseline": {
+      "generatedAt": "2026-10-02T19:28:20.296Z",
+      "revision": "573e128863e0543133e5ccbd513216d19513b7da",
+      "runId": "18011008-6bfc-4b40-8a77-d9d0b5fceb05"
+    },
+    "candidate": {
+      "generatedAt": null,
+      "kind": "qualification-view",
+      "policyRevision": "rs-policy-1:sha256:94c247cf72ea74fa1f226af3392764e58a3bf64ad7af5056c3d68926a844f0da",
+      "populations": [
+        {
+          "artifactDigest": "sha256:c7a19ee3395e58a80da040570bd3b1eb89eb8bf012734cf24c6b4fe4a4e15f85",
+          "engineVersion": "0.1.0-alpha.16",
+          "population": "policy-corpus",
+          "runClass": "public",
+          "scannerBuilds": {
+            "flare-redact": "released",
+            "gitleaks": "released",
+            "redact-secret": "released",
+            "trufflehog": "released"
+          },
+          "scannerVersions": {
+            "flare-redact": "1.6.1",
+            "gitleaks": "8.30.1",
+            "redact-secret": "0.1.0-beta.14",
+            "trufflehog": "3.97.4"
+          },
+          "semanticDigest": "sha256:47854ffdc5d0f75a6088b395b8f84d62b17469d6c91a32b18d9c1df5e33bb1ef"
+        },
+        {
+          "artifactDigest": "sha256:36c1b5c77651bd14d2f6010ccc1e47e16ccc5b4120e62c3d66aa4a3bb406b3fc",
+          "engineVersion": "0.1.0-alpha.16",
+          "population": "public-evidence-snapshot",
+          "runClass": "public",
+          "scannerBuilds": {
+            "flare-redact": "released",
+            "gitleaks": "released",
+            "redact-secret": "released",
+            "trufflehog": "released"
+          },
+          "scannerVersions": {
+            "flare-redact": "1.6.1",
+            "gitleaks": "8.30.1",
+            "redact-secret": "0.1.0-beta.14",
+            "trufflehog": "3.97.4"
+          },
+          "semanticDigest": "sha256:4bec6e539482ad55f5d2e9ad25d84b5958d24050ada07271a33d50c6d4118586"
+        },
+        {
+          "artifactDigest": "sha256:322855ea53cc4404dfc23c780d541a8b0ea830ddd647b685c61534bfeedbfa87",
+          "engineVersion": "0.1.0-alpha.16",
+          "population": "regression-corpus",
+          "runClass": "public",
+          "scannerBuilds": {
+            "flare-redact": "released",
+            "gitleaks": "released",
+            "redact-secret": "released",
+            "trufflehog": "released"
+          },
+          "scannerVersions": {
+            "flare-redact": "1.6.1",
+            "gitleaks": "8.30.1",
+            "redact-secret": "0.1.0-beta.14",
+            "trufflehog": "3.97.4"
+          },
+          "semanticDigest": "sha256:afedeab625b51e2bc842286c1ab93da7fcdc9e188c8b4b44573055e35d5f7e7b"
+        }
+      ],
+      "publishedPackage": {
+        "packageName": "@redact-secret/core",
+        "version": "0.1.0-beta.14"
+      },
+      "revision": "6c1ffd6717e5acc534c063337652d12f8701434b",
+      "runId": null
+    },
+    "familyCount": 184,
+    "generatedAt": "2026-10-10T19:19:55.261731+00:00",
+    "improvements": [],
+    "newAndUnclassified": [
+      {
+        "family": "baseten:api-key",
+        "familyName": "API key (b10_)",
+        "provider": "baseten",
+        "status": "provisional"
+      },
+      {
+        "family": "buildkite:access-token",
+        "familyName": "Tokens (bkua_ and sibling role prefixes)",
+        "provider": "buildkite",
+        "status": "provisional"
+      },
+      {
+        "family": "fly:access-token",
+        "familyName": "Access token (fm1r_, fm1a_, fm2_)",
+        "provider": "fly",
+        "status": "provisional"
+      },
+      {
+        "family": "mapbox:secret-access-token",
+        "familyName": "Secret access token (sk.)",
+        "provider": "mapbox",
+        "status": "provisional"
+      },
+      {
+        "family": "ory:network-api-key",
+        "familyName": "Session and OAuth2 sibling tokens",
+        "provider": "ory",
+        "status": "provisional"
+      },
+      {
+        "family": "pydantic:logfire-token",
+        "familyName": "Logfire token (pylf_v)",
+        "provider": "pydantic",
+        "status": "provisional"
+      },
+      {
+        "family": "sourcegraph:access-token",
+        "familyName": "Personal access token (sgp_)",
+        "provider": "sourcegraph",
+        "status": "provisional"
+      },
+      {
+        "family": "square:access-token",
+        "familyName": "Access token (EAAA)",
+        "provider": "square",
+        "status": "provisional"
+      },
+      {
+        "family": "square:oauth-application-secret",
+        "familyName": "OAuth application secret (sq0csp-, sandbox-sq0csb-)",
+        "provider": "square",
+        "status": "provisional"
+      },
+      {
+        "family": "unkey:root-key",
+        "familyName": "Root key (unkey_)",
+        "provider": "unkey",
+        "status": "provisional"
+      },
+      {
+        "family": "xata:api-key",
+        "familyName": "API key (xau_, xao_)",
+        "provider": "xata",
+        "status": "provisional"
+      }
+    ],
+    "regressions": [
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "anthropic:admin-api-key",
+        "familyName": "Admin API key (sk-ant-admin01-)",
+        "provider": "anthropic",
+        "reason": "mutation.unresolvedCritical: 2 > 0 \u2014 An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "anthropic:compliance-access-key",
+        "familyName": "Enterprise organization key (sk-ant-api01-)",
+        "provider": "anthropic",
+        "reason": "mutation.unresolvedCritical: 2 > 0 \u2014 An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "aws:iam-user-secret-access-key",
+        "familyName": "IAM user secret access key",
+        "provider": "aws",
+        "reason": "metamorphic.criticalFailures: 7 > 0 \u2014 A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 1 > 0 \u2014 An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 6 > 0 \u2014 An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "github:app-server-to-server-token",
+        "familyName": "GitHub App server-to-server token",
+        "provider": "github",
+        "reason": "differential.unresolvedContractDisagreements: 23 > 0 \u2014 An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "github:app-user-to-server-token",
+        "familyName": "GitHub App user-to-server token",
+        "provider": "github",
+        "reason": "differential.unresolvedContractDisagreements: 23 > 0 \u2014 An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "github:classic-personal-access-token",
+        "familyName": "Classic personal access token",
+        "provider": "github",
+        "reason": "differential.unresolvedContractDisagreements: 23 > 0 \u2014 An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "github:oauth-access-token",
+        "familyName": "OAuth access token",
+        "provider": "github",
+        "reason": "differential.unresolvedContractDisagreements: 23 > 0 \u2014 An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "github:oauth-refresh-token",
+        "familyName": "OAuth refresh token",
+        "provider": "github",
+        "reason": "differential.unresolvedContractDisagreements: 23 > 0 \u2014 An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "polar:api-credential",
+        "familyName": "API credentials (polar_pat_, polar_at_, polar_rt_, polar_cs_, polar_crt_)",
+        "provider": "polar",
+        "reason": "documented.minimumBenignCases: 6 < 8 \u2014 Eight independent benign controls are required by the documented fixture profile. | documented.minimumTwinPairs: 4 < 5 \u2014 Five authored positive/negative twin pairs are required by the documented fixture profile."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "polar:organization-access-token",
+        "familyName": "Organization access token (polar_oat_)",
+        "provider": "polar",
+        "reason": "documented.minimumTwinPairs: 4 < 5 \u2014 Five authored positive/negative twin pairs are required by the documented fixture profile."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "sendgrid:api-key",
+        "familyName": "API key",
+        "provider": "sendgrid",
+        "reason": "metamorphic.criticalFailures: 206 > 0 \u2014 A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 30 > 0 \u2014 An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 32 > 0 \u2014 An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "twilio:api-key-secret",
+        "familyName": "API key secret",
+        "provider": "twilio",
+        "reason": "differential.unresolvedContractDisagreements: 4 > 0 \u2014 An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "vercel:app-access-token",
+        "familyName": "App access token",
+        "provider": "vercel",
+        "reason": "empirical.minimumTwinPairs: 5 < 8 \u2014 Eight independently authored twin pairs complete the 40-fixture empirical profile. | twinFailures: 1 > 0 \u2014 A twin failure is a recorded false negative on the exact discrimination this project exists to make; stable tolerates none, however small the sample. | mutation.unresolvedCritical: 2 > 0 \u2014 An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | fixtureProfile stable-empirical: 37 total fixtures < 40 (3 short) | fixtureProfile stable-empirical: 5 twin pairs < 8 (3 short)"
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "vercel:app-refresh-token",
+        "familyName": "App refresh token",
+        "provider": "vercel",
+        "reason": "empirical.minimumTwinPairs: 5 < 8 \u2014 Eight independently authored twin pairs complete the 40-fixture empirical profile. | twinFailures: 1 > 0 \u2014 A twin failure is a recorded false negative on the exact discrimination this project exists to make; stable tolerates none, however small the sample. | mutation.unresolvedCritical: 2 > 0 \u2014 An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | fixtureProfile stable-empirical: 37 total fixtures < 40 (3 short) | fixtureProfile stable-empirical: 5 twin pairs < 8 (3 short)"
+      },
+      {
+        "baselineStatus": "stable",
+        "candidateStatus": "provisional",
+        "family": "vercel:personal-access-token",
+        "familyName": "Personal access token",
+        "provider": "vercel",
+        "reason": "empirical.minimumTwinPairs: 5 < 8 \u2014 Eight independently authored twin pairs complete the 40-fixture empirical profile. | twinFailures: 1 > 0 \u2014 A twin failure is a recorded false negative on the exact discrimination this project exists to make; stable tolerates none, however small the sample. | mutation.unresolvedCritical: 2 > 0 \u2014 An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | fixtureProfile stable-empirical: 37 total fixtures < 40 (3 short) | fixtureProfile stable-empirical: 5 twin pairs < 8 (3 short)"
+      }
+    ],
+    "schemaVersion": 1,
+    "staleProviderProvenance": [
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "aws-access-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 8,
+            "confusionAxes": 6,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 6,
+            "positiveCases": 12,
+            "totalFixtures": 26,
+            "twinPairs": 6
+          },
+          "providerSource": {
+            "covers": "AKIA/ASIA/ABIA/ACCA prefixes, and AIDA as the IAM-user unique-ID prefix rather than an access key (re-checked 2026-09-20, #36); 16-character base32 body and 40-character secret are tool-corroborated",
+            "formatVersion": "IAM unique-ID prefix table",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "AKIA/ASIA/ABIA/ACCA prefixes, and AIDA as the IAM-user unique-ID prefix rather than an access key (re-checked 2026-09-20, #36); 16-character base32 body and 40-character secret are tool-corroborated",
+          "formatVersion": "IAM unique-ID prefix table",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "aws-access-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 8,
+            "confusionAxes": 7,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 8,
+            "positiveCases": 16,
+            "totalFixtures": 30,
+            "twinPairs": 6
+          },
+          "providerSource": {
+            "covers": "AKIA/ASIA/ABIA/ACCA prefixes, and AIDA as the IAM-user unique-ID prefix rather than an access key (re-checked 2026-09-20, #36); 16-character base32 body and 40-character secret are tool-corroborated",
+            "formatVersion": "IAM unique-ID prefix table",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "AKIA/ASIA/ABIA/ACCA prefixes, and AIDA as the IAM-user unique-ID prefix rather than an access key (re-checked 2026-09-20, #36); 16-character base32 body and 40-character secret are tool-corroborated",
+          "formatVersion": "IAM unique-ID prefix table",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes"
+        },
+        "candidateStatus": "stable",
+        "family": "aws:iam-user-access-key",
+        "familyName": "IAM user access key",
+        "provider": "aws"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "bearer-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "project-policy",
+          "evidenceTier": "T3",
+          "fixtureProfile": {
+            "benignCases": 19,
+            "confusionAxes": 9,
+            "contextTwinPairs": 10,
+            "controlAxes": 6,
+            "positiveAxes": 13,
+            "positiveCases": 19,
+            "totalFixtures": 52,
+            "twinPairs": 14
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 14,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": null,
+        "baselineStatus": "provisional",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "bearer-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "project-policy",
+          "evidenceTier": "T3",
+          "fixtureProfile": {
+            "benignCases": 19,
+            "confusionAxes": 9,
+            "contextTwinPairs": 10,
+            "controlAxes": 6,
+            "positiveAxes": 14,
+            "positiveCases": 19,
+            "totalFixtures": 52,
+            "twinPairs": 14
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 14,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 4,
+            "metamorphic": 14,
+            "mutation": 2
+          }
+        },
+        "candidateProviderSource": null,
+        "candidateStatus": "provisional",
+        "family": "generic:bearer-token",
+        "familyName": "Bearer credential",
+        "provider": null
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "connection-string"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "project-policy",
+          "evidenceTier": "T3",
+          "fixtureProfile": {
+            "benignCases": 24,
+            "confusionAxes": 7,
+            "contextTwinPairs": 18,
+            "controlAxes": 6,
+            "positiveAxes": 10,
+            "positiveCases": 32,
+            "totalFixtures": 74,
+            "twinPairs": 18
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 18,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": null,
+        "baselineStatus": "provisional",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "connection-string"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "project-policy",
+          "evidenceTier": "T3",
+          "fixtureProfile": {
+            "benignCases": 41,
+            "confusionAxes": 14,
+            "contextTwinPairs": 18,
+            "controlAxes": 13,
+            "positiveAxes": 19,
+            "positiveCases": 45,
+            "totalFixtures": 104,
+            "twinPairs": 18
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 18,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 2,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": null,
+        "candidateStatus": "provisional",
+        "family": "generic:connection-string-password",
+        "familyName": "Connection-string password",
+        "provider": null
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "generic-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "project-policy",
+          "evidenceTier": "T3",
+          "fixtureProfile": {
+            "benignCases": 76,
+            "confusionAxes": 5,
+            "contextTwinPairs": 10,
+            "controlAxes": 4,
+            "positiveAxes": 36,
+            "positiveCases": 79,
+            "totalFixtures": 165,
+            "twinPairs": 10
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 10,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": null,
+        "baselineStatus": "provisional",
+        "candidateEvidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "generic-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "project-policy",
+          "evidenceTier": "T3",
+          "fixtureProfile": {
+            "benignCases": 93,
+            "confusionAxes": 20,
+            "contextTwinPairs": 10,
+            "controlAxes": 16,
+            "positiveAxes": 49,
+            "positiveCases": 115,
+            "totalFixtures": 221,
+            "twinPairs": 13
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 13,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 6,
+            "metamorphic": 252,
+            "mutation": 36
+          }
+        },
+        "candidateProviderSource": null,
+        "candidateStatus": "provisional",
+        "family": "generic:unclassified-assignment-literal",
+        "familyName": "Unclassified assignment literal",
+        "provider": null
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "gitlab-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 8,
+            "confusionAxes": 7,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 6,
+            "positiveCases": 11,
+            "totalFixtures": 26,
+            "twinPairs": 7
+          },
+          "providerSource": {
+            "covers": "glpat- prefix; 20-character legacy body is tool-corroborated, routable tokens are not covered",
+            "formatVersion": "token prefix table",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.gitlab.com/security/tokens/"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 7,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "glpat- prefix; 20-character legacy body is tool-corroborated, routable tokens are not covered",
+          "formatVersion": "token prefix table",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.gitlab.com/security/tokens/"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "gitlab-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 8,
+            "confusionAxes": 7,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 16,
+            "positiveCases": 42,
+            "totalFixtures": 57,
+            "twinPairs": 7
+          },
+          "providerSource": {
+            "covers": "glpat- prefix; 20-character legacy body is tool-corroborated, routable tokens are not covered",
+            "formatVersion": "token prefix table",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.gitlab.com/security/tokens/"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 7,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "glpat- prefix; 20-character legacy body is tool-corroborated, routable tokens are not covered",
+          "formatVersion": "token prefix table",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.gitlab.com/security/tokens/"
+        },
+        "candidateStatus": "stable",
+        "family": "gitlab:legacy-personal-access-token",
+        "familyName": "Legacy personal access token",
+        "provider": "gitlab"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "linear-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 11,
+            "confusionAxes": 5,
+            "contextTwinPairs": 0,
+            "controlAxes": 4,
+            "positiveAxes": 5,
+            "positiveCases": 11,
+            "totalFixtures": 27,
+            "twinPairs": 5
+          },
+          "providerSource": {
+            "covers": "the provider documents lin_api_ for API keys and lin_oauth_ for OAuth access tokens; the 40-character body and alphabet remain tool-corroborated",
+            "formatVersion": "Linear-specific API and OAuth prefixes",
+            "observedAt": "2026-09-23",
+            "url": "https://linear.app/changelog/2021-08-19-github-secret-scanning"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 5,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "the provider documents lin_api_ for API keys and lin_oauth_ for OAuth access tokens; the 40-character body and alphabet remain tool-corroborated",
+          "formatVersion": "Linear-specific API and OAuth prefixes",
+          "observedAt": "2026-09-23",
+          "url": "https://linear.app/changelog/2021-08-19-github-secret-scanning"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "linear-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 11,
+            "confusionAxes": 5,
+            "contextTwinPairs": 0,
+            "controlAxes": 4,
+            "positiveAxes": 5,
+            "positiveCases": 8,
+            "totalFixtures": 24,
+            "twinPairs": 5
+          },
+          "providerSource": {
+            "covers": "the provider documents lin_api_ for API keys and lin_oauth_ for OAuth access tokens; the 40-character body and alphabet remain tool-corroborated",
+            "formatVersion": "Linear-specific API and OAuth prefixes",
+            "observedAt": "2026-09-23",
+            "url": "https://linear.app/changelog/2021-08-19-github-secret-scanning"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 5,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "the provider documents lin_api_ for API keys and lin_oauth_ for OAuth access tokens; the 40-character body and alphabet remain tool-corroborated",
+          "formatVersion": "Linear-specific API and OAuth prefixes",
+          "observedAt": "2026-09-23",
+          "url": "https://linear.app/changelog/2021-08-19-github-secret-scanning"
+        },
+        "candidateStatus": "stable",
+        "family": "linear:personal-api-key",
+        "familyName": "Personal API key",
+        "provider": "linear"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "npm-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 8,
+            "confusionAxes": 8,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 5,
+            "positiveCases": 10,
+            "totalFixtures": 24,
+            "twinPairs": 6
+          },
+          "providerSource": {
+            "covers": "npm_ prefix, underscore delimiter and six-character Base62 CRC32 checksum; 36-character body is tool-corroborated",
+            "formatVersion": "2021-09 npm_ prefix scheme",
+            "observedAt": "2026-09-17",
+            "url": "https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "npm_ prefix, underscore delimiter and six-character Base62 CRC32 checksum; 36-character body is tool-corroborated",
+          "formatVersion": "2021-09 npm_ prefix scheme",
+          "observedAt": "2026-09-17",
+          "url": "https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "npm-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 8,
+            "confusionAxes": 8,
+            "contextTwinPairs": 0,
+            "controlAxes": 5,
+            "positiveAxes": 15,
+            "positiveCases": 41,
+            "totalFixtures": 55,
+            "twinPairs": 6
+          },
+          "providerSource": {
+            "covers": "npm_ prefix, underscore delimiter and six-character Base62 CRC32 checksum; 36-character body is tool-corroborated",
+            "formatVersion": "2021-09 npm_ prefix scheme",
+            "observedAt": "2026-09-17",
+            "url": "https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "npm_ prefix, underscore delimiter and six-character Base62 CRC32 checksum; 36-character body is tool-corroborated",
+          "formatVersion": "2021-09 npm_ prefix scheme",
+          "observedAt": "2026-09-17",
+          "url": "https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/"
+        },
+        "candidateStatus": "stable",
+        "family": "npm:granular-access-token",
+        "familyName": "Granular access token",
+        "provider": "npm"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "postman-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 6,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 5,
+            "corroborationReferences": 5,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "bare value (the PMAK- prefix is the only marker; no keyword required)",
+              "double-quoted assignment value",
+              "lowercase-hex segments only (uppercase hex is outside the benchmark claim)",
+              "value on the line after an unrelated comment line (CRLF)"
+            ],
+            "supportsBareValues": true,
+            "uncertainty": "Postman's docs state no PMAK- grammar (only the X-API-Key header and a postman-api-key variable). Its own Insights Agent redaction config fixes PMAK- + 24 lowercase hex + '-' + 34 lowercase hex, matching gitleaks and Nosey Parker, while trufflehog corroborates only the prefix and 59-byte width. The same Postman config also redacts a bare PMAK- + 24 hex value (L32). That pattern matches the id part of every full key, so the family reads it as a prefix-level scrub and keeps the 24-hex fragment as a non-credential near miss (settled by L72, a judgement). The benchmark claims only lowercase-hex keys. No issued key has been measured, and a second Postman credential (PMAT-) exists outside the contract (redact-secret#700)."
+          },
+          "evidenceBasis": "corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 17,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 12,
+            "positiveCases": 14,
+            "totalFixtures": 40,
+            "twinPairs": 9
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 9,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": null,
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "postman-api-key"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 6,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 5,
+            "corroborationReferences": 5,
+            "issuanceDates": 0,
+            "mode": "shape",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "bare value (the PMAK- prefix is the only marker; no keyword required)",
+              "double-quoted assignment value",
+              "lowercase-hex segments only (uppercase hex is outside the benchmark claim)",
+              "value on the line after an unrelated comment line (CRLF)"
+            ],
+            "supportsBareValues": true,
+            "uncertainty": "Postman's docs state no PMAK- grammar (only the X-API-Key header and a postman-api-key variable). Its own Insights Agent redaction config fixes PMAK- + 24 lowercase hex + '-' + 34 lowercase hex, matching gitleaks and Nosey Parker, while trufflehog corroborates only the prefix and 59-byte width. The same Postman config also redacts a bare PMAK- + 24 hex value (L32). That pattern matches the id part of every full key, so the family reads it as a prefix-level scrub and keeps the 24-hex fragment as a non-credential near miss (settled by L72, a judgement). The benchmark claims only lowercase-hex keys. No issued key has been measured, and a second Postman credential (PMAT-) exists outside the contract (redact-secret#700)."
+          },
+          "evidenceBasis": "corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 18,
+            "confusionAxes": 11,
+            "contextTwinPairs": 0,
+            "controlAxes": 7,
+            "positiveAxes": 15,
+            "positiveCases": 18,
+            "totalFixtures": 46,
+            "twinPairs": 10
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 10,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": null,
+        "candidateStatus": "stable",
+        "family": "postman:api-key",
+        "familyName": "API key",
+        "provider": "postman"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "slack-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 13,
+            "confusionAxes": 6,
+            "contextTwinPairs": 0,
+            "controlAxes": 4,
+            "positiveAxes": 5,
+            "positiveCases": 28,
+            "totalFixtures": 47,
+            "twinPairs": 6
+          },
+          "providerSource": {
+            "covers": "prefixes and section structure with the secret last; numeric section widths and 24-character secret are tool-corroborated",
+            "formatVersion": "xoxb-/xoxp-/xapp-/xwfp- prefixes, dash-separated sections",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.slack.dev/authentication/tokens"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "prefixes and section structure with the secret last; numeric section widths and 24-character secret are tool-corroborated",
+          "formatVersion": "xoxb-/xoxp-/xapp-/xwfp- prefixes, dash-separated sections",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.slack.dev/authentication/tokens"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "slack-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 13,
+            "confusionAxes": 6,
+            "contextTwinPairs": 0,
+            "controlAxes": 4,
+            "positiveAxes": 5,
+            "positiveCases": 25,
+            "totalFixtures": 44,
+            "twinPairs": 6
+          },
+          "providerSource": {
+            "covers": "prefixes and section structure with the secret last; numeric section widths and 24-character secret are tool-corroborated",
+            "formatVersion": "xoxb-/xoxp-/xapp-/xwfp- prefixes, dash-separated sections",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.slack.dev/authentication/tokens"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "prefixes and section structure with the secret last; numeric section widths and 24-character secret are tool-corroborated",
+          "formatVersion": "xoxb-/xoxp-/xapp-/xwfp- prefixes, dash-separated sections",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.slack.dev/authentication/tokens"
+        },
+        "candidateStatus": "stable",
+        "family": "slack:bot-token",
+        "familyName": "Bot token",
+        "provider": "slack"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 25,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 46,
+            "totalFixtures": 79,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 46,
+            "confusionAxes": 13,
+            "contextTwinPairs": 0,
+            "controlAxes": 10,
+            "positiveAxes": 22,
+            "positiveCases": 82,
+            "totalFixtures": 136,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "candidateStatus": "stable",
+        "family": "stripe:restricted-key-live",
+        "familyName": "Live restricted key",
+        "provider": "stripe"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 25,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 46,
+            "totalFixtures": 79,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 46,
+            "confusionAxes": 13,
+            "contextTwinPairs": 0,
+            "controlAxes": 10,
+            "positiveAxes": 22,
+            "positiveCases": 82,
+            "totalFixtures": 136,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "candidateStatus": "stable",
+        "family": "stripe:restricted-key-test",
+        "familyName": "Test restricted key",
+        "provider": "stripe"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 25,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 46,
+            "totalFixtures": 79,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 46,
+            "confusionAxes": 13,
+            "contextTwinPairs": 0,
+            "controlAxes": 10,
+            "positiveAxes": 22,
+            "positiveCases": 82,
+            "totalFixtures": 136,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "candidateStatus": "stable",
+        "family": "stripe:secret-key-live",
+        "familyName": "Live secret key",
+        "provider": "stripe"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 25,
+            "confusionAxes": 9,
+            "contextTwinPairs": 0,
+            "controlAxes": 6,
+            "positiveAxes": 11,
+            "positiveCases": 46,
+            "totalFixtures": 79,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "provider-documented",
+          "evidenceTier": "T1",
+          "fixtureProfile": {
+            "benignCases": 46,
+            "confusionAxes": 13,
+            "contextTwinPairs": 0,
+            "controlAxes": 10,
+            "positiveAxes": 22,
+            "positiveCases": 82,
+            "totalFixtures": 136,
+            "twinPairs": 8
+          },
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "qualificationProfile": "documented",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": {
+          "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+          "formatVersion": "sk_/rk_/pk_ key types",
+          "observedAt": "2026-09-17",
+          "url": "https://docs.stripe.com/keys"
+        },
+        "candidateStatus": "stable",
+        "family": "stripe:secret-key-test",
+        "familyName": "Test secret key",
+        "provider": "stripe"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "twilio-auth-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 4,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-example",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 5,
+            "corroborationReferences": 7,
+            "issuanceDates": 0,
+            "mode": "context-constrained",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "same line as an Account SID (AC + 32 hex), e.g. Client(AC..., token) or Basic-auth -u AC...:token",
+              "same line as the word twilio (e.g. TWILIO_AUTH_TOKEN=, twilio_auth_token:, log/prose mentioning Twilio)"
+            ],
+            "supportsBareValues": false,
+            "uncertainty": "Twilio documents no alphabet. Its own code checks only the length (32), and one Twilio sample accepts [a-z0-9], so lowercase hex rests on scanner rules. The value has no marker, so it is claimed only beside same-line Twilio context. Secondary, regional and test tokens have no stated shape. It has not been checked against an issued token."
+          },
+          "evidenceBasis": "corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 20,
+            "confusionAxes": 7,
+            "contextTwinPairs": 12,
+            "controlAxes": 6,
+            "positiveAxes": 24,
+            "positiveCases": 28,
+            "totalFixtures": 60,
+            "twinPairs": 12
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 12,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": null,
+        "baselineStatus": "stable",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "twilio-auth-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 4,
+            "contradictions": 0,
+            "corroborationClasses": [
+              "independent-research",
+              "peer-scanner-rule",
+              "provider-example",
+              "provider-owned-code"
+            ],
+            "corroborationOwners": 5,
+            "corroborationReferences": 7,
+            "issuanceDates": 0,
+            "mode": "context-constrained",
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [
+              "same line as an Account SID (AC + 32 hex), e.g. Client(AC..., token) or Basic-auth -u AC...:token",
+              "same line as the word twilio (e.g. TWILIO_AUTH_TOKEN=, twilio_auth_token:, log/prose mentioning Twilio)"
+            ],
+            "supportsBareValues": false,
+            "uncertainty": "Twilio documents no alphabet. Its own code checks only the length (32), and one Twilio sample accepts [a-z0-9], so lowercase hex rests on scanner rules. The value has no marker, so it is claimed only beside same-line Twilio context. Secondary, regional and test tokens have no stated shape. It has not been checked against an issued token."
+          },
+          "evidenceBasis": "corroborated",
+          "evidenceTier": "T2",
+          "fixtureProfile": {
+            "benignCases": 20,
+            "confusionAxes": 7,
+            "contextTwinPairs": 12,
+            "controlAxes": 6,
+            "positiveAxes": 25,
+            "positiveCases": 32,
+            "totalFixtures": 64,
+            "twinPairs": 12
+          },
+          "providerSource": null,
+          "qualificationProfile": "empirical",
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 12,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": null,
+        "candidateStatus": "stable",
+        "family": "twilio:auth-token",
+        "familyName": "Account auth token",
+        "provider": "twilio"
+      },
+      {
+        "baselineEvidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "vercel-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "none",
+          "evidenceTier": "T0",
+          "fixtureProfile": {
+            "benignCases": 5,
+            "confusionAxes": 3,
+            "contextTwinPairs": 0,
+            "controlAxes": 3,
+            "positiveAxes": 1,
+            "positiveCases": 15,
+            "totalFixtures": 20,
+            "twinPairs": 0
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 0,
+            "unprobeable": {
+              "observedAt": "2026-09-20",
+              "reason": "The positive is T0 pending. Vercel documents the prefixes as scanning markers but states the body is intentionally opaque, so no lexical grammar exists to mutate; deferred until a shipped scanner rule or Vercel's own documentation states one body length/alphabet rule in prose."
+            }
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "baselineProviderSource": null,
+        "baselineStatus": "pending",
+        "candidateEvidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "vercel-token"
+          ],
+          "empiricalEvidence": {
+            "boundedContradictions": 0,
+            "contradictions": 0,
+            "corroborationClasses": [],
+            "corroborationOwners": 0,
+            "corroborationReferences": 0,
+            "issuanceDates": 0,
+            "mode": null,
+            "observations": 0,
+            "subjects": 0,
+            "supportedContexts": [],
+            "supportsBareValues": false,
+            "uncertainty": null
+          },
+          "evidenceBasis": "none",
+          "evidenceTier": "T0",
+          "fixtureProfile": {
+            "benignCases": 5,
+            "confusionAxes": 3,
+            "contextTwinPairs": 0,
+            "controlAxes": 3,
+            "positiveAxes": 0,
+            "positiveCases": 0,
+            "totalFixtures": 5,
+            "twinPairs": 0
+          },
+          "providerSource": null,
+          "qualificationProfile": null,
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 0,
+            "unprobeable": {
+              "observedAt": "2026-09-20",
+              "reason": "The positive is T0 pending. Vercel documents the prefixes as scanning markers but states the body is intentionally opaque, so no lexical grammar exists to mutate; deferred until a shipped scanner rule or Vercel's own documentation states one body length/alphabet rule in prose."
+            }
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "candidateProviderSource": null,
+        "candidateStatus": "pending",
+        "family": "vercel:access-token",
+        "familyName": "Compatibility aggregate (unreviewed Vercel token shapes)",
+        "provider": "vercel"
+      }
+    ],
+    "summary": {
+      "improvements": 0,
+      "newAndUnclassified": 11,
+      "regressions": 15,
+      "staleProviderProvenance": 15
+    },
+    "taxonomySchemaVersion": null
+  },
+  "version": "0.1.0-beta.15"
+}

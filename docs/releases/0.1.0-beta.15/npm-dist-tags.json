@@ -1,0 +1,86 @@
+{
+  "observedAtUTC": "2026-10-10T19:53:59.183730+00:00",
+  "records": [
+    {
+      "package": "@redact-secret/core",
+      "distTags": {
+        "beta": "0.1.0-beta.15",
+        "latest": "0.1.0-beta.14"
+      },
+      "url": "https://registry.npmjs.org/-/package/%40redact-secret%2Fcore/dist-tags"
+    },
+    {
+      "package": "@redact-secret/node-darwin-arm64",
+      "distTags": {
+        "beta": "0.1.0-beta.15",
+        "latest": "0.1.0-beta.14"
+      },
+      "url": "https://registry.npmjs.org/-/package/%40redact-secret%2Fnode-darwin-arm64/dist-tags"
+    },
+    {
+      "package": "@redact-secret/node-darwin-x64",
+      "distTags": {
+        "latest": "0.1.0-beta.14",
+        "beta": "0.1.0-beta.15"
+      },
+      "url": "https://registry.npmjs.org/-/package/%40redact-secret%2Fnode-darwin-x64/dist-tags"
+    },
+    {
+      "package": "@redact-secret/node-linux-arm64-gnu",
+      "distTags": {
+        "beta": "0.1.0-beta.15",
+        "latest": "0.1.0-beta.14"
+      },
+      "url": "https://registry.npmjs.org/-/package/%40redact-secret%2Fnode-linux-arm64-gnu/dist-tags"
+    },
+    {
+      "package": "@redact-secret/node-linux-arm64-musl",
+      "distTags": {
+        "latest": "0.1.0-beta.14",
+        "beta": "0.1.0-beta.15"
+      },
+      "url": "https://registry.npmjs.org/-/package/%40redact-secret%2Fnode-linux-arm64-musl/dist-tags"
+    },
+    {
+      "package": "@redact-secret/node-linux-x64-gnu",
+      "distTags": {
+        "latest": "0.1.0-beta.14",
+        "beta": "0.1.0-beta.15"
+      },
+      "url": "https://registry.npmjs.org/-/package/%40redact-secret%2Fnode-linux-x64-gnu/dist-tags"
+    },
+    {
+      "package": "@redact-secret/node-linux-x64-musl",
+      "distTags": {
+        "beta": "0.1.0-beta.15",
+        "latest": "0.1.0-beta.14"
+      },
+      "url": "https://registry.npmjs.org/-/package/%40redact-secret%2Fnode-linux-x64-musl/dist-tags"
+    },
+    {
+      "package": "@redact-secret/node-win32-arm64-msvc",
+      "distTags": {
+        "latest": "0.1.0-beta.14",
+        "beta": "0.1.0-beta.15"
+      },
+      "url": "https://registry.npmjs.org/-/package/%40redact-secret%2Fnode-win32-arm64-msvc/dist-tags"
+    },
+    {
+      "package": "@redact-secret/node-win32-x64-msvc",
+      "distTags": {
+        "beta": "0.1.0-beta.15",
+        "latest": "0.1.0-beta.14"
+      },
+      "url": "https://registry.npmjs.org/-/package/%40redact-secret%2Fnode-win32-x64-msvc/dist-tags"
+    },
+    {
+      "package": "@redact-secret/wasm",
+      "distTags": {
+        "latest": "0.1.0-beta.14",
+        "beta": "0.1.0-beta.15"
+      },
+      "url": "https://registry.npmjs.org/-/package/%40redact-secret%2Fwasm/dist-tags"
+    }
+  ],
+  "registryWrites": 0
+}
