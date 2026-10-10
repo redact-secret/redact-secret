@@ -5,6 +5,13 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Changed
+
+- For the 0.1.0-beta.15 candidate, Linux Node addon selection omits network
+  collection from its libc diagnostic report when Node provides `excludeNetwork`,
+  restoring the previous setting after the probe. GNU/musl package selection
+  retains the same header signal.
+
 ## 0.1.0-beta.15 (release candidate)
 
 ### Compatibility and qualification
@@ -22,6 +29,11 @@ evidence is linked from each published version.
   and package rehearsal must bind to the final merged beta.15 SHA. Historical
   #1283 measurements do not approve this candidate. [Preparation and final
   evidence](https://github.com/redact-secret/redact-secret/issues/1320).
+
+### Changed
+
+- The Linux Node startup change under [Unreleased](#unreleased) is included in
+  this candidate.
 
 ### Added
 

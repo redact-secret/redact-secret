@@ -227,10 +227,18 @@ const LINUX_PLATFORM_PACKAGES: Readonly<Partial<Record<string, Readonly<Record<"
  * same signal napi-rs's own platform detection uses.
  */
 function detectLinuxLibc(): "gnu" | "musl" {
-  const report = process.report.getReport() as {
-    header?: { glibcVersionRuntime?: unknown };
-  };
-  return typeof report.header?.glibcVersionRuntime === "string" ? "gnu" : "musl";
+  const diagnostic = process.report as typeof process.report & { excludeNetwork?: boolean };
+  const previous = diagnostic.excludeNetwork;
+  try {
+    // Libc selection reads only the header, so omit network collection when Node supports it.
+    if (typeof previous === "boolean") diagnostic.excludeNetwork = true;
+    const report = diagnostic.getReport() as {
+      header?: { glibcVersionRuntime?: unknown };
+    };
+    return typeof report.header?.glibcVersionRuntime === "string" ? "gnu" : "musl";
+  } finally {
+    if (typeof previous === "boolean") diagnostic.excludeNetwork = previous;
+  }
 }
 
 /**

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { resolveAddonSpecifier } from "../src/runtime/node.js";
 
@@ -54,6 +54,16 @@ function withLibc<T>(libc: "gnu" | "musl", fn: () => T): T {
   }
 }
 
+function withReport<T>(report: { getReport: () => unknown; excludeNetwork?: boolean }, fn: () => T): T {
+  const descriptor = Object.getOwnPropertyDescriptor(process, "report");
+  Object.defineProperty(process, "report", { value: report, configurable: true });
+  try {
+    return fn();
+  } finally {
+    if (descriptor) Object.defineProperty(process, "report", descriptor);
+  }
+}
+
 describe("resolveAddonSpecifier", () => {
   it.each(NON_LINUX)("maps %s/%s to %s", (platform, arch, specifier) => {
     expect(withHost(platform, arch, () => resolveAddonSpecifier())).toBe(specifier);
@@ -87,5 +97,61 @@ describe("resolveAddonSpecifier", () => {
     const musl = withHost("linux", "x64", () => withLibc("musl", () => resolveAddonSpecifier()));
 
     expect(gnu).not.toBe(musl);
+  });
+
+  it.each([
+    ["gnu", false],
+    ["gnu", true],
+    ["musl", false],
+    ["musl", true],
+  ] as const)("omits network collection for %s and restores excludeNetwork=%s", (libc, previous) => {
+    const report = {
+      excludeNetwork: previous as boolean,
+      getReport: () => {
+        expect(report.excludeNetwork).toBe(true);
+        return libc === "gnu" ? { header: { glibcVersionRuntime: "2.31" } } : { header: {} };
+      },
+    };
+    expect(withHost("linux", "x64", () => withReport(report, resolveAddonSpecifier))).toBe(
+      `@redact-secret/node-linux-x64-${libc}`,
+    );
+    expect(report.excludeNetwork).toBe(previous);
+  });
+
+  it("leaves an older Node report without excludeNetwork unchanged", () => {
+    const report = {
+      getReport: () => {
+        expect(Object.hasOwn(report, "excludeNetwork")).toBe(false);
+        return { header: { glibcVersionRuntime: "2.31" } };
+      },
+    };
+    expect(withHost("linux", "x64", () => withReport(report, resolveAddonSpecifier))).toBe(
+      "@redact-secret/node-linux-x64-gnu",
+    );
+    expect(Object.hasOwn(report, "excludeNetwork")).toBe(false);
+  });
+
+  it.each([false, true])("restores excludeNetwork=%s and rethrows a report failure", (previous) => {
+    const failure = new Error("synthetic report failure");
+    const report = {
+      excludeNetwork: previous,
+      getReport: () => {
+        expect(report.excludeNetwork).toBe(true);
+        throw failure;
+      },
+    };
+    expect(() => withHost("linux", "x64", () => withReport(report, resolveAddonSpecifier))).toThrow(failure);
+    expect(report.excludeNetwork).toBe(previous);
+  });
+
+  it.each([
+    ["darwin", "arm64"],
+    ["freebsd", "x64"],
+    ["linux", "ia32"],
+  ])("does not collect or change reports for %s/%s", (platform, arch) => {
+    const report = { excludeNetwork: false, getReport: vi.fn() };
+    withHost(platform, arch, () => withReport(report, resolveAddonSpecifier));
+    expect(report.getReport).not.toHaveBeenCalled();
+    expect(report.excludeNetwork).toBe(false);
   });
 });

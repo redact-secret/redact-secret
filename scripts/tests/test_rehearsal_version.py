@@ -315,6 +315,17 @@ class WorkflowWiringTests(unittest.TestCase):
         self.assertIn("--allow-dirty", text)
         self.assertNotIn("cargo package --no-verify --locked -p redact-secret-cli", text)
 
+    def test_both_custom_receipt_producer_and_verifier_receive_the_rehearsal_version(self) -> None:
+        text = self.read("artifact-qualification.yml")
+        steps = re.findall(r"^      - name: .*?(?=^      - name:|^  [a-z0-9-]+:|\Z)", text, re.M | re.S)
+        for consumer in ("node scripts/qualify-configuration.mjs", "python3 -B scripts/record-artifact-inventory.py"):
+            matching = [step for step in steps if consumer in step]
+            self.assertEqual(len(matching), 1, consumer)
+            # The composite apply action's step-local env does not reach these processes.
+            before_run = matching[0].split("        run:", 1)[0]
+            self.assertIn("        env:\n", before_run, consumer)
+            self.assertIn("          REHEARSAL_VERSION: ${{ inputs.rehearsal-version }}\n", before_run, consumer)
+
 
 if __name__ == "__main__":
     unittest.main()
