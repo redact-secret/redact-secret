@@ -367,6 +367,13 @@ How it works:
   optional `rehearsal-version` input, empty for `release.yml` and for every
   push or pull request run, so those paths are unchanged. The inventory job's
   `cargo package` passes `--allow-dirty` only when a rehearsal version is set.
+- Custom rehearsal builds retain `sourceTreeDirty: true` and a null manifest
+  source revision. Their separate `rehearsal-source/v1` receipt binds the
+  original commit/tree and run-derived version to the exact lockstep rewrite.
+  Inventory recomputes that receipt and checks every emitted file hash.
+  Extra tracked edits, hidden index flags, staged changes outside the rewrite,
+  relevant untracked source, mode changes and symlinks fail verification.
+  Ordinary candidates still require clean source and an exact manifest revision.
 - The suffix is `-beta.<run id>` because the Python wheel qualification
   (`scripts/qualify-python-wheel.py`) and the quickstart pin check
   (`scripts/clean-install-doc.mjs`) accept only `X.Y.Z-beta.N`, and PEP 440 has

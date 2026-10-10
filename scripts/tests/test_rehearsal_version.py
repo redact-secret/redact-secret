@@ -4,6 +4,7 @@ import importlib.util
 import json
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -22,6 +23,7 @@ def load(name: str, filename: str):
 
 
 REHEARSAL = load("rehearsal_version", "rehearsal-version.py")
+INVENTORY = load("rehearsal_inventory", "record-artifact-inventory.py")
 WORKSPACE = load("check_rust_workspace_for_rehearsal", "check-rust-workspace.py")
 
 THROWAWAY = "0.1.0-beta.9876543210"
@@ -140,6 +142,106 @@ class ApplyTests(unittest.TestCase):
         (self.root / "packages/javascript/src/version.ts").write_text('export const VERSION = "9.9.9";\n')
         with self.assertRaises(REHEARSAL.RehearsalError):
             REHEARSAL.apply(self.root, THROWAWAY)
+
+
+class ProvenanceTests(unittest.TestCase):
+    def setUp(self) -> None:
+        scratch = tempfile.TemporaryDirectory()
+        self.addCleanup(scratch.cleanup)
+        self.root = Path(scratch.name)
+        copy_lockstep_tree(self.root)
+        source = self.root / "crates/synthetic.rs"
+        source.parent.mkdir(parents=True)
+        source.write_text("// synthetic unchanged source\n")
+        self.git("init", "-q")
+        self.git("add", ".")
+        self.git("-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "-qm", "synthetic source")
+        self.source = self.git("rev-parse", "HEAD").strip()
+        REHEARSAL.apply(self.root, THROWAWAY)
+
+    def git(self, *args: str) -> str:
+        return subprocess.check_output(["git", *args], cwd=self.root).decode()
+
+    def receipt(self) -> dict:
+        return REHEARSAL.provenance(self.root, self.source, THROWAWAY, "9876543210")
+
+    def test_exact_unstaged_or_staged_transform_has_identical_receipt(self) -> None:
+        receipt = self.receipt()
+        self.git("add", ".")
+        self.assertEqual(self.receipt(), receipt)
+        self.assertEqual(receipt["sourceCommit"], self.source)
+        self.assertEqual(receipt["rehearsalVersion"], THROWAWAY)
+        self.assertTrue(receipt["files"])
+
+    def test_inventory_adapter_recomputes_proof_and_translates_rejection(self) -> None:
+        self.assertEqual(
+            INVENTORY.rehearsal_source_provenance(self.root, self.source, THROWAWAY, "9876543210"), self.receipt()
+        )
+        with self.assertRaisesRegex(ValueError, "source transform is not verified"):
+            INVENTORY.rehearsal_source_provenance(self.root, self.source, THROWAWAY, "9876543211")
+
+    def test_unrelated_source_edit_or_relevant_untracked_source_is_rejected(self) -> None:
+        source = self.root / "crates/synthetic.rs"
+        original = source.read_bytes()
+        source.write_bytes(original + b"// changed\n")
+        with self.assertRaises(REHEARSAL.RehearsalError):
+            self.receipt()
+        source.write_bytes(original)
+        (self.root / "crates/untracked.rs").write_text("// untracked\n")
+        with self.assertRaises(REHEARSAL.RehearsalError):
+            self.receipt()
+
+    def test_hidden_staged_edit_and_extra_bytes_in_allowed_file_are_rejected(self) -> None:
+        path = self.root / "Cargo.toml"
+        expected = path.read_bytes()
+        path.write_bytes(expected + b"\n# extra\n")
+        self.git("add", "Cargo.toml")
+        path.write_bytes(expected)
+        with self.assertRaises(REHEARSAL.RehearsalError):
+            self.receipt()
+        self.git("reset", "-q", "HEAD", "Cargo.toml")
+        path.write_bytes(expected + b"\n# extra\n")
+        with self.assertRaises(REHEARSAL.RehearsalError):
+            self.receipt()
+
+    def test_source_run_version_and_file_mode_mismatches_are_rejected(self) -> None:
+        for source, version, run in (
+            ("f" * 40, THROWAWAY, "9876543210"),
+            (self.source, THROWAWAY, "9876543211"),
+            (self.source, "0.1.0-beta.15", "9876543210"),
+        ):
+            with self.assertRaises(REHEARSAL.RehearsalError):
+                REHEARSAL.provenance(self.root, source, version, run)
+        (self.root / "Cargo.toml").chmod(0o755)
+        with self.assertRaises(REHEARSAL.RehearsalError):
+            self.receipt()
+
+    def test_hidden_index_flags_and_symlink_are_rejected(self) -> None:
+        source = self.root / "crates/synthetic.rs"
+        original = source.read_bytes()
+        for flag in ("assume-unchanged", "skip-worktree"):
+            self.git("update-index", f"--{flag}", "crates/synthetic.rs")
+            source.write_bytes(original + b"// hidden change\n")
+            with self.assertRaises(REHEARSAL.RehearsalError):
+                self.receipt()
+            source.write_bytes(original)
+            self.git("update-index", f"--no-{flag}", "crates/synthetic.rs")
+        path = self.root / "Cargo.toml"
+        target = self.root / "copied.toml"
+        target.write_bytes(path.read_bytes())
+        path.unlink()
+        path.symlink_to(target)
+        with self.assertRaises(REHEARSAL.RehearsalError):
+            self.receipt()
+
+    def test_unrelated_staged_edit_reverted_on_disk_is_rejected(self) -> None:
+        path = self.root / "crates/synthetic.rs"
+        original = path.read_bytes()
+        path.write_bytes(original + b"// staged change\n")
+        self.git("add", "crates/synthetic.rs")
+        path.write_bytes(original)
+        with self.assertRaises(REHEARSAL.RehearsalError):
+            self.receipt()
 
 
 class UnpublishedProbeTests(unittest.TestCase):

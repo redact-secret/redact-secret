@@ -9,6 +9,7 @@ import tempfile
 import unittest
 import unittest.mock
 from pathlib import Path
+from unittest import mock
 
 SCRIPT = Path(__file__).resolve().parents[1] / "record-artifact-inventory.py"
 SPEC = importlib.util.spec_from_file_location("record_artifact_inventory", SCRIPT)
@@ -1033,6 +1034,32 @@ class ConfigurationQualificationTests(unittest.TestCase):
         self.assertTrue(self.collect()[1])
         (self.directory / "candidate" / self.report["packages"][0]["file"]).write_bytes(b"changed")
         self.assertTrue(self.collect()[1])
+
+    def test_rehearsal_requires_a_recomputed_matching_source_transform(self) -> None:
+        proof = {
+            "schema": "rehearsal-source/v1",
+            "sourceCommit": SOURCE_COMMIT,
+            "files": {"Cargo.toml": {"after": "synthetic"}},
+        }
+        self.build["engine"].update(sourceTreeDirty=True, rehearsalSource=proof)
+        self.manifest["sourceRevision"] = None
+        with (
+            mock.patch.dict(os.environ, {"REHEARSAL_VERSION": PRODUCT_VERSION, "GITHUB_RUN_ID": "9876543210"}),
+            mock.patch.object(RECORD, "rehearsal_source_provenance", return_value=proof),
+        ):
+            record, errors = self.collect()
+            self.assertEqual(errors, [])
+            self.assertEqual(record["rehearsalSource"], proof)
+            self.build["engine"]["rehearsalSource"] = {**proof, "sourceCommit": "f" * 40}
+            self.assertTrue(self.collect()[1])
+            self.build["engine"]["rehearsalSource"] = proof
+            self.manifest["sourceRevision"] = SOURCE_COMMIT
+            self.assertTrue(self.collect()[1])
+        with (
+            mock.patch.dict(os.environ, {"REHEARSAL_VERSION": PRODUCT_VERSION}),
+            mock.patch.object(RECORD, "rehearsal_source_provenance", side_effect=ValueError("proof rejected")),
+        ):
+            self.assertTrue(self.collect()[1])
 
     def test_malformed_nested_evidence_returns_errors(self) -> None:
         for value in (None, [], {"workerd": None}, {"chromium": {}, "workerd": {}}):
