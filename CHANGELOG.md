@@ -23,6 +23,12 @@ evidence is linked from each published version.
   #1283 measurements do not approve this candidate. [Preparation and final
   evidence](https://github.com/redact-secret/redact-secret/issues/1320).
 
+### Changed
+
+- Linux Node addon selection omits network collection from its libc diagnostic
+  report when Node provides `excludeNetwork`, restoring the previous setting
+  after the probe. GNU/musl package selection retains the same header signal.
+
 ### Added
 
 - PII evidence regression controls (#1293, #1295): seeded email, phone and
