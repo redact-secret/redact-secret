@@ -299,7 +299,7 @@ jobs:
       # `record-manifest` embeds into the durable manifest (acceptance criterion 1).
       - name: Upload the support-matrix drift record
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: support-matrix-drift
           path: support-matrix-drift.json
@@ -381,13 +381,13 @@ jobs:
           version: ${{ inputs.rehearsal-version }}
 
       - name: Set up the floor Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 20
           cache: npm
 
       - name: Set up stable Rust with the addon target
-        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
+        uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
         with:
           toolchain: stable
           targets: ${{ matrix.target }}
@@ -484,7 +484,7 @@ jobs:
 
       - name: Set up Node 22
         if: matrix.smoke == 'host'
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
 
@@ -494,7 +494,7 @@ jobs:
 
       - name: Set up Node 24
         if: matrix.smoke == 'host'
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
 
@@ -524,7 +524,7 @@ jobs:
             node scripts/qualify-node-addon.mjs --target ${{ matrix.target }} --detector-profile common
 
       - name: Upload the addon
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: node-addon-${{ matrix.target }}
           path: |
@@ -564,13 +564,13 @@ jobs:
           version: ${{ inputs.rehearsal-version }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: npm
 
       - name: Set up stable Rust with the wasm32 target
-        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
+        uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
         with:
           toolchain: stable
           targets: wasm32-unknown-unknown
@@ -612,7 +612,7 @@ jobs:
 
       - name: Upload the browser artifact
         if: matrix.engine == 'chromium'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: wasm-web
           path: bindings/wasm/pkg/
@@ -621,7 +621,7 @@ jobs:
 
       - name: Upload the common browser artifact
         if: matrix.engine == 'chromium'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: wasm-web-common
           path: bindings/wasm/pkg-common/
@@ -667,12 +667,12 @@ jobs:
           version: ${{ inputs.rehearsal-version }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 20
 
       - name: Set up stable Rust with the CLI target
-        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
+        uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
         with:
           toolchain: stable
           targets: ${{ matrix.target }}
@@ -689,7 +689,7 @@ jobs:
         run: node scripts/qualify-cli-binary.mjs --target ${{ matrix.target }}
 
       - name: Upload the CLI binary
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: cli-${{ matrix.target }}
           path: |
@@ -716,13 +716,13 @@ jobs:
           persist-credentials: false
 
       - name: Set up the floor Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 20
           cache: npm
 
       - name: Set up stable Rust with the macOS ARM target
-        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
+        uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
         with:
           toolchain: stable
           targets: aarch64-apple-darwin
@@ -780,7 +780,7 @@ jobs:
           version: ${{ inputs.rehearsal-version }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -797,7 +797,7 @@ jobs:
       # (`npm/<platform>/package.json`); Node's loader opens a `.node` file
       # itself, so nothing here needs napi's generated `index.js`.
       - name: Download this host's Node addon
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: node-addon-x86_64-unknown-linux-gnu
           path: bindings/node
@@ -805,7 +805,7 @@ jobs:
       # The `browser` job's own qualified build, reused here rather than
       # rebuilt.
       - name: Download the qualified wasm-bindgen build
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: wasm-web
           path: dist/wasm-web
@@ -818,7 +818,7 @@ jobs:
             --report installed-javascript-node-${{ matrix.node-version }}.json
 
       - name: Upload installed Node qualification evidence
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: installed-javascript-node-${{ matrix.node-version }}
           path: installed-javascript-node-${{ matrix.node-version }}.json
@@ -853,7 +853,7 @@ jobs:
           version: ${{ inputs.rehearsal-version }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: npm
@@ -865,13 +865,13 @@ jobs:
         run: npm run js:build
 
       - name: Download this host's Node addon
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: node-addon-x86_64-unknown-linux-gnu
           path: bindings/node
 
       - name: Download the qualified wasm-bindgen build
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: wasm-web
           path: dist/wasm-web
@@ -888,7 +888,7 @@ jobs:
             --report installed-javascript-browser-${{ matrix.engine }}.json
 
       - name: Upload installed browser qualification evidence
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: installed-javascript-browser-${{ matrix.engine }}
           path: installed-javascript-browser-${{ matrix.engine }}.json
@@ -922,7 +922,7 @@ jobs:
           version: ${{ inputs.rehearsal-version }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: npm
@@ -934,13 +934,13 @@ jobs:
         run: npm run js:build
 
       - name: Download the qualified wasm-bindgen build
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: wasm-web
           path: dist/wasm-web
 
       - name: Download the qualified common wasm-bindgen build
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: wasm-web-common
           path: dist/wasm-web-common
@@ -969,7 +969,7 @@ jobs:
           node scripts/qualify-workerd-artifact.mjs --candidate-dir edge-candidate --detector-profile common --pii --report edge-reports/common-on.json
 
       - name: Record installed Cloudflare Workers qualification
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: edge-runtime-cloudflare-workers
           path: edge-reports/*.json
@@ -1010,7 +1010,7 @@ jobs:
           version: ${{ inputs.rehearsal-version }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: npm
@@ -1024,21 +1024,21 @@ jobs:
 
       - name: Download this host's Node addon
         if: matrix.lane != 'python'
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: node-addon-x86_64-unknown-linux-gnu
           path: candidate-inputs/addon
 
       - name: Download the qualified wasm-bindgen build
         if: matrix.lane != 'python'
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: wasm-web
           path: candidate-inputs/wasm-web
 
       - name: Download the qualified common wasm-bindgen build
         if: matrix.lane != 'python'
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: wasm-web-common
           path: candidate-inputs/wasm-web-common
@@ -1054,7 +1054,7 @@ jobs:
 
       - name: Download this host's wheel
         if: matrix.lane == 'python'
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: python-wheel-x86_64-unknown-linux-gnu
           path: candidate
@@ -1071,7 +1071,7 @@ jobs:
             --report "clean-install-${{ matrix.lane }}.json"
 
       - name: Upload clean-install qualification evidence
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: clean-install-${{ matrix.lane }}
           path: clean-install-${{ matrix.lane }}.json
@@ -1116,7 +1116,7 @@ jobs:
           version: ${{ inputs.rehearsal-version }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: npm
@@ -1128,19 +1128,19 @@ jobs:
         run: npm run js:build
 
       - name: Download this host's Node addon
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: node-addon-x86_64-unknown-linux-gnu
           path: candidate-inputs/addon
 
       - name: Download the qualified wasm-bindgen build
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: wasm-web
           path: candidate-inputs/wasm-web
 
       - name: Download the qualified common wasm-bindgen build
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: wasm-web-common
           path: candidate-inputs/wasm-web-common
@@ -1161,7 +1161,7 @@ jobs:
             --report "golden-path-${{ matrix.lane }}.json"
 
       - name: Upload golden-path qualification evidence
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: golden-path-${{ matrix.lane }}
           path: golden-path-${{ matrix.lane }}.json
@@ -1198,13 +1198,13 @@ jobs:
           version: ${{ inputs.rehearsal-version }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: npm
 
       - name: Set up stable Rust with the wasm32 target
-        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
+        uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
         with:
           toolchain: stable
           targets: wasm32-unknown-unknown
@@ -1224,31 +1224,31 @@ jobs:
         run: npm run js:build
 
       - name: Download this host's Node addon
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: node-addon-x86_64-unknown-linux-gnu
           path: target/configuration-qualification/inputs/addon
 
       - name: Download the qualified wasm-bindgen build
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: wasm-web
           path: target/configuration-qualification/inputs/wasm-web
 
       - name: Download the qualified common wasm-bindgen build
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: wasm-web-common
           path: target/configuration-qualification/inputs/wasm-web-common
 
       - name: Download this host's CLI binary
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: cli-x86_64-unknown-linux-gnu
           path: target/configuration-qualification/inputs/cli
 
       - name: Download this host's wheel
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: python-wheel-x86_64-unknown-linux-gnu
           path: target/configuration-qualification/inputs/wheel
@@ -1284,7 +1284,7 @@ jobs:
             --report target/configuration-qualification/configuration-journeys.json
 
       - name: Upload configuration qualification evidence
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: configuration-journeys
           path: |
@@ -1396,14 +1396,14 @@ jobs:
 
       - name: Set up Node.js
         if: needs.plan.outputs.full == 'true'
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: npm
 
       - name: Set up stable Rust
         if: needs.plan.outputs.full == 'true'
-        uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
+        uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
         with:
           toolchain: stable
 
@@ -1417,7 +1417,7 @@ jobs:
 
       - name: Download every artifact this run produced
         if: needs.plan.outputs.full == 'true'
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: qualification-artifacts
 
@@ -1480,7 +1480,7 @@ jobs:
 
       - name: Upload the artifact inventory
         if: needs.plan.outputs.full == 'true'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: artifact-inventory
           path: artifact-inventory.json
