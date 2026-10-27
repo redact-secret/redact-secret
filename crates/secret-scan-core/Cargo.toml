@@ -30,7 +30,7 @@ name = "redact_secret"
 [dependencies]
 # Pure, table-driven Unicode NFC. It performs no I/O and keeps context
 # normalization identical across native and WebAssembly artifacts.
-unicode-normalization = "=0.1.25"
+unicode-normalization = "=0.1.26"
 
 [dev-dependencies]
 # Test-only. Dev-dependencies are outside the core boundary because they never
